@@ -95,4 +95,19 @@ describe('Validator', function() {
             expect(v.getErrors()).to.have.lengthOf(1)
         })
     })
+    describe('#validateRequired()', function() {
+        var rules = [{ name: 'email', rules: 'required'}]
+        it('should pass validation for required rule', function() {
+            var v = Validator.make(
+                { email: 'rati@example.com' },rules
+            )
+            expect(v.passes()).to.be.true
+        })
+        it('should fail validation for required rule', function() {
+            var v = Validator.make(
+                { name: 'Rati' }, rules
+            )
+            expect(v.fails()).to.be.true
+        })
+    })
 })
