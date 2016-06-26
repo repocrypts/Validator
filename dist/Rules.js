@@ -27,7 +27,6 @@ var Rules = function () {
     }], [{
         key: 'validateRequired',
         value: function validateRequired(name, value, params) {
-            console.log('validateRequired:', name, value);
             if (value === null) {
                 return false;
             } else if (typeof value === 'string' && value.trim() === '') {
@@ -78,7 +77,6 @@ var Rules = function () {
     }, {
         key: 'validateMin',
         value: function validateMin(name, value, params) {
-            console.log('validateMin: ', name, value, params);
             return value.length >= params[0];
         }
     }, {
@@ -86,7 +84,6 @@ var Rules = function () {
         value: function validateNumeric(name, value) {
             var params = arguments.length <= 2 || arguments[2] === undefined ? null : arguments[2];
 
-            console.log('validateNumeric:', name, value, params);
             return this.validateMatch(name, value, /^-?\d+(\.\d*)?$/);
         }
     }, {
@@ -94,7 +91,6 @@ var Rules = function () {
         value: function validateInteger(name, value) {
             var params = arguments.length <= 2 || arguments[2] === undefined ? null : arguments[2];
 
-            console.log('validateInteger:', name, value, params);
             return this.validateMatch(name, value, /^-?\d+$/);
         }
     }, {
@@ -102,7 +98,6 @@ var Rules = function () {
         value: function validateEmail(name, value) {
             var params = arguments.length <= 2 || arguments[2] === undefined ? null : arguments[2];
 
-            console.log('validateEmail:', name, value, params);
             return this.validateMatch(name, value, /^[A-Z0-9._%+\-]+@[A-Z0-9.\-]+\.[A-Z]{2,4}$/i);
         }
     }]);

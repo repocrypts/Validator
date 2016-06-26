@@ -2,14 +2,14 @@
   "name": "js-validator",
   "version": "1.0.0",
   "description": "",
-  "main": "dist/index.js",
+  "main": "dist/Validator.js",
   "scripts": {
-    "test": "mocha src/index.test.js --compilers js:babel-register",
+    "test": "mocha src/Validator.test.js --compilers js:babel-register",
     "prebuild": "rimraf dist",
     "build": "npm-run-all --parallel build:*",
     "build:main": "babel --out-dir dist --ignore *.test.js src",
-    "build:umd": "webpack --output-filename index.umd.js",
-    "build:umd.min": "webpack --output-filename index.umd.min.js -p"
+    "build:umd": "webpack --output-filename Validator.umd.js",
+    "build:umd.min": "webpack --output-filename Validator.umd.min.js -p"
   },
   "author": "Rati Wannapanop <rati.wannapanop@gmail.com>",
   "license": "MIT",

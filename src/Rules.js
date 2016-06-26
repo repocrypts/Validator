@@ -17,7 +17,6 @@ export default class Rules {
     }
 
     static validateRequired(name, value, params) {
-        console.log('validateRequired:', name, value)
         if (value === null) {
             return false
         } else if (typeof(value) === 'string' && value.trim() === '') {
@@ -64,22 +63,18 @@ export default class Rules {
     }
 
     static validateMin(name, value, params) {
-      console.log('validateMin: ', name, value, params)
       return value.length >= params[0]
     }
 
     static validateNumeric(name, value, params = null) {
-        console.log('validateNumeric:', name, value, params)
         return this.validateMatch(name, value, /^-?\d+(\.\d*)?$/)
     }
 
     static validateInteger(name, value, params = null) {
-        console.log('validateInteger:', name, value, params)
         return this.validateMatch(name, value, /^-?\d+$/)
     }
 
     static validateEmail(name, value, params = null) {
-        console.log('validateEmail:', name, value, params)
         return this.validateMatch(name, value, /^[A-Z0-9._%+\-]+@[A-Z0-9.\-]+\.[A-Z]{2,4}$/i)
     }
 }

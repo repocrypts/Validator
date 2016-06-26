@@ -56,44 +56,21 @@ return /******/ (function(modules) { // webpackBootstrap
 
 	'use strict';
 	
-	var _Validator = __webpack_require__(1);
-	
-	var _Validator2 = _interopRequireDefault(_Validator);
-	
-	function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { default: obj }; }
-	
-	var rules = [{ name: 'name', rules: 'required|min:3' }, { name: 'email', rules: 'required|email|unique:users' }, { name: 'age', rules: 'integer' }];
-	
-	var data = {
-	    name: 'Rati',
-	    email: 'rati@mui.co.th'
-	};
-	
-	var vv = _Validator2.default.make(data, rules);
-	
-	console.log(data, rules, vv.passes());
-
-/***/ },
-/* 1 */
-/***/ function(module, exports, __webpack_require__) {
-
-	'use strict';
-	
 	Object.defineProperty(exports, "__esModule", {
 	    value: true
 	});
 	
 	var _createClass = function () { function defineProperties(target, props) { for (var i = 0; i < props.length; i++) { var descriptor = props[i]; descriptor.enumerable = descriptor.enumerable || false; descriptor.configurable = true; if ("value" in descriptor) descriptor.writable = true; Object.defineProperty(target, descriptor.key, descriptor); } } return function (Constructor, protoProps, staticProps) { if (protoProps) defineProperties(Constructor.prototype, protoProps); if (staticProps) defineProperties(Constructor, staticProps); return Constructor; }; }();
 	
-	var _Rules = __webpack_require__(2);
+	var _Rules = __webpack_require__(1);
 	
 	var _Rules2 = _interopRequireDefault(_Rules);
 	
-	var _Messages = __webpack_require__(3);
+	var _Messages = __webpack_require__(2);
 	
 	var _Messages2 = _interopRequireDefault(_Messages);
 	
-	var _Replacers = __webpack_require__(4);
+	var _Replacers = __webpack_require__(3);
 	
 	var _Replacers2 = _interopRequireDefault(_Replacers);
 	
@@ -266,7 +243,7 @@ return /******/ (function(modules) { // webpackBootstrap
 	exports.default = Validator;
 
 /***/ },
-/* 2 */
+/* 1 */
 /***/ function(module, exports) {
 
 	'use strict';
@@ -298,7 +275,6 @@ return /******/ (function(modules) { // webpackBootstrap
 	    }], [{
 	        key: 'validateRequired',
 	        value: function validateRequired(name, value, params) {
-	            console.log('validateRequired:', name, value);
 	            if (value === null) {
 	                return false;
 	            } else if (typeof value === 'string' && value.trim() === '') {
@@ -349,7 +325,6 @@ return /******/ (function(modules) { // webpackBootstrap
 	    }, {
 	        key: 'validateMin',
 	        value: function validateMin(name, value, params) {
-	            console.log('validateMin: ', name, value, params);
 	            return value.length >= params[0];
 	        }
 	    }, {
@@ -357,7 +332,6 @@ return /******/ (function(modules) { // webpackBootstrap
 	        value: function validateNumeric(name, value) {
 	            var params = arguments.length <= 2 || arguments[2] === undefined ? null : arguments[2];
 	
-	            console.log('validateNumeric:', name, value, params);
 	            return this.validateMatch(name, value, /^-?\d+(\.\d*)?$/);
 	        }
 	    }, {
@@ -365,7 +339,6 @@ return /******/ (function(modules) { // webpackBootstrap
 	        value: function validateInteger(name, value) {
 	            var params = arguments.length <= 2 || arguments[2] === undefined ? null : arguments[2];
 	
-	            console.log('validateInteger:', name, value, params);
 	            return this.validateMatch(name, value, /^-?\d+$/);
 	        }
 	    }, {
@@ -373,7 +346,6 @@ return /******/ (function(modules) { // webpackBootstrap
 	        value: function validateEmail(name, value) {
 	            var params = arguments.length <= 2 || arguments[2] === undefined ? null : arguments[2];
 	
-	            console.log('validateEmail:', name, value, params);
 	            return this.validateMatch(name, value, /^[A-Z0-9._%+\-]+@[A-Z0-9.\-]+\.[A-Z]{2,4}$/i);
 	        }
 	    }]);
@@ -384,7 +356,7 @@ return /******/ (function(modules) { // webpackBootstrap
 	exports.default = Rules;
 
 /***/ },
-/* 3 */
+/* 2 */
 /***/ function(module, exports) {
 
 	"use strict";
@@ -428,7 +400,7 @@ return /******/ (function(modules) { // webpackBootstrap
 	}, _defineProperty(_accepted$active_url$, "integer", "The :attr must be an integer."), _defineProperty(_accepted$active_url$, "ip", "The :attr must be a valid IP address."), _defineProperty(_accepted$active_url$, "match", "The :attr format is invalid."), _defineProperty(_accepted$active_url$, "max", "The :attr must not exceed :max."), _defineProperty(_accepted$active_url$, "not_in", "The selected :attr is invalid."), _defineProperty(_accepted$active_url$, "numeric", "The :attr must be a number."), _defineProperty(_accepted$active_url$, "regex", "The :attr format is invalid."), _defineProperty(_accepted$active_url$, "required", "The :attr field is required."), _defineProperty(_accepted$active_url$, "required_if", "The :attr field is required when :other is :value."), _defineProperty(_accepted$active_url$, "required_with", "The :attr field is required when :values is present."), _defineProperty(_accepted$active_url$, "required_without", "The :attr field is required when :values is not present."), _defineProperty(_accepted$active_url$, "same", "The :attr and :other must match."), _defineProperty(_accepted$active_url$, "size", "The :attr must be :size."), _defineProperty(_accepted$active_url$, "unique", "The :attr has already been taken."), _defineProperty(_accepted$active_url$, "url", "The :attr format is invalid."), _accepted$active_url$);
 
 /***/ },
-/* 4 */
+/* 3 */
 /***/ function(module, exports) {
 
 	'use strict';
@@ -462,4 +434,4 @@ return /******/ (function(modules) { // webpackBootstrap
 /******/ ])
 });
 ;
-//# sourceMappingURL=index.umd.js.map
+//# sourceMappingURL=Validator.umd.js.map

@@ -24,4 +24,14 @@ describe('Validator', function() {
             expect(Validator.make(data, rules)).to.be.ok
         })
     })
+    describe('hasError', function() {
+        it('should returns errors', function() {
+            var v = Validator.make({name: 'Test'}, [{
+                name: 'name',
+                rules: 'required|min:6'
+            }])
+            v.passes()
+            expect(v.hasError()).to.be.true
+        })
+    })
 })
