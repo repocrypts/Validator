@@ -107,7 +107,7 @@ var Validator = function () {
                     allValid = allValid && isValid;
 
                     if (!isValid) {
-                        console.log(rule.name, rule.params + '** invalid');
+                        // console.log(rule.name, rule.params + '** invalid')
                         self.errors.push({
                             name: name,
                             rule: rule.name,

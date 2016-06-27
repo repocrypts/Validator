@@ -163,7 +163,7 @@ return /******/ (function(modules) { // webpackBootstrap
 	                    allValid = allValid && isValid;
 	
 	                    if (!isValid) {
-	                        console.log(rule.name, rule.params + '** invalid');
+	                        // console.log(rule.name, rule.params + '** invalid')
 	                        self.errors.push({
 	                            name: name,
 	                            rule: rule.name,
@@ -269,7 +269,6 @@ return /******/ (function(modules) { // webpackBootstrap
 	            var numericRules = ['Numeric', 'Integer'];
 	            var implicitRules = ['Required', 'Filled', 'RequiredWith', 'RequiredWithAll', 'RequiredWithout', 'RequiredWithoutAll', 'RequiredIf', 'RequiredUnless', 'Accepted', 'Present'];
 	
-	            // 'Array', 'Boolean', 'Integer', 'Numeric', 'String',
 	            var dependentRules = ['RequiredWith', 'RequiredWithAll', 'RequiredWithout', 'RequiredWithoutAll', 'RequiredIf', 'RequiredUnless', 'Confirmed', 'Same', 'Different', 'Unique', 'Before', 'After'];
 	        }
 	    }], [{

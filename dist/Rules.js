@@ -21,7 +21,6 @@ var Rules = function () {
             var numericRules = ['Numeric', 'Integer'];
             var implicitRules = ['Required', 'Filled', 'RequiredWith', 'RequiredWithAll', 'RequiredWithout', 'RequiredWithoutAll', 'RequiredIf', 'RequiredUnless', 'Accepted', 'Present'];
 
-            // 'Array', 'Boolean', 'Integer', 'Numeric', 'String',
             var dependentRules = ['RequiredWith', 'RequiredWithAll', 'RequiredWithout', 'RequiredWithoutAll', 'RequiredIf', 'RequiredUnless', 'Confirmed', 'Same', 'Different', 'Unique', 'Before', 'After'];
         }
     }], [{
