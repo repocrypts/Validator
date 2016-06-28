@@ -101,6 +101,15 @@ var Rules = function () {
             return this.validateSame(name, value, [name + '_confirmation']);
         }
     }, {
+        key: 'validateAccept',
+        value: function validateAccept(name, value) {
+            var params = arguments.length <= 2 || arguments[2] === undefined ? null : arguments[2];
+
+            var acceptable = ['yes', 'on', '1', 1, true, 'true'];
+
+            return this.validateRequired(name, value) && acceptable.indexOf(value) > -1;
+        }
+    }, {
         key: 'validateSame',
         value: function validateSame(name, value, params) {
             this.requireParameterCount(1, params, 'same');

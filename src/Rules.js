@@ -102,6 +102,12 @@ export default class Rules {
         return this.validateSame(name, value, [name+'_confirmation'])
     }
 
+    static validateAccept(name, value, params = null) {
+        var acceptable = ['yes', 'on', '1', 1, true, 'true']
+
+        return this.validateRequired(name, value) && (acceptable.indexOf(value) > -1)
+    }
+
     static validateSame(name, value, params) {
         this.requireParameterCount(1, params, 'same')
 
