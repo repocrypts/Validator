@@ -215,5 +215,43 @@ describe('Validator', function() {
             expect(v.passes()).to.be.false
         })
     })
-
+    describe('#validateNumeric()', function() {
+        var rules = [
+            { name: 'amount', rules: 'numeric' }
+        ]
+        it('should pass numeric validation', function() {
+            var v = Validator.make({ amount: '100.25'}, rules)
+            expect(v.passes()).to.be.true
+        })
+        it('should fail numeric validation', function() {
+            var v = Validator.make({ amount: '100AAB.00'}, rules)
+            expect(v.passes()).to.be.false
+        })
+    })
+    describe('#validateInteger()', function() {
+        var rules = [
+            { name: 'amount', rules: 'integer' }
+        ]
+        it('should pass integer validation', function() {
+            var v = Validator.make({ amount: '100'}, rules)
+            expect(v.passes()).to.be.true
+        })
+        it('should fail integer validation', function() {
+            var v = Validator.make({ amount: '100.25'}, rules)
+            expect(v.passes()).to.be.false
+        })
+    })
+    describe('#validateEmail()', function() {
+        var rules = [
+            { name: 'email', rules: 'email' }
+        ]
+        it('should pass email validation', function() {
+            var v = Validator.make({ email: 'rati@example.com'}, rules)
+            expect(v.passes()).to.be.true
+        })
+        it('should fail email validation', function() {
+            var v = Validator.make({ email: 'example.com'}, rules)
+            expect(v.passes()).to.be.false
+        })
+    })
 })
