@@ -266,13 +266,6 @@ return /******/ (function(modules) { // webpackBootstrap
 	        key: 'constractor',
 	        value: function constractor() {
 	            this.validator = null;
-	
-	            this.dateRules = ['Before', 'After', 'DateBetween'];
-	            this.sizeRules = ['Size', 'Between', 'Min', 'Max'];
-	            this.numericRules = ['Numeric', 'Integer'];
-	            this.implicitRules = ['Required', 'Filled', 'RequiredWith', 'RequiredWithAll', 'RequiredWithout', 'RequiredWithoutAll', 'RequiredIf', 'RequiredUnless', 'Accepted', 'Present'];
-	
-	            this.dependentRules = ['RequiredWith', 'RequiredWithAll', 'RequiredWithout', 'RequiredWithoutAll', 'RequiredIf', 'RequiredUnless', 'Confirmed', 'Same', 'Different', 'Unique', 'Before', 'After'];
 	        }
 	    }], [{
 	        key: 'setValidator',
@@ -432,6 +425,31 @@ return /******/ (function(modules) { // webpackBootstrap
 	            var params = arguments.length <= 2 || arguments[2] === undefined ? null : arguments[2];
 	
 	            return this.validateMatch(name, value, /^[A-Z0-9._%+\-]+@[A-Z0-9.\-]+\.[A-Z]{2,4}$/i);
+	        }
+	    }, {
+	        key: 'dateRules',
+	        get: function get() {
+	            return ['Before', 'After', 'DateBetween'];
+	        }
+	    }, {
+	        key: 'sizeRules',
+	        get: function get() {
+	            return ['Size', 'Between', 'Min', 'Max'];
+	        }
+	    }, {
+	        key: 'numericRules',
+	        get: function get() {
+	            return ['Numeric', 'Integer'];
+	        }
+	    }, {
+	        key: 'implicitRules',
+	        get: function get() {
+	            return ['Required', 'Filled', 'RequiredWith', 'RequiredWithAll', 'RequiredWithout', 'RequiredWithoutAll', 'RequiredIf', 'RequiredUnless', 'Accepted', 'Present'];
+	        }
+	    }, {
+	        key: 'dependentRules',
+	        get: function get() {
+	            return ['RequiredWith', 'RequiredWithAll', 'RequiredWithout', 'RequiredWithoutAll', 'RequiredIf', 'RequiredUnless', 'Confirmed', 'Same', 'Different', 'Unique', 'Before', 'After'];
 	        }
 	    }]);
 	

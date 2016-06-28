@@ -1,16 +1,29 @@
 export default class Rules {
     constractor() {
         this.validator = null
+    }
 
-        this.dateRules = ['Before', 'After', 'DateBetween']
-        this.sizeRules = ['Size', 'Between', 'Min', 'Max']
-        this.numericRules = ['Numeric', 'Integer']
-        this.implicitRules = [
+    static get dateRules() {
+        return ['Before', 'After', 'DateBetween']
+    }
+
+    static get sizeRules() {
+        return ['Size', 'Between', 'Min', 'Max']
+    }
+
+    static get numericRules() {
+        return ['Numeric', 'Integer']
+    }
+
+    static get implicitRules() {
+        return [
             'Required', 'Filled', 'RequiredWith', 'RequiredWithAll', 'RequiredWithout', 'RequiredWithoutAll',
             'RequiredIf', 'RequiredUnless', 'Accepted', 'Present',
         ]
+    }
 
-        this.dependentRules = [
+    static get dependentRules() {
+        return [
             'RequiredWith', 'RequiredWithAll', 'RequiredWithout', 'RequiredWithoutAll',
             'RequiredIf', 'RequiredUnless', 'Confirmed', 'Same', 'Different', 'Unique',
             'Before', 'After',
