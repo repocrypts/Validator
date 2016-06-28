@@ -26,6 +26,53 @@ describe('Validator', function() {
             expect(Validator.make(data, rules)).to.be.ok
         })
     })
+    describe('#parseEachRule()', function() {
+        var rules = [
+            { name: 'name', rules: 'required|min:3' },
+            { name: 'group', rules: 'not_in:admin,exec'}
+        ]
+        var v = Validator.make({name: 'Rati'}, rules)
+
+        it('should parse each rule correctly', function() {
+            var arr = v.parseEachRule(rules[0].rules)
+            expect(arr).to.be.lengthOf(2)
+            expect(arr).to.deep.equal([
+                { name: 'Required', params: [] },
+                { name: 'Min', params: ['3'] }
+            ])
+
+            var arr = v.parseEachRule(rules[1].rules)
+            expect(arr).to.deep.equal([
+                { name: 'NotIn', params: ['admin', 'exec'] }
+            ])
+        })
+    })
+    describe('#parseRules()', function() {
+        var rules = [
+            { name: 'name', rules: 'required|min:3' },
+            { name: 'group', rules: 'not_in:admin,exec'}
+        ]
+        var v = Validator.make({name: 'Rati'}, rules)
+
+        it('should parse all rules correctly', function() {
+            var arr = v.parseRules(rules)
+            expect(arr).to.deep.equal([
+                {
+                    name: 'name',
+                    rules: [
+                        { name: 'Required', params: [] },
+                        { name: 'Min', params: ['3'] }
+                    ]
+                },
+                {
+                    name: 'group',
+                    rules: [
+                        { name: 'NotIn', params: ['admin', 'exec']}
+                    ]
+                }
+            ])
+        })
+    })
     describe('#hasError()', function() {
         it('should return errors', function() {
             var v = Validator.make({name: 'Test'}, [{
@@ -155,4 +202,18 @@ describe('Validator', function() {
             expect(v.passes()).to.be.false
         })
     })
+    describe('#validateNotIn()', function() {
+        var rules = [
+            { name: 'name', rules: 'not_in:mom,dad,children'}
+        ]
+        it('should pass validation', function() {
+            var v = Validator.make({ name: 'me' }, rules)
+            expect(v.passes()).to.be.true
+        })
+        it('should fail validation', function() {
+            var v = Validator.make({ name: 'dad' }, rules)
+            expect(v.passes()).to.be.false
+        })
+    })
+
 })

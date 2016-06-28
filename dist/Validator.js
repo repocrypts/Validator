@@ -64,7 +64,7 @@ var Validator = function () {
             rule.split('|').forEach(function (ruleAndArgs) {
                 var args = ruleAndArgs.split(':');
                 arr.push({
-                    name: self.titleCase(args[0]),
+                    name: self.titleCase(args[0], '_'),
                     params: args[1] ? args[1].split(',') : []
                 });
             });

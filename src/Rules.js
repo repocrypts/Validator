@@ -142,12 +142,14 @@ export default class Rules {
     }
 
     static validateIn(name, value, params) {
-        var arr = params[0].split(',')
+        this.requireParameterCount(1, params, 'in')
 
-        return arr.indexOf(value) >= 0
+        return params.indexOf(value) >= 0
     }
 
     static validateNotIn(name, value, params) {
+        this.requireParameterCount(1, params, 'not_in')
+
         return ! this.validateIn(name, value, params)
     }
 
