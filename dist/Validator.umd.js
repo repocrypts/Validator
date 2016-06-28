@@ -368,6 +368,22 @@ return /******/ (function(modules) { // webpackBootstrap
 	            return typeof other !== 'undefined' && value !== other;
 	        }
 	    }, {
+	        key: 'validateSize',
+	        value: function validateSize(name, value, params) {
+	            this.requireParameterCount(1, params, 'size');
+	
+	            return this.getSize(name, value) == params[0];
+	        }
+	    }, {
+	        key: 'validateBetween',
+	        value: function validateBetween(name, value, params) {
+	            this.requireParameterCount(2, params, 'between');
+	
+	            var size = this.getSize(name, value);
+	
+	            return size >= params[0] && size <= params[1];
+	        }
+	    }, {
 	        key: 'validateMin',
 	        value: function validateMin(name, value, params) {
 	            this.requireParameterCount(1, params, 'min');
@@ -427,6 +443,61 @@ return /******/ (function(modules) { // webpackBootstrap
 	            var params = arguments.length <= 2 || arguments[2] === undefined ? null : arguments[2];
 	
 	            return this.validateMatch(name, value, /^[A-Z0-9._%+\-]+@[A-Z0-9.\-]+\.[A-Z]{2,4}$/i);
+	        }
+	    }, {
+	        key: 'validateIp',
+	        value: function validateIp(name, value) {
+	            var params = arguments.length <= 2 || arguments[2] === undefined ? null : arguments[2];
+	
+	            var segments = value.split('.');
+	
+	            if (segments.length === 4 && this.validateBetween(name, segments[0], [1, 255]) && this.validateBetween(name, segmentg[1], [0, 255]) && this.validateBetween(name, segmentg[2], [0, 255]) && this.validateBetween(name, segmentg[3], [1, 255])) {
+	                return true;
+	            }
+	
+	            return false;
+	        }
+	    }, {
+	        key: 'validateUrl',
+	        value: function validateUrl(name, value) {
+	            var params = arguments.length <= 2 || arguments[2] === undefined ? null : arguments[2];
+	
+	            return this.validateMatch(name, value, /^(https?|ftp):\/\/[^\s\/$.?#].[^\s]*$/i);
+	        }
+	    }, {
+	        key: 'validateAlpha',
+	        value: function validateAlpha(name, value, params) {
+	            return this.validateMatch(name, value, /^([a-z])+$/i);
+	        }
+	    }, {
+	        key: 'validateAlphaNum',
+	        value: function validateAlphaNum(name, value, params) {
+	            return this.validateMatch(name, value, /^([a-z0-9])+$/i);
+	        }
+	    }, {
+	        key: 'validateAlphaDash',
+	        value: function validateAlphaDash(name, value, params) {
+	            return this.validateMatch(name, value, /^([a-z0-9_\-])+$/i);
+	        }
+	    }, {
+	        key: 'validateBefore',
+	        value: function validateBefore(name, value, params) {
+	            this.requireParameterCount(1, params, 'before');
+	
+	            return Date.parse(value) < Date.parse(params[0]);
+	        }
+	    }, {
+	        key: 'validateAfter',
+	        value: function validateAfter(name, value, params) {
+	            this.requireParameterCount(1, params, 'after');
+	
+	            return Date.parse(value) > Date.parse(params[0]);
+	        }
+	    }, {
+	        key: 'validateDateBetween',
+	        value: function validateDateBetween(name, value, params) {
+	            var date = Date.parse(value);
+	            return date >= Date.parse(params[0]) && date <= Date.parse(params[1]);
 	        }
 	    }, {
 	        key: 'dateRules',

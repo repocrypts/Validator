@@ -118,6 +118,20 @@ export default class Rules {
         return typeof(other) !== 'undefined' && value !== other
     }
 
+    static validateSize(name, value, params) {
+        this.requireParameterCount(1, params, 'size')
+
+        return this.getSize(name, value) == params[0]
+    }
+
+    static validateBetween(name, value, params) {
+        this.requireParameterCount(2, params, 'between')
+
+        var size = this.getSize(name, value)
+
+        return size >= params[0] && size <= params[1]
+    }
+
     static validateMin(name, value, params) {
         this.requireParameterCount(1, params, 'min')
 
@@ -163,5 +177,53 @@ export default class Rules {
 
     static validateEmail(name, value, params = null) {
         return this.validateMatch(name, value, /^[A-Z0-9._%+\-]+@[A-Z0-9.\-]+\.[A-Z]{2,4}$/i)
+    }
+
+    static validateIp(name, value, params = null) {
+        var segments = value.split('.')
+
+        if (segments.length === 4 &&
+                this.validateBetween(name, segments[0], [1, 255]) &&
+                this.validateBetween(name, segmentg[1], [0, 255]) &&
+                this.validateBetween(name, segmentg[2], [0, 255]) &&
+                this.validateBetween(name, segmentg[3], [1, 255])
+            ) {
+            return true
+        }
+
+        return false
+    }
+
+    static validateUrl(name, value, params = null) {
+        return this.validateMatch(name, value, /^(https?|ftp):\/\/[^\s\/$.?#].[^\s]*$/i)
+    }
+
+    static validateAlpha(name, value, params) {
+        return this.validateMatch(name, value, /^([a-z])+$/i)
+    }
+
+    static validateAlphaNum(name, value, params) {
+        return this.validateMatch(name, value, /^([a-z0-9])+$/i)
+    }
+
+    static validateAlphaDash(name, value, params) {
+        return this.validateMatch(name, value, /^([a-z0-9_\-])+$/i)
+    }
+
+    static validateBefore(name, value, params) {
+        this.requireParameterCount(1, params, 'before')
+
+        return (Date.parse(value) < Date.parse(params[0]))
+    }
+
+    static validateAfter(name, value, params) {
+        this.requireParameterCount(1, params, 'after')
+
+        return (Date.parse(value) > Date.parse(params[0]))
+    }
+
+    static validateDateBetween(name, value, params) {
+        var date = Date.parse(value)
+        return date >= Date.parse(params[0]) && date <= Date.parse(params[1])
     }
 }
