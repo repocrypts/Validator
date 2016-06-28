@@ -111,10 +111,48 @@ describe('Validator', function() {
             expect(v.fails()).to.be.true
         })
     })
-    // describe('#validatePresent()', function() {
-    //     var data = { email: 'rati@example.com' }
-    //     it('should pass validation', function() {
-    //         expect(Rules.validatePresent('email'))
-    //     })
-    // })
+    describe('#getSize()', function() {
+        it('should return correct parameter value', function() {
+            expect(Rules.getSize('name', 'Rati')).to.equal(4)
+        })
+    })
+    describe('#validateMin()', function() {
+        var rules = [
+            { name: 'name', rules: 'min:3'}
+        ]
+        it('should pass validation', function() {
+            var v = Validator.make({ name: 'Rati' }, rules)
+            expect(v.passes()).to.be.true
+        })
+        it('should fail validation', function() {
+            var v = Validator.make({ name: 'Ra' }, rules)
+            expect(v.passes()).to.be.false
+        })
+    })
+    describe('#validateMax()', function() {
+        var rules = [
+            { name: 'name', rules: 'max:3'}
+        ]
+        it('should pass validation', function() {
+            var v = Validator.make({ name: 'Rat' }, rules)
+            expect(v.passes()).to.be.true
+        })
+        it('should fail validation', function() {
+            var v = Validator.make({ name: 'Rati' }, rules)
+            expect(v.passes()).to.be.false
+        })
+    })
+    describe('#validateIn()', function() {
+        var rules = [
+            { name: 'name', rules: 'in:mom,dad,children'}
+        ]
+        it('should pass validation', function() {
+            var v = Validator.make({ name: 'dad' }, rules)
+            expect(v.passes()).to.be.true
+        })
+        it('should fail validation', function() {
+            var v = Validator.make({ name: 'me' }, rules)
+            expect(v.passes()).to.be.false
+        })
+    })
 })
