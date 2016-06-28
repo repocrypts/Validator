@@ -128,6 +128,22 @@ var Rules = function () {
             return typeof other !== 'undefined' && value !== other;
         }
     }, {
+        key: 'validateDigits',
+        value: function validateDigits(name, value, params) {
+            this.requireParameterCount(1, params, 'digits');
+
+            return this.validateNumeric(name, value) && value.toString().length == params[0];
+        }
+    }, {
+        key: 'validateDigitsBetween',
+        value: function validateDigitsBetween(name, value, params) {
+            this.requireParameterCount(2, params, 'digits_between');
+
+            var len = value.toString().length;
+
+            return this.validateNumeric(name, value) && len >= params[0] && len <= params[1];
+        }
+    }, {
         key: 'validateSize',
         value: function validateSize(name, value, params) {
             this.requireParameterCount(1, params, 'size');

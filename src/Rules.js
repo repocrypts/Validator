@@ -124,6 +124,22 @@ export default class Rules {
         return typeof(other) !== 'undefined' && value !== other
     }
 
+    static validateDigits(name, value, params) {
+        this.requireParameterCount(1, params, 'digits')
+
+        return this.validateNumeric(name, value)
+            && value.toString().length == params[0]
+    }
+
+    static validateDigitsBetween(name, value, params) {
+        this.requireParameterCount(2, params, 'digits_between')
+
+        var len = value.toString().length
+
+        return this.validateNumeric(name, value)
+            && len >= params[0] && len <= params[1]
+    }
+
     static validateSize(name, value, params) {
         this.requireParameterCount(1, params, 'size')
 
