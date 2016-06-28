@@ -1,5 +1,6 @@
 import { expect } from 'chai'
 import Validator from './Validator'
+import Rules from './Rules'
 
 let rules = [
     {name: 'name', rules: 'required|min:3'},
@@ -110,4 +111,10 @@ describe('Validator', function() {
             expect(v.fails()).to.be.true
         })
     })
+    // describe('#validatePresent()', function() {
+    //     var data = { email: 'rati@example.com' }
+    //     it('should pass validation', function() {
+    //         expect(Rules.validatePresent('email'))
+    //     })
+    // })
 })

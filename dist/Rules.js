@@ -16,14 +16,43 @@ var Rules = function () {
     _createClass(Rules, [{
         key: 'constractor',
         value: function constractor() {
-            var dateRules = ['Before', 'After', 'DateBetween'];
-            var sizeRules = ['Size', 'Between', 'Min', 'Max'];
-            var numericRules = ['Numeric', 'Integer'];
-            var implicitRules = ['Required', 'Filled', 'RequiredWith', 'RequiredWithAll', 'RequiredWithout', 'RequiredWithoutAll', 'RequiredIf', 'RequiredUnless', 'Accepted', 'Present'];
+            this.validator = null;
 
-            var dependentRules = ['RequiredWith', 'RequiredWithAll', 'RequiredWithout', 'RequiredWithoutAll', 'RequiredIf', 'RequiredUnless', 'Confirmed', 'Same', 'Different', 'Unique', 'Before', 'After'];
+            this.dateRules = ['Before', 'After', 'DateBetween'];
+            this.sizeRules = ['Size', 'Between', 'Min', 'Max'];
+            this.numericRules = ['Numeric', 'Integer'];
+            this.implicitRules = ['Required', 'Filled', 'RequiredWith', 'RequiredWithAll', 'RequiredWithout', 'RequiredWithoutAll', 'RequiredIf', 'RequiredUnless', 'Accepted', 'Present'];
+
+            this.dependentRules = ['RequiredWith', 'RequiredWithAll', 'RequiredWithout', 'RequiredWithoutAll', 'RequiredIf', 'RequiredUnless', 'Confirmed', 'Same', 'Different', 'Unique', 'Before', 'After'];
         }
     }], [{
+        key: 'setValidator',
+        value: function setValidator(validator) {
+            this.validator = validator;
+        }
+    }, {
+        key: 'data',
+        value: function data(name) {
+            return this.validator.data[name];
+        }
+    }, {
+        key: 'isImplicit',
+        value: function isImplicit(rule) {
+            return this.implicitRules.indexOf(rule) > -1;
+        }
+    }, {
+        key: 'hasRule',
+        value: function hasRule(name, rules) {
+            return rules.indexOf(name) >= 0;
+        }
+    }, {
+        key: 'requireParameterCount',
+        value: function requireParameterCount(count, params, rule) {
+            if (params.length < count) {
+                console.error('Validation rule ' + rule + ' requires at least ' + count + ' parameters');
+            }
+        }
+    }, {
         key: 'validateRequired',
         value: function validateRequired(name, value, params) {
             if (value === null) {
@@ -74,9 +103,65 @@ var Rules = function () {
             return this.validateMatch(name, value, params);
         }
     }, {
+        key: 'validateConfirmed',
+        value: function validateConfirmed(name, value) {
+            return this.validateSame(name, value, [name + '_confirmation']);
+        }
+    }, {
+        key: 'validateSame',
+        value: function validateSame(name, value, params) {
+            this.requireParameterCount(1, params, 'same');
+
+            var other = this.data[params[0]];
+
+            return typeof other !== 'undefined' && value === other;
+        }
+    }, {
+        key: 'validateDifferent',
+        value: function validateDifferent(name, value, params) {
+            this.requireParameterCount(1, params, 'different');
+
+            var other = this.data[params[0]];
+
+            return typeof other !== 'undefined' && value !== other;
+        }
+    }, {
         key: 'validateMin',
         value: function validateMin(name, value, params) {
-            return value.length >= params[0];
+            this.requireParameterCount(1, params, 'min');
+
+            return this.getSize(name, value) >= params[0];
+        }
+    }, {
+        key: 'validateMax',
+        value: function validateMax(name, value, params) {
+            this.requireParameterCount(1, params, 'max');
+
+            return this.getSize(name, value) <= params[0];
+        }
+    }, {
+        key: 'getSize',
+        value: function getSize(name, value) {
+            var hasNumeric = this.hasRule(name, this.numericRules);
+
+            if (hasNumeric && !isNaN(parseInt(value))) {
+                return value;
+            }
+
+            // for array and string
+            return value.length;
+        }
+    }, {
+        key: 'validateIn',
+        value: function validateIn(name, value, params) {
+            var arr = params[0].split(',');
+
+            return arr.indexOf(value) >= 0;
+        }
+    }, {
+        key: 'validateNotIn',
+        value: function validateNotIn(name, value, params) {
+            return !this.validateIn(name, value, params);
         }
     }, {
         key: 'validateNumeric',

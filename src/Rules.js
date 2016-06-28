@@ -1,19 +1,32 @@
 export default class Rules {
     constractor() {
-        const dateRules = ['Before', 'After', 'DateBetween']
-        const sizeRules = ['Size', 'Between', 'Min', 'Max']
-        const numericRules = ['Numeric', 'Integer']
-        const implicitRules = [
+        this.validator = null
+
+        this.dateRules = ['Before', 'After', 'DateBetween']
+        this.sizeRules = ['Size', 'Between', 'Min', 'Max']
+        this.numericRules = ['Numeric', 'Integer']
+        this.implicitRules = [
             'Required', 'Filled', 'RequiredWith', 'RequiredWithAll', 'RequiredWithout', 'RequiredWithoutAll',
             'RequiredIf', 'RequiredUnless', 'Accepted', 'Present',
-            // 'Array', 'Boolean', 'Integer', 'Numeric', 'String',
         ]
 
-        const dependentRules = [
+        this.dependentRules = [
             'RequiredWith', 'RequiredWithAll', 'RequiredWithout', 'RequiredWithoutAll',
             'RequiredIf', 'RequiredUnless', 'Confirmed', 'Same', 'Different', 'Unique',
             'Before', 'After',
         ]
+    }
+
+    static setValidator(validator) {
+        this.validator = validator
+    }
+
+    static data(name) {
+        return this.validator.data[name]
+    }
+
+    static isImplicit(rule) {
+        return this.implicitRules.indexOf(rule) > -1
     }
 
     static hasRule(name, rules) {
@@ -70,6 +83,26 @@ export default class Rules {
 
     static validateRegex(name, value, params) {
         return this.validateMatch(name, value, params);
+    }
+
+    static validateConfirmed(name, value) {
+        return this.validateSame(name, value, [name+'_confirmation'])
+    }
+
+    static validateSame(name, value, params) {
+        this.requireParameterCount(1, params, 'same')
+
+        var other = this.data[params[0]]
+
+        return typeof(other) !== 'undefined' && value === other
+    }
+
+    static validateDifferent(name, value, params) {
+        this.requireParameterCount(1, params, 'different')
+
+        var other = this.data[params[0]]
+
+        return typeof(other) !== 'undefined' && value !== other
     }
 
     static validateMin(name, value, params) {

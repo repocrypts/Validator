@@ -8,6 +8,7 @@ export default class Validator {
         this.rules = this.parseRules(rules)
         this.errors = []
         this.customMessages = customMessages
+        this.validations = new Validations(this)
     }
 
     static make(data, rules, customMessages = []) {

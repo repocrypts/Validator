@@ -32,6 +32,7 @@ var Validator = function () {
         this.rules = this.parseRules(rules);
         this.errors = [];
         this.customMessages = customMessages;
+        this.validations = new _Rules2.default(this);
     }
 
     _createClass(Validator, [{
