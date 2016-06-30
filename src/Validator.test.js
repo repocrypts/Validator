@@ -310,4 +310,13 @@ describe('Validator', function() {
             expect(v.passes()).to.be.false
         })
     })
+    describe('# Rules.data()', function() {
+        let rules = [
+            { name: 'email', rules: 'email' }
+        ]
+        it('test', function() {
+            let v = Validator.make({ email: 'rati@example.com'}, rules)
+            console.dir(v.validations.data('email'))
+        })
+    })
 })

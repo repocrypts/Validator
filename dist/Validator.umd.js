@@ -258,26 +258,18 @@ return /******/ (function(modules) { // webpackBootstrap
 	function _classCallCheck(instance, Constructor) { if (!(instance instanceof Constructor)) { throw new TypeError("Cannot call a class as a function"); } }
 	
 	var Rules = function () {
-	    function Rules() {
+	    function Rules(validator) {
 	        _classCallCheck(this, Rules);
+	
+	        this.validator = validator;
 	    }
 	
 	    _createClass(Rules, [{
-	        key: 'constractor',
-	        value: function constractor() {
-	            this.validator = null;
-	        }
-	    }], [{
-	        key: 'setValidator',
-	        value: function setValidator(validator) {
-	            this.validator = validator;
-	        }
-	    }, {
 	        key: 'data',
 	        value: function data(name) {
 	            return this.validator.data[name];
 	        }
-	    }, {
+	    }], [{
 	        key: 'isImplicit',
 	        value: function isImplicit(rule) {
 	            return this.implicitRules.indexOf(rule) > -1;
@@ -553,6 +545,63 @@ return /******/ (function(modules) { // webpackBootstrap
 	
 	    return Rules;
 	}();
+	
+	/*
+	## tested
+	required
+	min
+	max
+	in
+	not_in
+	numeric
+	integer
+	email
+	
+	## untested
+	present
+	match
+	regex
+	confirmed
+	accept
+	same
+	different
+	digits
+	digits_between
+	size
+	between
+	ip
+	url
+	alpha
+	alpha_num
+	alpha_dash
+	before (date)
+	after (date)
+	date_between (date)
+	
+	## pending
+	array
+	boolean
+	date
+	date_format
+	dimensions
+	distinct
+	filled
+	image (File)
+	in_array
+	json
+	mime_types
+	required_if
+	required_unless
+	required_with
+	required_with_all
+	required_without
+	required_without_all
+	string
+	timezone
+	exists (DB)
+	unique (DB)
+	 */
+	
 	
 	exports.default = Rules;
 
