@@ -16,46 +16,45 @@ let data = {
 let v = new Validator(data, rules)
 
 describe('Validator', function() {
-    describe('new Validator', function() {
-        it('should be instantiatable', function() {
+    describe('instantiatable', function() {
+        it('instantiatable using new Validator(...)', function() {
             expect(new Validator(data, rules)).to.be.ok
         })
-    })
-    describe('#make()', function() {
-        it('should be instantiatable', function() {
+        it('instantiatable using Validator.make(...)', function() {
             expect(Validator.make(data, rules)).to.be.ok
         })
     })
-    describe('#parseEachRule()', function() {
-        var rules = [
+    describe('#parseItemRules()', function() {
+        let rules = [
             { name: 'name', rules: 'required|min:3' },
             { name: 'group', rules: 'not_in:admin,exec'}
         ]
-        var v = Validator.make({name: 'Rati'}, rules)
+        let v = Validator.make({name: 'Rati'}, rules)
 
-        it('should parse each rule correctly', function() {
-            var arr = v.parseEachRule(rules[0].rules)
+        it('parses multiple rules correctly', function() {
+            let arr = v.parseItemRules(rules[0].rules)
             expect(arr).to.be.lengthOf(2)
             expect(arr).to.deep.equal([
                 { name: 'Required', params: [] },
                 { name: 'Min', params: ['3'] }
             ])
-
-            var arr = v.parseEachRule(rules[1].rules)
+        })
+        it('parses rule with array argument (not_in)', function() {
+            let arr = v.parseItemRules(rules[1].rules)
             expect(arr).to.deep.equal([
                 { name: 'NotIn', params: ['admin', 'exec'] }
             ])
         })
     })
     describe('#parseRules()', function() {
-        var rules = [
+        let rules = [
             { name: 'name', rules: 'required|min:3' },
             { name: 'group', rules: 'not_in:admin,exec'}
         ]
-        var v = Validator.make({name: 'Rati'}, rules)
+        let v = Validator.make({name: 'Rati'}, rules)
 
-        it('should parse all rules correctly', function() {
-            var arr = v.parseRules(rules)
+        it('parses rules on every item correctly', function() {
+            let arr = v.parseRules(rules)
             expect(arr).to.deep.equal([
                 {
                     name: 'name',
@@ -74,183 +73,240 @@ describe('Validator', function() {
         })
     })
     describe('#hasError()', function() {
-        it('should return errors', function() {
-            var v = Validator.make({name: 'Test'}, [{
+        it('returns true if there is any error', function() {
+            let v = Validator.make({name: 'Test'}, [{
                 name: 'name',
                 rules: 'required|min:6'
             }])
             v.passes()
             expect(v.hasError()).to.be.true
         })
+        it('returns false if there is no error', function() {
+            let v = Validator.make({name: 'Testing'}, [{
+                name: 'name',
+                rules: 'required|min:6'
+            }])
+            v.passes()
+            expect(v.hasError()).to.be.false
+        })
     })
     describe('#titleCase()', function() {
-        it('should return title case', function() {
+        it('returns title case using space as default delimiter', function() {
             expect(v.titleCase('hello world')).to.equal('HelloWorld')
         })
-        it('should return title case using hyphen as delimiter', function() {
+        it('returns title case using hyphen as delimiter', function() {
             expect(v.titleCase('hello-world', '-')).to.equal('HelloWorld')
+        })
+        it('returns title case when given just one word', function() {
+            expect(v.titleCase('helloworld')).to.equal('Helloworld')
+        })
+        it('returns title case when given a capitalized word', function() {
+            expect(v.titleCase('HELLOWORLD')).to.equal('Helloworld')
+        })
+        it('returns title case when given all capitalized words', function() {
+            expect(v.titleCase('HELLO WORLD')).to.equal('HelloWorld')
         })
     })
     describe('#snakeCase()', function() {
-        it('should return snake case', function() {
+        it('returns snake case using underscore as default delimitor', function() {
             expect(v.snakeCase('helloWorld')).to.equal('hello_world')
         })
-        it('should return snake case using hyphen as delimiter', function() {
+        it('returns snake case using hyphen as delimiter', function() {
             expect(v.snakeCase('helloWorld', '-')).to.equal('hello-world')
+        })
+        it('returns snake case when given title case word', function() {
+            expect(v.snakeCase('HelloWorld')).to.equal('hello_world')
+        })
+        it('returns lowercase word when given a single word', function() {
+            expect(v.snakeCase('Hello')).to.equal('hello')
+        })
+        it('returns lowercase of characters each separated by a delimiter when given all capitalized word', function() {
+            expect(v.snakeCase('HELLO')).to.equal('h_e_l_l_o')
         })
     })
     describe('#getValue()', function() {
-        it('should return correct value', function() {
+        it('returns value when given existing key', function() {
             expect(v.getValue('email')).to.equal('rati@example.com')
         })
-        it('should return empty string when given incorrect key', function() {
+        it('returns empty string when given non-existing key', function() {
             expect(v.getValue('wrong-key')).to.equal('')
         })
     })
     describe('#passes()', function() {
-        it('should pass all validation', function() {
-            var v = Validator.make(data,
-                [
-                    { name: 'name', rules: 'required' },
-                    { name: 'email', rules: 'required|email' }
-                ]
-            )
+        let rules = [
+            { name: 'name', rules: 'required' },
+            { name: 'email', rules: 'required|email' }
+        ]
+        it('returns true when all validations are valid', function() {
+            var v = Validator.make({
+                name: 'Rati', email: 'rati@example.com'
+            }, rules)
             expect(v.passes()).to.be.true
+        })
+        it('returns false when any validation rule is invalid', function() {
+            var v = Validator.make({
+                name: 'Rati'
+            }, rules)
+            expect(v.passes()).to.be.false
         })
     })
     describe('#fails()', function() {
-        it('should fail validation', function() {
-            var v = Validator.make(data,
-                [
-                    { name: 'name', rules: 'required' },
-                    { name: 'email', rules: 'required|email' },
-                    { name: 'age', rules: 'required' }
-                ]
-            )
+        let rules = [
+            { name: 'name', rules: 'required' },
+            { name: 'email', rules: 'required|email' }
+        ]
+        it('returns true when any validation fails', function() {
+            var v = Validator.make({
+                name: 'Rati'
+            }, rules)
             expect(v.fails()).to.be.true
+        })
+        it('returns false when all validations pass', function() {
+            let v = Validator.make({
+                name: 'Rati', email: 'rati@example.com'
+            }, rules)
+            expect(v.fails()).to.be.false
         })
     })
     describe('#getErrors()', function() {
-        it('should return errors', function() {
-            var v = Validator.make(data,
-                [
-                    { name: 'name', rules: 'required' },
-                    { name: 'email', rules: 'required|email' },
-                    { name: 'age', rules: 'required' }
-                ]
-            )
+        let rules = [
+            { name: 'name', rules: 'required' },
+            { name: 'email', rules: 'required|email' },
+            { name: 'age', rules: 'required' }
+        ]
+        it('returns errors when validation fails', function() {
+            let v = Validator.make(
+                {
+                    name: 'Rati', email: 'rati@example.com'
+                }, rules)
+
             v.fails()
             expect(v.getErrors()).to.have.lengthOf(1)
+
+            v = Validator.make({ name: 'Rati' }, rules)
+            v.fails()
+            expect(v.getErrors()).to.have.lengthOf(3)
+        })
+        it('returns empty array when all validation pass', function() {
+            let v = Validator.make(
+                {
+                    name: 'Rati',
+                    email: 'rati@example.com',
+                    age: '45'
+                }, rules)
+
+            v.fails()
+            expect(v.getErrors()).to.have.lengthOf(0)
         })
     })
     describe('#validateRequired()', function() {
-        var rules = [{ name: 'email', rules: 'required'}]
-        it('should pass validation for required rule', function() {
-            var v = Validator.make(
+        let rules = [{ name: 'email', rules: 'required'}]
+        it('return true when passes "required" validation', function() {
+            let v = Validator.make(
                 { email: 'rati@example.com' },rules
             )
             expect(v.passes()).to.be.true
         })
-        it('should fail validation for required rule', function() {
-            var v = Validator.make(
+        it('returns false when fails "required" validation', function() {
+            let v = Validator.make(
                 { name: 'Rati' }, rules
             )
             expect(v.fails()).to.be.true
         })
     })
     describe('#getSize()', function() {
-        it('should return correct parameter value', function() {
+        it('returns correct parameter value', function() {
             expect(Rules.getSize('name', 'Rati')).to.equal(4)
         })
     })
     describe('#validateMin()', function() {
-        var rules = [
+        let rules = [
             { name: 'name', rules: 'min:3'}
         ]
-        it('should pass validation', function() {
-            var v = Validator.make({ name: 'Rati' }, rules)
+        it('returns true when passes "min" validation', function() {
+            let v = Validator.make({ name: 'Rati' }, rules)
             expect(v.passes()).to.be.true
         })
-        it('should fail validation', function() {
-            var v = Validator.make({ name: 'Ra' }, rules)
+        it('returns false when fails "min" validation', function() {
+            let v = Validator.make({ name: 'Ra' }, rules)
             expect(v.passes()).to.be.false
         })
     })
     describe('#validateMax()', function() {
-        var rules = [
+        let rules = [
             { name: 'name', rules: 'max:3'}
         ]
-        it('should pass validation', function() {
-            var v = Validator.make({ name: 'Rat' }, rules)
+        it('returns true when passes "max" validation', function() {
+            let v = Validator.make({ name: 'Rat' }, rules)
             expect(v.passes()).to.be.true
         })
-        it('should fail validation', function() {
-            var v = Validator.make({ name: 'Rati' }, rules)
+        it('returns false when fails "max" validation', function() {
+            let v = Validator.make({ name: 'Rati' }, rules)
             expect(v.passes()).to.be.false
         })
     })
     describe('#validateIn()', function() {
-        var rules = [
+        let rules = [
             { name: 'name', rules: 'in:mom,dad,children'}
         ]
-        it('should pass validation', function() {
-            var v = Validator.make({ name: 'dad' }, rules)
+        it('returns true when passes "in" validation', function() {
+            let v = Validator.make({ name: 'dad' }, rules)
             expect(v.passes()).to.be.true
         })
-        it('should fail validation', function() {
-            var v = Validator.make({ name: 'me' }, rules)
+        it('returns false when fails "in" validation', function() {
+            let v = Validator.make({ name: 'me' }, rules)
             expect(v.passes()).to.be.false
         })
     })
     describe('#validateNotIn()', function() {
-        var rules = [
+        let rules = [
             { name: 'name', rules: 'not_in:mom,dad,children'}
         ]
-        it('should pass validation', function() {
-            var v = Validator.make({ name: 'me' }, rules)
+        it('return true when pass "not_in" validation', function() {
+            let v = Validator.make({ name: 'me' }, rules)
             expect(v.passes()).to.be.true
         })
-        it('should fail validation', function() {
-            var v = Validator.make({ name: 'dad' }, rules)
+        it('returns false when failes "not_in" validation', function() {
+            let v = Validator.make({ name: 'dad' }, rules)
             expect(v.passes()).to.be.false
         })
     })
     describe('#validateNumeric()', function() {
-        var rules = [
+        let rules = [
             { name: 'amount', rules: 'numeric' }
         ]
-        it('should pass numeric validation', function() {
-            var v = Validator.make({ amount: '100.25'}, rules)
+        it('returns true when passes "numeric" validation', function() {
+            let v = Validator.make({ amount: '100.25'}, rules)
             expect(v.passes()).to.be.true
         })
-        it('should fail numeric validation', function() {
-            var v = Validator.make({ amount: '100AAB.00'}, rules)
+        it('returns false when fails "numeric" validation', function() {
+            let v = Validator.make({ amount: '100AAB.00'}, rules)
             expect(v.passes()).to.be.false
         })
     })
     describe('#validateInteger()', function() {
-        var rules = [
+        let rules = [
             { name: 'amount', rules: 'integer' }
         ]
-        it('should pass integer validation', function() {
-            var v = Validator.make({ amount: '100'}, rules)
+        it('returns true when passes "integer" validation', function() {
+            let v = Validator.make({ amount: '100'}, rules)
             expect(v.passes()).to.be.true
         })
-        it('should fail integer validation', function() {
-            var v = Validator.make({ amount: '100.25'}, rules)
+        it('returns false when fails "integer" validation', function() {
+            let v = Validator.make({ amount: '100.25'}, rules)
             expect(v.passes()).to.be.false
         })
     })
     describe('#validateEmail()', function() {
-        var rules = [
+        let rules = [
             { name: 'email', rules: 'email' }
         ]
-        it('should pass email validation', function() {
-            var v = Validator.make({ email: 'rati@example.com'}, rules)
+        it('returns true when passes "email" validation', function() {
+            let v = Validator.make({ email: 'rati@example.com'}, rules)
             expect(v.passes()).to.be.true
         })
-        it('should fail email validation', function() {
-            var v = Validator.make({ email: 'example.com'}, rules)
+        it('returns false when fails "email" validation', function() {
+            let v = Validator.make({ email: 'example.com'}, rules)
             expect(v.passes()).to.be.false
         })
     })

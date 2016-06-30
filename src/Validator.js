@@ -26,14 +26,14 @@ export default class Validator {
         rules.forEach(function(item) {
             arr.push({
                 name: item.name,
-                rules: self.parseEachRule(item.rules)
+                rules: self.parseItemRules(item.rules)
             })
         })
 
         return arr
     }
 
-    parseEachRule(rule) {
+    parseItemRules(rule) {
         let self = this
         let arr = []
 
@@ -51,13 +51,13 @@ export default class Validator {
     titleCase(str, delimiter) {
         delimiter = delimiter || ' '
         return str.split(delimiter).map(function(item) {
-            return item[0].toUpperCase() + item.slice(1)
+            return item[0].toUpperCase() + item.slice(1).toLowerCase()
         }).join('')
     }
 
     snakeCase(str, delimiter) {
         delimiter = delimiter || '_'
-        return str.replace(/(.)(?=[A-Z])/u, '$1'+delimiter).toLowerCase()
+        return str.replace(/(.)(?=[A-Z])/ug, '$1'+delimiter).toLowerCase()
     }
 
     getValue(name) {

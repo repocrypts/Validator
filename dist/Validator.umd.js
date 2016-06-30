@@ -105,15 +105,15 @@ return /******/ (function(modules) { // webpackBootstrap
 	            rules.forEach(function (item) {
 	                arr.push({
 	                    name: item.name,
-	                    rules: self.parseEachRule(item.rules)
+	                    rules: self.parseItemRules(item.rules)
 	                });
 	            });
 	
 	            return arr;
 	        }
 	    }, {
-	        key: 'parseEachRule',
-	        value: function parseEachRule(rule) {
+	        key: 'parseItemRules',
+	        value: function parseItemRules(rule) {
 	            var self = this;
 	            var arr = [];
 	
@@ -132,14 +132,14 @@ return /******/ (function(modules) { // webpackBootstrap
 	        value: function titleCase(str, delimiter) {
 	            delimiter = delimiter || ' ';
 	            return str.split(delimiter).map(function (item) {
-	                return item[0].toUpperCase() + item.slice(1);
+	                return item[0].toUpperCase() + item.slice(1).toLowerCase();
 	            }).join('');
 	        }
 	    }, {
 	        key: 'snakeCase',
 	        value: function snakeCase(str, delimiter) {
 	            delimiter = delimiter || '_';
-	            return str.replace(/((?:[\0-\t\x0B\f\x0E-\u2027\u202A-\uD7FF\uE000-\uFFFF]|[\uD800-\uDBFF][\uDC00-\uDFFF]|[\uD800-\uDBFF](?![\uDC00-\uDFFF])|(?:[^\uD800-\uDBFF]|^)[\uDC00-\uDFFF]))(?=[A-Z])/, '$1' + delimiter).toLowerCase();
+	            return str.replace(/((?:[\0-\t\x0B\f\x0E-\u2027\u202A-\uD7FF\uE000-\uFFFF]|[\uD800-\uDBFF][\uDC00-\uDFFF]|[\uD800-\uDBFF](?![\uDC00-\uDFFF])|(?:[^\uD800-\uDBFF]|^)[\uDC00-\uDFFF]))(?=[A-Z])/g, '$1' + delimiter).toLowerCase();
 	        }
 	    }, {
 	        key: 'getValue',
