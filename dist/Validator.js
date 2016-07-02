@@ -230,23 +230,12 @@ var Validator = function () {
                 value = [value];
             }
 
-            var i = 0;
             var re = params[0];
 
             if (!(re instanceof RegExp)) {
-                // re = re.replace(/\/?([^\/]*)\/?/, "$1");
-                // re = new RegExp(re);
                 re = re.split('/');
                 re = new RegExp(re[1], re[2]);
             }
-
-            // for (var i = 0; i < value.length; i++) {
-            //     if (value[i] !== null && value[i].match(re) !== null) {
-            //         return true
-            //     }
-            // }
-
-            // return false
 
             return re.test(value);
         }

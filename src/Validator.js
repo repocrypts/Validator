@@ -218,7 +218,6 @@ export default class Validator {
             value = [value]
         }
 
-        var i = 0
         var re = params[0]
 
         if (!(re instanceof RegExp)) {
