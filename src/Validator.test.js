@@ -327,9 +327,103 @@ describe('Validator', function() {
         it('returns true when the given data passes regex validation', function() {
             let v = Validator.make({ x: 'asdasdf'}, [ { name: 'x', rules: 'regex:/^([a-z])+$/i' }])
             let result = v.passes()
-            console.log(v.getRules('x')[0]['rules'])
-            console.log(v.getErrors())
+            // console.log(v.getRules('x')[0]['rules'])
+            // console.log(v.getErrors())
             expect(result).to.be.true
+        })
+        it('returns false when the given data fails regex validation', function() {
+            let v = Validator.make({ x: 'aasd234fsd1'}, [ {name: 'x', rules: 'regex:/^([a-z])+$/i'}])
+            expect(v.passes()).to.be.false
+        })
+        it('returns true when given data has comma delimited value', function() {
+            let v = Validator.make({x: 'a,b'}, [{name: 'x', rules: 'regex:/^a,b$/i'}])
+            expect(v.passes()).to.be.true
+        })
+        it('returns true when given data is a string value of "12"', function() {
+            let v = Validator.make({x: '12'}, [{name: 'x', rules: 'regex:/^12$/i'}])
+            expect(v.passes()).to.be.true
+        })
+        it('returns true when given data is numeric 123', function() {
+            let v = Validator.make({x: 123}, [{name: 'x', rules: 'regex:/^123$/i'}])
+            expect(v.passes()).to.be.true
+        })
+    })
+    describe('#validateSame()', function() {
+        it('returns false when the specified field has different value', function() {
+            let v = Validator.make({
+                'foo': 'bar',
+                'baz': 'boom'
+            }, [{name: 'foo', rules: 'same:baz'}])
+            expect(v.passes()).to.be.false
+        })
+        it('returns false when the specified field does not present', function() {
+            let v = Validator.make({
+                'foo': 'bar',
+            }, [{name: 'foo', rules: 'same:baz'}])
+            expect(v.passes()).to.be.false
+        })
+        it('returns true when the specified field is present and has the same value', function() {
+            let v = Validator.make({
+                'foo': 'bar',
+                'baz': 'bar'
+            }, [{name: 'foo', rules: 'same:baz'}])
+            expect(v.passes()).to.be.true
+        })
+        it('returns false when the specified field has different numeric value', function() {
+            let v = Validator.make({
+                'foo': '1e2',
+                'baz': '100'
+            }, [{name: 'foo', rules: 'same:baz'}])
+            expect(v.passes()).to.be.false
+        })
+    })
+    describe('#validateDifferent()', function() {
+        it('returns true when the specified field has different value', function() {
+            let v = Validator.make({
+                'foo': 'bar',
+                'baz': 'boom'
+            }, [{name: 'foo', rules: 'different:baz'}])
+            expect(v.passes()).to.be.true
+        })
+        it('returns false when the specified field does not present', function() {
+            let v = Validator.make({
+                'foo': 'bar',
+            }, [{name: 'foo', rules: 'different:baz'}])
+            expect(v.passes()).to.be.false
+        })
+        it('returns false when the specified field is present and has the same value', function() {
+            let v = Validator.make({
+                'foo': 'bar',
+                'baz': 'bar'
+            }, [{name: 'foo', rules: 'different:baz'}])
+            expect(v.passes()).to.be.false
+        })
+        it('returns true when the specified field has different numeric value', function() {
+            let v = Validator.make({
+                'foo': '1e2',
+                'baz': '100'
+            }, [{name: 'foo', rules: 'different:baz'}])
+            expect(v.passes()).to.be.true
+        })
+    })
+    describe('#validateConfirm()', function() {
+        it('returns false when confirmation field is not present', function() {
+            let v = Validator.make({password: 'foo'}, [ {name: 'password', rules: 'confirmed'}])
+            expect(v.passes()).to.be.false
+        })
+        it('returns false when confirmation field value does not match', function() {
+            let v = Validator.make({
+                'password': 'foo',
+                'password_confirmation': 'bar'
+            }, [ {name: 'password', rules: 'confirmed'}])
+            expect(v.passes()).to.be.false
+        })
+        it('returns true when confirmation field value does match', function() {
+            let v = Validator.make({
+                'password': 'foo',
+                'password_confirmation': 'foo'
+            }, [ {name: 'password', rules: 'confirmed'}])
+            expect(v.passes()).to.be.true
         })
     })
 })
@@ -344,14 +438,14 @@ not_in
 numeric
 integer
 email
-## untested
 present
-match
 regex
-confirmed
-accept
 same
 different
+confirmed
+
+## untested
+accept
 digits
 digits_between
 size

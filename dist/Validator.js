@@ -245,16 +245,16 @@ var Validator = function () {
             return this.validateMatch(name, value, params);
         }
     }, {
-        key: 'validateConfirmed',
-        value: function validateConfirmed(name, value) {
-            return this.validateSame(name, value, [name + '_confirmation']);
-        }
-    }, {
         key: 'validateAccept',
         value: function validateAccept(name, value) {
             var acceptable = ['yes', 'on', '1', 1, true, 'true'];
 
             return this.validateRequired(name, value) && acceptable.indexOf(value) > -1;
+        }
+    }, {
+        key: 'validateConfirmed',
+        value: function validateConfirmed(name, value) {
+            return this.validateSame(name, value, [name + '_confirmation']);
         }
     }, {
         key: 'validateSame',

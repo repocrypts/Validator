@@ -232,14 +232,14 @@ export default class Validator {
         return this.validateMatch(name, value, params);
     }
 
-    validateConfirmed(name, value) {
-        return this.validateSame(name, value, [name+'_confirmation'])
-    }
-
     validateAccept(name, value) {
         var acceptable = ['yes', 'on', '1', 1, true, 'true']
 
         return this.validateRequired(name, value) && (acceptable.indexOf(value) > -1)
+    }
+
+    validateConfirmed(name, value) {
+        return this.validateSame(name, value, [name+'_confirmation'])
     }
 
     validateSame(name, value, params) {
