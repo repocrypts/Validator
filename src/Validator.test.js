@@ -1,6 +1,5 @@
 import { expect } from 'chai'
 import Validator from './Validator'
-import Rules from './Rules'
 
 let rules = [
     {name: 'name', rules: 'required|min:3'},
@@ -27,7 +26,7 @@ describe('Validator', function() {
     describe('#parseItemRules()', function() {
         let rules = [
             { name: 'name', rules: 'required|min:3' },
-            { name: 'group', rules: 'not_in:admin,exec'}
+            { name: 'group', rules: 'not_in:admin,exec'},
         ]
         let v = Validator.make({name: 'Rati'}, rules)
 
@@ -216,7 +215,8 @@ describe('Validator', function() {
     })
     describe('#getSize()', function() {
         it('returns correct parameter value', function() {
-            expect(Rules.getSize('name', 'Rati')).to.equal(4)
+            let v = Validator.make({name: 'Rati'}, [])
+            expect(v.getSize('name', 'Rati')).to.equal(4)
         })
     })
     describe('#validateMin()', function() {
@@ -310,13 +310,26 @@ describe('Validator', function() {
             expect(v.passes()).to.be.false
         })
     })
-    describe('# Rules.data()', function() {
+    describe('#validatePresent()', function() {
         let rules = [
-            { name: 'email', rules: 'email' }
+            { name: 'name', rules: 'present' }
         ]
-        it('test', function() {
-            let v = Validator.make({ email: 'rati@example.com'}, rules)
-            console.dir(v.validations.data('email'))
+        it('returns true when the given data is present', function() {
+            let v = Validator.make({ name: ''}, rules)
+            expect(v.passes()).to.be.true
+        })
+        it('returns false when the given data is not present', function() {
+            let v = Validator.make({ email: 'rati@example.com' }, rules)
+            expect(v.passes()).to.be.false
+        })
+    })
+    describe('#validateRegex()', function() {
+        it('returns true when the given data passes regex validation', function() {
+            let v = Validator.make({ x: 'asdasdf'}, [ { name: 'x', rules: 'regex:/^([a-z])+$/i' }])
+            let result = v.passes()
+            console.log(v.getRules('x')[0]['rules'])
+            console.log(v.getErrors())
+            expect(result).to.be.true
         })
     })
 })

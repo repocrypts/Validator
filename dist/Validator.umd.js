@@ -62,15 +62,11 @@ return /******/ (function(modules) { // webpackBootstrap
 	
 	var _createClass = function () { function defineProperties(target, props) { for (var i = 0; i < props.length; i++) { var descriptor = props[i]; descriptor.enumerable = descriptor.enumerable || false; descriptor.configurable = true; if ("value" in descriptor) descriptor.writable = true; Object.defineProperty(target, descriptor.key, descriptor); } } return function (Constructor, protoProps, staticProps) { if (protoProps) defineProperties(Constructor.prototype, protoProps); if (staticProps) defineProperties(Constructor, staticProps); return Constructor; }; }();
 	
-	var _Rules = __webpack_require__(1);
-	
-	var _Rules2 = _interopRequireDefault(_Rules);
-	
-	var _Messages = __webpack_require__(2);
+	var _Messages = __webpack_require__(1);
 	
 	var _Messages2 = _interopRequireDefault(_Messages);
 	
-	var _Replacers = __webpack_require__(3);
+	var _Replacers = __webpack_require__(2);
 	
 	var _Replacers2 = _interopRequireDefault(_Replacers);
 	
@@ -88,13 +84,37 @@ return /******/ (function(modules) { // webpackBootstrap
 	        this.rules = this.parseRules(rules);
 	        this.errors = [];
 	        this.customMessages = customMessages;
-	        this.validations = new _Rules2.default(this);
 	    }
 	
 	    _createClass(Validator, [{
-	        key: 'getErrors',
-	        value: function getErrors() {
-	            return this.errors;
+	        key: 'isImplicit',
+	        value: function isImplicit(rule) {
+	            return this.implicitRules.indexOf(rule) > -1;
+	        }
+	    }, {
+	        key: 'hasRule',
+	        value: function hasRule(name, rules) {
+	            return rules.indexOf(name) >= 0;
+	        }
+	    }, {
+	        key: 'getRules',
+	        value: function getRules() {
+	            var name = arguments.length <= 0 || arguments[0] === undefined ? null : arguments[0];
+	
+	            if (name === null) {
+	                return this.rules;
+	            }
+	
+	            return this.rules.filter(function (item) {
+	                return item.name === name;
+	            });
+	        }
+	    }, {
+	        key: 'requireParameterCount',
+	        value: function requireParameterCount(count, params, rule) {
+	            if (params.length < count) {
+	                console.error('Validation rule ' + rule + ' requires at least ' + count + ' parameters');
+	            }
 	        }
 	    }, {
 	        key: 'parseRules',
@@ -218,74 +238,25 @@ return /******/ (function(modules) { // webpackBootstrap
 	            return errors.length > 0;
 	        }
 	    }, {
+	        key: 'getErrors',
+	        value: function getErrors() {
+	            return this.errors;
+	        }
+	    }, {
 	        key: 'validate',
 	        value: function validate(name, rule) {
-	            var method = _Rules2.default['validate' + rule.name];
+	            var method = this['validate' + rule.name];
 	            var value = this.getValue(name);
 	
 	            if (typeof method === 'function') {
-	                return method.apply(_Rules2.default, [name, value, rule.params]);
+	                return method.apply(this, [name, value, rule.params]);
 	            }
 	
 	            return false;
 	        }
-	    }], [{
-	        key: 'make',
-	        value: function make(data, rules) {
-	            var customMessages = arguments.length <= 2 || arguments[2] === undefined ? [] : arguments[2];
 	
-	            return new Validator(data, rules, customMessages);
-	        }
-	    }]);
+	        /** Validation Rules **/
 	
-	    return Validator;
-	}();
-	
-	exports.default = Validator;
-
-/***/ },
-/* 1 */
-/***/ function(module, exports) {
-
-	'use strict';
-	
-	Object.defineProperty(exports, "__esModule", {
-	    value: true
-	});
-	
-	var _createClass = function () { function defineProperties(target, props) { for (var i = 0; i < props.length; i++) { var descriptor = props[i]; descriptor.enumerable = descriptor.enumerable || false; descriptor.configurable = true; if ("value" in descriptor) descriptor.writable = true; Object.defineProperty(target, descriptor.key, descriptor); } } return function (Constructor, protoProps, staticProps) { if (protoProps) defineProperties(Constructor.prototype, protoProps); if (staticProps) defineProperties(Constructor, staticProps); return Constructor; }; }();
-	
-	function _classCallCheck(instance, Constructor) { if (!(instance instanceof Constructor)) { throw new TypeError("Cannot call a class as a function"); } }
-	
-	var Rules = function () {
-	    function Rules(validator) {
-	        _classCallCheck(this, Rules);
-	
-	        this.validator = validator;
-	    }
-	
-	    _createClass(Rules, [{
-	        key: 'data',
-	        value: function data(name) {
-	            return this.validator.data[name];
-	        }
-	    }], [{
-	        key: 'isImplicit',
-	        value: function isImplicit(rule) {
-	            return this.implicitRules.indexOf(rule) > -1;
-	        }
-	    }, {
-	        key: 'hasRule',
-	        value: function hasRule(name, rules) {
-	            return rules.indexOf(name) >= 0;
-	        }
-	    }, {
-	        key: 'requireParameterCount',
-	        value: function requireParameterCount(count, params, rule) {
-	            if (params.length < count) {
-	                console.error('Validation rule ' + rule + ' requires at least ' + count + ' parameters');
-	            }
-	        }
 	    }, {
 	        key: 'validateRequired',
 	        value: function validateRequired(name, value, params) {
@@ -302,7 +273,7 @@ return /******/ (function(modules) { // webpackBootstrap
 	    }, {
 	        key: 'validatePresent',
 	        value: function validatePresent(name, value, params) {
-	            return this.data[name] !== 'undefined';
+	            return typeof this.data[name] !== 'undefined';
 	        }
 	    }, {
 	        key: 'validateMatch',
@@ -319,17 +290,21 @@ return /******/ (function(modules) { // webpackBootstrap
 	            var re = params[0];
 	
 	            if (!(re instanceof RegExp)) {
-	                re = re.replace(/\/?([^\/]*)\/?/, "$1");
-	                re = new RegExp(re);
+	                // re = re.replace(/\/?([^\/]*)\/?/, "$1");
+	                // re = new RegExp(re);
+	                re = re.split('/');
+	                re = new RegExp(re[1], re[2]);
 	            }
 	
-	            for (var i = 0; i < value.length; i++) {
-	                if (value[i] !== null && value[i].match(re) !== null) {
-	                    return true;
-	                }
-	            }
+	            // for (var i = 0; i < value.length; i++) {
+	            //     if (value[i] !== null && value[i].match(re) !== null) {
+	            //         return true
+	            //     }
+	            // }
 	
-	            return false;
+	            // return false
+	
+	            return re.test(value);
 	        }
 	    }, {
 	        key: 'validateRegex',
@@ -344,8 +319,6 @@ return /******/ (function(modules) { // webpackBootstrap
 	    }, {
 	        key: 'validateAccept',
 	        value: function validateAccept(name, value) {
-	            var params = arguments.length <= 2 || arguments[2] === undefined ? null : arguments[2];
-	
 	            var acceptable = ['yes', 'on', '1', 1, true, 'true'];
 	
 	            return this.validateRequired(name, value) && acceptable.indexOf(value) > -1;
@@ -443,29 +416,21 @@ return /******/ (function(modules) { // webpackBootstrap
 	    }, {
 	        key: 'validateNumeric',
 	        value: function validateNumeric(name, value) {
-	            var params = arguments.length <= 2 || arguments[2] === undefined ? null : arguments[2];
-	
 	            return this.validateMatch(name, value, /^-?\d+(\.\d*)?$/);
 	        }
 	    }, {
 	        key: 'validateInteger',
 	        value: function validateInteger(name, value) {
-	            var params = arguments.length <= 2 || arguments[2] === undefined ? null : arguments[2];
-	
 	            return this.validateMatch(name, value, /^-?\d+$/);
 	        }
 	    }, {
 	        key: 'validateEmail',
 	        value: function validateEmail(name, value) {
-	            var params = arguments.length <= 2 || arguments[2] === undefined ? null : arguments[2];
-	
 	            return this.validateMatch(name, value, /^[A-Z0-9._%+\-]+@[A-Z0-9.\-]+\.[A-Z]{2,4}$/i);
 	        }
 	    }, {
 	        key: 'validateIp',
 	        value: function validateIp(name, value) {
-	            var params = arguments.length <= 2 || arguments[2] === undefined ? null : arguments[2];
-	
 	            var segments = value.split('.');
 	
 	            if (segments.length === 4 && this.validateBetween(name, segments[0], [1, 255]) && this.validateBetween(name, segmentg[1], [0, 255]) && this.validateBetween(name, segmentg[2], [0, 255]) && this.validateBetween(name, segmentg[3], [1, 255])) {
@@ -477,23 +442,21 @@ return /******/ (function(modules) { // webpackBootstrap
 	    }, {
 	        key: 'validateUrl',
 	        value: function validateUrl(name, value) {
-	            var params = arguments.length <= 2 || arguments[2] === undefined ? null : arguments[2];
-	
 	            return this.validateMatch(name, value, /^(https?|ftp):\/\/[^\s\/$.?#].[^\s]*$/i);
 	        }
 	    }, {
 	        key: 'validateAlpha',
-	        value: function validateAlpha(name, value, params) {
+	        value: function validateAlpha(name, value) {
 	            return this.validateMatch(name, value, /^([a-z])+$/i);
 	        }
 	    }, {
 	        key: 'validateAlphaNum',
-	        value: function validateAlphaNum(name, value, params) {
+	        value: function validateAlphaNum(name, value) {
 	            return this.validateMatch(name, value, /^([a-z0-9])+$/i);
 	        }
 	    }, {
 	        key: 'validateAlphaDash',
-	        value: function validateAlphaDash(name, value, params) {
+	        value: function validateAlphaDash(name, value) {
 	            return this.validateMatch(name, value, /^([a-z0-9_\-])+$/i);
 	        }
 	    }, {
@@ -541,72 +504,22 @@ return /******/ (function(modules) { // webpackBootstrap
 	        get: function get() {
 	            return ['RequiredWith', 'RequiredWithAll', 'RequiredWithout', 'RequiredWithoutAll', 'RequiredIf', 'RequiredUnless', 'Confirmed', 'Same', 'Different', 'Unique', 'Before', 'After'];
 	        }
+	    }], [{
+	        key: 'make',
+	        value: function make(data, rules) {
+	            var customMessages = arguments.length <= 2 || arguments[2] === undefined ? [] : arguments[2];
+	
+	            return new Validator(data, rules, customMessages);
+	        }
 	    }]);
 	
-	    return Rules;
+	    return Validator;
 	}();
 	
-	/*
-	## tested
-	required
-	min
-	max
-	in
-	not_in
-	numeric
-	integer
-	email
-	
-	## untested
-	present
-	match
-	regex
-	confirmed
-	accept
-	same
-	different
-	digits
-	digits_between
-	size
-	between
-	ip
-	url
-	alpha
-	alpha_num
-	alpha_dash
-	before (date)
-	after (date)
-	date_between (date)
-	
-	## pending
-	array
-	boolean
-	date
-	date_format
-	dimensions
-	distinct
-	filled
-	image (File)
-	in_array
-	json
-	mime_types
-	required_if
-	required_unless
-	required_with
-	required_with_all
-	required_without
-	required_without_all
-	string
-	timezone
-	exists (DB)
-	unique (DB)
-	 */
-	
-	
-	exports.default = Rules;
+	exports.default = Validator;
 
 /***/ },
-/* 2 */
+/* 1 */
 /***/ function(module, exports) {
 
 	"use strict";
@@ -650,7 +563,7 @@ return /******/ (function(modules) { // webpackBootstrap
 	}, _defineProperty(_accepted$active_url$, "integer", "The :attr must be an integer."), _defineProperty(_accepted$active_url$, "ip", "The :attr must be a valid IP address."), _defineProperty(_accepted$active_url$, "match", "The :attr format is invalid."), _defineProperty(_accepted$active_url$, "max", "The :attr must not exceed :max."), _defineProperty(_accepted$active_url$, "not_in", "The selected :attr is invalid."), _defineProperty(_accepted$active_url$, "numeric", "The :attr must be a number."), _defineProperty(_accepted$active_url$, "regex", "The :attr format is invalid."), _defineProperty(_accepted$active_url$, "required", "The :attr field is required."), _defineProperty(_accepted$active_url$, "required_if", "The :attr field is required when :other is :value."), _defineProperty(_accepted$active_url$, "required_with", "The :attr field is required when :values is present."), _defineProperty(_accepted$active_url$, "required_without", "The :attr field is required when :values is not present."), _defineProperty(_accepted$active_url$, "same", "The :attr and :other must match."), _defineProperty(_accepted$active_url$, "size", "The :attr must be :size."), _defineProperty(_accepted$active_url$, "unique", "The :attr has already been taken."), _defineProperty(_accepted$active_url$, "url", "The :attr format is invalid."), _accepted$active_url$);
 
 /***/ },
-/* 3 */
+/* 2 */
 /***/ function(module, exports) {
 
 	'use strict';
