@@ -273,28 +273,44 @@ describe('Validator', function() {
     })
     describe('#validateNumeric()', function() {
         let rules = [
-            { name: 'amount', rules: 'numeric' }
+            { name: 'foo', rules: 'numeric' }
         ]
-        it('returns true when passes "numeric" validation', function() {
-            let v = Validator.make({ amount: '100.25'}, rules)
+        it('return false when given string is not numeric', function() {
+            let v = Validator.make({foo: 'asdad'}, rules)
+            expect(v.passes()).to.be.false
+        })
+        it('returns true when given string is floating point value', function() {
+            let v = Validator.make({foo: '1.23'}, rules)
             expect(v.passes()).to.be.true
         })
-        it('returns false when fails "numeric" validation', function() {
-            let v = Validator.make({ amount: '100AAB.00'}, rules)
-            expect(v.passes()).to.be.false
+        it('returns true when given string is "-1"', function() {
+            let v = Validator.make({foo: '-1'}, rules)
+            expect(v.passes()).to.be.true
+        })
+        it('returns true when given string is "1"', function() {
+            let v = Validator.make({foo: '1'}, rules)
+            expect(v.passes()).to.be.true
         })
     })
     describe('#validateInteger()', function() {
         let rules = [
-            { name: 'amount', rules: 'integer' }
+            { name: 'foo', rules: 'integer' }
         ]
-        it('returns true when passes "integer" validation', function() {
-            let v = Validator.make({ amount: '100'}, rules)
+        it('returns false when given string is text value', function() {;
+            let v = Validator.make({ foo: 'asdad'}, rules)
+            expect(v.passes()).to.be.false
+        })
+        it('returns false when given string is decimal point value', function() {;
+            let v = Validator.make({ foo: '1.23'}, rules)
+            expect(v.passes()).to.be.false
+        })
+        it('returns true when given string is "-1"', function() {
+            let v = Validator.make({ foo: '-1'}, rules)
             expect(v.passes()).to.be.true
         })
-        it('returns false when fails "integer" validation', function() {
-            let v = Validator.make({ amount: '100.25'}, rules)
-            expect(v.passes()).to.be.false
+        it('returns true when given string is "1"', function() {
+            let v = Validator.make({ foo: '1'}, rules)
+            expect(v.passes()).to.be.true
         })
     })
     describe('#validateEmail()', function() {
@@ -498,6 +514,51 @@ describe('Validator', function() {
         it('returns false when the number of digits given is not in the range', function() {
             let v = Validator.make({foo: '123'}, [{name: 'foo', rules: 'digits_between:4,5'}])
             expect(v.passes()).to.be.false
+        })
+    })
+    describe('#validateSize()', function() {
+        it('returns false when string length is more than the given size', function() {
+            let v = Validator.make({foo: 'asdad'}, [{name: 'foo', rules: 'size:3'}])
+            expect(v.passes()).to.be.false
+        })
+        it('returns true when string length is equal to the given size', function() {
+            let v = Validator.make({foo: 'asd'}, [{name: 'foo', rules: 'size:3'}])
+            expect(v.passes()).to.be.true
+        })
+        it('returns false when numeric value is not equal to the given size', function() {
+            let v = Validator.make({foo: '123'}, [{name: 'foo', rules: 'numeric|size:3'}])
+            expect(v.passes()).to.be.false
+        })
+        it('returns true when numeric value is equal to the given size', function() {
+            let v = Validator.make({foo: '3'}, [{name: 'foo', rules: 'numeric|size:3'}])
+            expect(v.passes()).to.be.true
+        })
+        it('returns true when given value is array of the given size', function() {
+            let v = Validator.make({foo: [1, 2, 3]}, [{name: 'foo', rules: 'array|size:3'}])
+            expect(v.passes()).to.be.true
+        })
+        it('returns false when given value is array of different size', function() {
+            let v = Validator.make({foo: [1, 2, 3]}, [{name: 'foo', rules: 'array|size:4'}])
+            expect(v.passes()).to.be.false
+        })
+    })
+    describe('#getRule()', function() {
+        let rules = [
+            { name: 'name', rules: 'required|min:3' },
+            { name: 'group', rules: 'in:admin,exec'}
+        ]
+        let data = {
+            name: 'Rati',
+            group: 'admin'
+        }
+        let v = Validator.make(data, rules)
+        it('returns correct array when item is in the given rules', function() {
+            let arr = v.getRule('name', ['Required'])
+            expect(arr).to.deep.equal(['Required', []])
+        })
+        it('returns null when item is not in the given rules', function() {
+            let arr = v.getRule('group', ['Required'])
+            expect(arr).to.be.null
         })
     })
 })

@@ -94,20 +94,26 @@ return /******/ (function(modules) { // webpackBootstrap
 	    }, {
 	        key: 'hasRule',
 	        value: function hasRule(name, rules) {
-	            return rules.indexOf(name) >= 0;
+	            return this.getRule(name, rules) !== null;
 	        }
 	    }, {
-	        key: 'getRules',
-	        value: function getRules() {
-	            var name = arguments.length <= 0 || arguments[0] === undefined ? null : arguments[0];
-	
-	            if (name === null) {
-	                return this.rules;
-	            }
-	
-	            return this.rules.filter(function (item) {
+	        key: 'getRule',
+	        value: function getRule(name, rulesToCheck) {
+	            var a = this.rules.filter(function (item) {
 	                return item.name === name;
 	            });
+	
+	            if (a.length === 0) {
+	                return null;
+	            } else {
+	                a = a[0];
+	            }
+	
+	            var b = a.rules.filter(function (rule) {
+	                return rulesToCheck.indexOf(rule.name) >= 0;
+	            });
+	
+	            return b.length === 0 ? null : [b[0].name, b[0].params];
 	        }
 	    }, {
 	        key: 'requireParameterCount',
@@ -310,6 +316,15 @@ return /******/ (function(modules) { // webpackBootstrap
 	            return this.validateRequired(name, value) && acceptable.indexOf(value) >= 0;
 	        }
 	    }, {
+	        key: 'validateArray',
+	        value: function validateArray(name, value) {
+	            if (typeof this.data[name] === 'undefined') {
+	                return true;
+	            }
+	
+	            return value === null || Array.isArray(value);
+	        }
+	    }, {
 	        key: 'validateConfirmed',
 	        value: function validateConfirmed(name, value) {
 	            return this.validateSame(name, value, [name + '_confirmation']);
@@ -383,8 +398,8 @@ return /******/ (function(modules) { // webpackBootstrap
 	        value: function getSize(name, value) {
 	            var hasNumeric = this.hasRule(name, this.numericRules);
 	
-	            if (hasNumeric && !isNaN(parseInt(value))) {
-	                return value;
+	            if (hasNumeric && !isNaN(parseFloat(value))) {
+	                return parseFloat(value);
 	            }
 	
 	            // for array and string
