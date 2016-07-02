@@ -333,3 +333,57 @@ describe('Validator', function() {
         })
     })
 })
+
+/*
+## tested
+required
+min
+max
+in
+not_in
+numeric
+integer
+email
+## untested
+present
+match
+regex
+confirmed
+accept
+same
+different
+digits
+digits_between
+size
+between
+ip
+url
+alpha
+alpha_num
+alpha_dash
+before (date)
+after (date)
+date_between (date)
+## pending
+array
+boolean
+date
+date_format
+dimensions
+distinct
+filled
+image (File)
+in_array
+json
+mime_types
+required_if
+required_unless
+required_with
+required_with_all
+required_without
+required_without_all
+string
+timezone
+exists (DB)
+unique (DB)
+ */
