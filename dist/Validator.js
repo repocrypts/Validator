@@ -194,6 +194,8 @@ var Validator = function () {
 
             if (typeof method === 'function') {
                 return method.apply(this, [name, value, rule.params]);
+            } else {
+                console.error('"' + rule.name + '" validation rule does not exist!');
             }
 
             return false;
@@ -245,11 +247,11 @@ var Validator = function () {
             return this.validateMatch(name, value, params);
         }
     }, {
-        key: 'validateAccept',
-        value: function validateAccept(name, value) {
+        key: 'validateAccepted',
+        value: function validateAccepted(name, value) {
             var acceptable = ['yes', 'on', '1', 1, true, 'true'];
 
-            return this.validateRequired(name, value) && acceptable.indexOf(value) > -1;
+            return this.validateRequired(name, value) && acceptable.indexOf(value) >= 0;
         }
     }, {
         key: 'validateConfirmed',

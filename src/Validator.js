@@ -186,6 +186,8 @@ export default class Validator {
 
         if (typeof method === 'function') {
             return method.apply(this, [name, value, rule.params])
+        } else {
+            console.error('"' + rule.name + '" validation rule does not exist!')
         }
 
         return false
@@ -232,10 +234,10 @@ export default class Validator {
         return this.validateMatch(name, value, params);
     }
 
-    validateAccept(name, value) {
+    validateAccepted(name, value) {
         var acceptable = ['yes', 'on', '1', 1, true, 'true']
 
-        return this.validateRequired(name, value) && (acceptable.indexOf(value) > -1)
+        return this.validateRequired(name, value) && (acceptable.indexOf(value) >= 0)
     }
 
     validateConfirmed(name, value) {

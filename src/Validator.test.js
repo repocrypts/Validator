@@ -426,6 +426,80 @@ describe('Validator', function() {
             expect(v.passes()).to.be.true
         })
     })
+    describe('#validateAccepted()', function() {
+        it('returns false when given value is "no"', function() {
+            let v = Validator.make({ foo: 'no'}, [{name: 'foo', rules: 'accepted'}])
+            expect(v.passes()).to.be.false
+        })
+        it('returns false when given value is null', function() {
+            let v = Validator.make({ foo: null}, [{name: 'foo', rules: 'accepted'}])
+            expect(v.passes()).to.be.false
+        })
+        it('returns false when the field is not present', function() {
+            let v = Validator.make({}, [{name: 'foo', rules: 'accepted'}])
+            expect(v.passes()).to.be.false
+        })
+        it('returns false when given value is 0', function() {
+            let v = Validator.make({ foo: 0}, [{name: 'foo', rules: 'accepted'}])
+            expect(v.passes()).to.be.false
+        })
+        it('returns false when given value is false', function() {
+            let v = Validator.make({ foo: false}, [{name: 'foo', rules: 'accepted'}])
+            expect(v.passes()).to.be.false
+        })
+        it('returns false when given value is string "false"', function() {
+            let v = Validator.make({ foo: 'false'}, [{name: 'foo', rules: 'accepted'}])
+            expect(v.passes()).to.be.false
+        })
+        it('returns true when given value is string "yes"', function() {
+            let v = Validator.make({ foo: 'yes'}, [{name: 'foo', rules: 'accepted'}])
+            expect(v.passes()).to.be.true
+        })
+        it('returns true when given value is string "on"', function() {
+            let v = Validator.make({ foo: 'on'}, [{name: 'foo', rules: 'accepted'}])
+            expect(v.passes()).to.be.true
+        })
+        it('returns true when given value is string "1"', function() {
+            let v = Validator.make({ foo: '1'}, [{name: 'foo', rules: 'accepted'}])
+            expect(v.passes()).to.be.true
+        })
+        it('returns true when given value is numeric 1', function() {
+            let v = Validator.make({ foo: 1}, [{name: 'foo', rules: 'accepted'}])
+            expect(v.passes()).to.be.true
+        })
+        it('returns true when given value is true', function() {
+            let v = Validator.make({ foo: true}, [{name: 'foo', rules: 'accepted'}])
+            expect(v.passes()).to.be.true
+        })
+        it('returns true when given value is string "true"', function() {
+            let v = Validator.make({ foo: 'true'}, [{name: 'foo', rules: 'accepted'}])
+            expect(v.passes()).to.be.true
+        })
+    })
+    describe('#validateDigits()', function() {
+        it('returns true when the number of digits given matched', function() {
+            let v = Validator.make({foo: '12345'}, [{name: 'foo', rules: 'digits:5'}])
+            expect(v.passes()).to.be.true
+        })
+        it('returns false when the number of digits given does not match', function() {
+            let v = Validator.make({foo: '123'}, [{name: 'foo', rules: 'digits:200'}])
+            expect(v.passes()).to.be.false
+        })
+    })
+    describe('$validateDigitsBetween()', function() {
+        it('returns true when the number of digits given is between the range', function() {
+            let v = Validator.make({foo: '12345'}, [{name: 'foo', rules: 'digits_between:1,6'}])
+            expect(v.passes()).to.be.true
+        })
+        it('returns false when the given value is not numeric', function() {
+            let v = Validator.make({foo: 'bar'}, [{name: 'foo', rules: 'digits_between:1,10'}])
+            expect(v.passes()).to.be.false
+        })
+        it('returns false when the number of digits given is not in the range', function() {
+            let v = Validator.make({foo: '123'}, [{name: 'foo', rules: 'digits_between:4,5'}])
+            expect(v.passes()).to.be.false
+        })
+    })
 })
 
 /*
@@ -443,11 +517,11 @@ regex
 same
 different
 confirmed
-
-## untested
-accept
+accepted
 digits
 digits_between
+
+## untested
 size
 between
 ip
