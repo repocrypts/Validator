@@ -242,12 +242,28 @@ describe('Validator', function() {
         let rules = [
             { name: 'name', rules: 'min:3'}
         ]
-        it('returns true when passes "min" validation', function() {
+        it('returns true when the length of given string is >= the specified "min"', function() {
             let v = Validator.make({ name: 'Rati' }, rules)
             expect(v.passes()).to.be.true
         })
-        it('returns false when fails "min" validation', function() {
+        it('returns false when the length of given string is < the specified "min"', function() {
             let v = Validator.make({ name: 'Ra' }, rules)
+            expect(v.passes()).to.be.false
+        })
+        it('returns false when the given value is < the numeric min', function() {
+            let v = Validator.make({foo: '2'}, [{name: 'foo', rules: 'numeric|min:3'}])
+            expect(v.passes()).to.be.false
+        })
+        it('returns true when the given value is >= the numeric min', function() {
+            let v = Validator.make({foo: '5'}, [{name: 'foo', rules: 'numeric|min:3'}])
+            expect(v.passes()).to.be.true
+        })
+        it('returns true when size of given array is >= the array min', function() {
+            let v = Validator.make({foo: [1, 2, 3, 4]}, [{name: 'foo', rules: 'array|min:3'}])
+            expect(v.passes()).to.be.true
+        })
+        it('returns false when size of given array is < the array min', function() {
+            let v = Validator.make({foo: [1, 2]}, [{name: 'foo', rules: 'array|min:3'}])
             expect(v.passes()).to.be.false
         })
     })
@@ -255,12 +271,28 @@ describe('Validator', function() {
         let rules = [
             { name: 'name', rules: 'max:3'}
         ]
-        it('returns true when passes "max" validation', function() {
+        it('returns true when length of the given string is <= the specified max', function() {
             let v = Validator.make({ name: 'Rat' }, rules)
             expect(v.passes()).to.be.true
         })
-        it('returns false when fails "max" validation', function() {
+        it('returns false when length of the given string is > the specified max', function() {
             let v = Validator.make({ name: 'Rati' }, rules)
+            expect(v.passes()).to.be.false
+        })
+        it('returns false when the given value is > the specified numeric max', function() {
+            let v = Validator.make({foo: '211'}, [{name: 'foo', rules: 'numeric|max:100'}])
+            expect(v.passes()).to.be.false
+        })
+        it('returns true when the given value is <= the specified numeric max', function() {
+            let v = Validator.make({foo: '22'}, [{name: 'foo', rules: 'numeric|max:33'}])
+            expect(v.passes()).to.be.true
+        })
+        it('returns true when size of given array is <= the specified array max size', function() {
+            let v = Validator.make({foo: [1, 2, 3]}, [{name: 'foo', rules: 'array|max:4'}])
+            expect(v.passes()).to.be.true
+        })
+        it('returns false when size of given array is > the specified array max size', function() {
+            let v = Validator.make({foo: [1, 2, 3]}, [{name: 'foo', rules: 'array|max:2'}])
             expect(v.passes()).to.be.false
         })
     })
@@ -614,9 +646,9 @@ accepted
 digits
 digits_between
 size
+between
 
 ## untested
-between
 ip
 url
 alpha
