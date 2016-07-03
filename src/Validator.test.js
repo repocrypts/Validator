@@ -71,6 +71,25 @@ describe('Validator', function() {
             ])
         })
     })
+    describe('#getRule()', function() {
+        let rules = [
+            { name: 'name', rules: 'required|min:3' },
+            { name: 'group', rules: 'in:admin,exec'}
+        ]
+        let data = {
+            name: 'Rati',
+            group: 'admin'
+        }
+        let v = Validator.make(data, rules)
+        it('returns correct array when item is in the given rules', function() {
+            let arr = v.getRule('name', ['Required'])
+            expect(arr).to.deep.equal(['Required', []])
+        })
+        it('returns null when item is not in the given rules', function() {
+            let arr = v.getRule('group', ['Required'])
+            expect(arr).to.be.null
+        })
+    })
     describe('#hasError()', function() {
         it('returns true if there is any error', function() {
             let v = Validator.make({name: 'Test'}, [{
@@ -542,23 +561,36 @@ describe('Validator', function() {
             expect(v.passes()).to.be.false
         })
     })
-    describe('#getRule()', function() {
-        let rules = [
-            { name: 'name', rules: 'required|min:3' },
-            { name: 'group', rules: 'in:admin,exec'}
-        ]
-        let data = {
-            name: 'Rati',
-            group: 'admin'
-        }
-        let v = Validator.make(data, rules)
-        it('returns correct array when item is in the given rules', function() {
-            let arr = v.getRule('name', ['Required'])
-            expect(arr).to.deep.equal(['Required', []])
+    describe('#validateBetween()', function() {
+        it('returns false when given string length is not in the range', function() {
+            let v = Validator.make({foo: 'asdad'}, [{name: 'foo', rules: 'between:3,4'}])
+            expect(v.passes()).to.be.false
         })
-        it('returns null when item is not in the given rules', function() {
-            let arr = v.getRule('group', ['Required'])
-            expect(arr).to.be.null
+        it('returns true when given string length is in the range', function() {
+            let v = Validator.make({foo: 'asd'}, [{name: 'foo', rules: 'between:3,5'}])
+            expect(v.passes()).to.be.true
+
+            v = Validator.make({foo: 'asda'}, [{name: 'foo', rules: 'between:3,5'}])
+            expect(v.passes()).to.be.true
+
+            v = Validator.make({foo: 'asdad'}, [{name: 'foo', rules: 'between:3,5'}])
+            expect(v.passes()).to.be.true
+        })
+        it('returns false when the given numeric value is not in the specified range', function() {
+            let v = Validator.make({foo: '123'}, [{name: 'foo', rules: 'numeric|between:50,100'}])
+            expect(v.passes()).to.be.false
+        })
+        it('returns true when the given numeric value is in the specified range', function() {
+            let v = Validator.make({foo: '3'}, [{name: 'foo', rules: 'numeric|between:1,5'}])
+            expect(v.passes()).to.be.true
+        })
+        it('returns true when the given array size is in the specified range', function() {
+            let v = Validator.make({foo: [1, 2, 3]}, [{name: 'foo', rules: 'array|between:1,5'}])
+            expect(v.passes()).to.be.true
+        })
+        it('returns false when the given array size is not in the specified range', function() {
+            let v = Validator.make({foo: [1, 2, 3]}, [{name: 'foo', rules: 'array|between:1,2'}])
+            expect(v.passes()).to.be.false
         })
     })
 })
@@ -581,9 +613,9 @@ confirmed
 accepted
 digits
 digits_between
+size
 
 ## untested
-size
 between
 ip
 url
