@@ -442,10 +442,14 @@ export default class Validator {
         return ! isNaN(Date.parse(value))
     }
 
-    validateDateBetween(name, value, params) {
-        var date = Date.parse(value)
-        return date >= Date.parse(params[0]) && date <= Date.parse(params[1])
-    }
+    validateBoolean(name, value) {
+        if (! this.hasData(name)) {
+            return true
+        }
 
+        let acceptable = [true, false, 0, 1, '0', '1']
+
+        return value === null || acceptable.indexOf(value) >= 0
+    }
 }
 

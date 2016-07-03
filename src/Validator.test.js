@@ -785,6 +785,59 @@ describe('Validator', function() {
             expect(v.fails()).to.be.true
         })
     })
+    describe('#validateArray()', function() {
+        it('returns true when given data is an array', function() {
+            let v = Validator.make({foo: [1, 2, 3]}, [{name: 'foo', rules: 'array'}])
+            expect(v.passes()).to.be.true
+        })
+        it('returns false when given data is not an array', function() {
+            let v = Validator.make({foo: 'xyz'}, [{name: 'foo', rules: 'array'}])
+            expect(v.passes()).to.be.false
+        })
+    })
+    describe('#validateBoolean()', function() {
+        it('returns false when given string "no"', function() {
+            let v = Validator.make({foo: 'no'}, [{name: 'foo', rules: 'boolean'}])
+            expect(v.passes()).to.be.false
+        })
+        it('returns false when given string "yes"', function() {
+            let v = Validator.make({foo: 'yes'}, [{name: 'foo', rules: 'boolean'}])
+            expect(v.passes()).to.be.false
+        })
+        it('returns false when given string "false"', function() {
+            let v = Validator.make({foo: 'false'}, [{name: 'foo', rules: 'boolean'}])
+            expect(v.passes()).to.be.false
+        })
+        it('returns false when given string "true"', function() {
+            let v = Validator.make({foo: 'true'}, [{name: 'foo', rules: 'boolean'}])
+            expect(v.passes()).to.be.false
+        })
+        it('returns true when passing empty data', function() {
+            let v = Validator.make({}, [{name: 'foo', rules: 'boolean'}])
+            expect(v.passes()).to.be.true
+        })
+        it('returns true when given boolean value true or false', function() {
+            let v = Validator.make({foo: true}, [{name: 'foo', rules: 'boolean'}])
+            expect(v.passes()).to.be.true
+
+            v = Validator.make({foo: false}, [{name: 'foo', rules: 'boolean'}])
+            expect(v.passes()).to.be.true
+        })
+        it('returns true when given value 1 or "1"', function() {
+            let v = Validator.make({foo: 1}, [{name: 'foo', rules: 'boolean'}])
+            expect(v.passes()).to.be.true
+
+            v = Validator.make({foo: '1'}, [{name: 'foo', rules: 'boolean'}])
+            expect(v.passes()).to.be.true
+        })
+        it('returns true when given value 0 or "0"', function() {
+            let v = Validator.make({foo: 0}, [{name: 'foo', rules: 'boolean'}])
+            expect(v.passes()).to.be.true
+
+            v = Validator.make({foo: '0'}, [{name: 'foo', rules: 'boolean'}])
+            expect(v.passes()).to.be.true
+        })
+    })
 })
 
 /*
@@ -812,15 +865,13 @@ url
 alpha
 alpha_num
 alpha_dash
-
-## untested
 before (date)
 after (date)
-date_between (date)
-## pending
 array
 boolean
-date
+
+## untested
+## pending
 dimensions
 distinct
 filled
@@ -845,5 +896,6 @@ alpha_num -- other dialects
 alpha_dash -- other dialects
 date_format
 after -- not work with string like 'today', 'tomorrow', etc.
+before -- same as above
 
  */

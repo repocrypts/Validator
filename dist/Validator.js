@@ -473,10 +473,15 @@ var Validator = function () {
             return !isNaN(Date.parse(value));
         }
     }, {
-        key: 'validateDateBetween',
-        value: function validateDateBetween(name, value, params) {
-            var date = Date.parse(value);
-            return date >= Date.parse(params[0]) && date <= Date.parse(params[1]);
+        key: 'validateBoolean',
+        value: function validateBoolean(name, value) {
+            if (!this.hasData(name)) {
+                return true;
+            }
+
+            var acceptable = [true, false, 0, 1, '0', '1'];
+
+            return value === null || acceptable.indexOf(value) >= 0;
         }
     }, {
         key: 'dateRules',
