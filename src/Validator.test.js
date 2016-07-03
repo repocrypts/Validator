@@ -1097,7 +1097,7 @@ mime_types
 timezone
 exists (DB)
 unique (DB)
-dimensions
+dimensions (Image)
 distinct
 filled
 image (File)

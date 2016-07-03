@@ -72,7 +72,7 @@ var Validator = function () {
         key: 'requireParameterCount',
         value: function requireParameterCount(count, params, rule) {
             if (params.length < count) {
-                console.error('Validation rule ' + rule + ' requires at least ' + count + ' parameters');
+                throw new Error('Validation rule ' + rule + ' requires at least ' + count + ' parameters');
             }
         }
     }, {
