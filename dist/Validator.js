@@ -383,7 +383,7 @@ var Validator = function () {
         value: function validateIp(name, value) {
             var segments = value.split('.');
 
-            if (segments.length === 4 && this.validateBetween(name, segments[0], [1, 255]) && this.validateBetween(name, segmentg[1], [0, 255]) && this.validateBetween(name, segmentg[2], [0, 255]) && this.validateBetween(name, segmentg[3], [1, 255])) {
+            if (segments.length === 4 && this.validateBetween(name, segments[0], [1, 255]) && this.validateBetween(name, segments[1], [0, 255]) && this.validateBetween(name, segments[2], [0, 255]) && this.validateBetween(name, segments[3], [1, 255])) {
                 return true;
             }
 

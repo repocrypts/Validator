@@ -625,6 +625,70 @@ describe('Validator', function() {
             expect(v.passes()).to.be.false
         })
     })
+    describe('#validateIp()', function() {
+        it('returns false when given string that does not look like IP address', function() {
+            let v = Validator.make({ip: 'asdfsdfsd'}, [{name: 'ip', rules: 'ip'}])
+            expect(v.passes()).to.be.false
+        })
+        it('returns true when given string that looks loke IP address', function() {
+            let v = Validator.make({ip: '127.0.0.1'}, [{name: 'ip', rules: 'ip'}])
+            expect(v.passes()).to.be.true
+        })
+    })
+    describe('#validateUrl()', function() {
+        it('returns false when given string that does not look like URL', function() {
+            let v = Validator.make({url: 'skd:kssk.slsls.sl'}, [{name: 'url', rules: 'url'}])
+            expect(v.passes()).to.be.false
+        })
+        it('returns true when given string that looks like URL', function() {
+            let v = Validator.make({url: 'http://kssk.slsls.sl'}, [{name: 'url', rules: 'url'}])
+            expect(v.passes()).to.be.true
+
+            v = Validator.make({url: 'http://kssk.slsls.sl/'}, [{name: 'url', rules: 'url'}])
+            expect(v.passes()).to.be.true
+
+            v = Validator.make({url: 'http://kssk.slsls.sl/sksk'}, [{name: 'url', rules: 'url'}])
+            expect(v.passes()).to.be.true
+
+            v = Validator.make({url: 'https://kssk.slsls.sl/sksk'}, [{name: 'url', rules: 'url'}])
+            expect(v.passes()).to.be.true
+        })
+    })
+    describe('#validateAlpha()', function() {
+        it('returns false when given string contains linebreak and number character', function() {
+            let v = Validator.make({x: "asdfsd2fkl"}, [{name: 'x', rules: 'alpha'}])
+            expect(v.passes()).to.be.false
+
+            v = Validator.make({x: "asdfsdfk\nsd"}, [{name: 'x', rules: 'alpha'}])
+            expect(v.passes()).to.be.false
+
+            v = Validator.make({x: "asdfsdfk\tsd"}, [{name: 'x', rules: 'alpha'}])
+            expect(v.passes()).to.be.false
+
+            v = Validator.make({x: "http://google.com"}, [{name: 'x', rules: 'alpha'}])
+            expect(v.passes()).to.be.false
+
+            v = Validator.make({x: "123"}, [{name: 'x', rules: 'alpha'}])
+            expect(v.passes()).to.be.false
+
+            v = Validator.make({x: 123}, [{name: 'x', rules: 'alpha'}])
+            expect(v.passes()).to.be.false
+        })
+        it('returns true when given string contains only alphabet character', function() {
+            let v = Validator.make({x: 'asdfsdfkl'}, [{name: 'x', rules: 'alpha'}])
+            expect(v.passes()).to.be.true
+        })
+    })
+    describe('#validateAlphaNum()', function() {
+        it('returns true when given string contains alphabet and numeric characters', function() {
+            let v = Validator.make({x: 'asdfs234dfk'}, [{name: 'x', rules: 'alpha_num'}])
+            expect(v.passes()).to.be.true
+        })
+        it('returns false when given string contains other non-alpha_num', function() {
+            v = Validator.make({x: "http://222.google.com"}, [{name: 'x', rules: 'alpha_num'}])
+            expect(v.passes()).to.be.false
+        })
+    })
 })
 
 /*
@@ -647,10 +711,10 @@ digits
 digits_between
 size
 between
-
-## untested
 ip
 url
+
+## untested
 alpha
 alpha_num
 alpha_dash
