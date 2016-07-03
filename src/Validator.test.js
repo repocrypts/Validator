@@ -84,6 +84,9 @@ describe('Validator', function() {
         it('returns correct array when item is in the given rules', function() {
             let arr = v.getRule('name', ['Required'])
             expect(arr).to.deep.equal(['Required', []])
+
+            arr = v.getRule('name', ['Min'])
+            expect(arr).to.deep.equal(['Min', ['3']])
         })
         it('returns null when item is not in the given rules', function() {
             let arr = v.getRule('group', ['Required'])
@@ -689,6 +692,99 @@ describe('Validator', function() {
             expect(v.passes()).to.be.false
         })
     })
+    describe('#validateAlphaDash()', function() {
+        it('returns true when given string contains alphabet, hyphen, and underscore char', function() {
+            let v = Validator.make({x: 'aslsl-_3dlks'}, [{name: 'x', rules: 'alpha_dash'}])
+            expect(v.passes()).to.be.true
+        })
+        it('returns false when given string contains characters other than alpha_dash', function() {
+            let v = Validator.make({x: 'http://-g232oogle.com'}, [{name: 'x', rules: 'alpha_dash'}])
+            expect(v.passes()).to.be.false
+        })
+    })
+    describe('#validateDate()', function() {
+        it('returns true when given string can be converted to a Date', function() {
+            let v = Validator.make({x: '2000-01-01'}, [{name: 'x', rules: 'date'}])
+            expect(v.passes()).to.be.true
+
+            v = Validator.make({x: '01/01/2000'}, [{name: 'x', rules: 'date'}])
+            expect(v.passes()).to.be.true
+
+            v = Validator.make({x: new Date()}, [{name: 'x', rules: 'date'}])
+            expect(v.passes()).to.be.true
+        })
+        it('return false when given string cannot be converted to a Date', function() {
+            let v = Validator.make({x: '1325376000'}, [{name: 'x', rules: 'date'}])
+            expect(v.fails()).to.be.true
+
+            v = Validator.make({x: 'Not a date'}, [{name: 'x', rules: 'date'}])
+            expect(v.fails()).to.be.true
+
+            v = Validator.make({x: ['Not', 'a', 'date']}, [{name: 'x', rules: 'date'}])
+            expect(v.fails()).to.be.true
+        })
+    })
+    describe('#validateBefore()', function() {
+        it('returns true when given date is before the specified one', function() {
+            let v = Validator.make({x: '2000-01-01'}, [{name: 'x', rules: 'before:2012-01-01'}])
+            expect(v.passes()).to.be.true
+
+            v = Validator.make({x: new Date('2000-01-01')}, [{name: 'x', rules: 'before:2012-01-01'}])
+            expect(v.passes()).to.be.true
+        })
+        it('returns false when given date is not a string or number', function() {
+            let v = Validator.make({x: ['2000-01-01']}, [{name: 'x', rules: 'before:2012-01-01'}])
+            expect(v.passes()).to.be.false
+        })
+        it('returns true when given date refer to another existing field', function() {
+            let v = Validator.make({start: '2012-01-01', ends: '2013-01-01'}, [
+                {name: 'start', rules: 'before:ends'},
+                {name: 'ends', rules: 'after:start'}
+            ])
+            expect(v.passes()).to.be.true
+
+            v = Validator.make({start: '2012-01-01', ends: '2000-01-01'}, [
+                {name: 'start', rules: 'before:ends'},
+                {name: 'ends', rules: 'after:start'}
+            ])
+            expect(v.fails()).to.be.true
+        })
+    })
+    describe('#validateAfter()', function() {
+        it('returns true when given date is after the specified one', function() {
+            let v = Validator.make({x: '2012-01-01'}, [{name: 'x', rules: 'after:2000-01-01'}])
+            expect(v.passes()).to.be.true
+        })
+        it('returns false when given date is not a string or number', function() {
+            let v = Validator.make({x: ['2012-01-01']}, [{name: 'x', rules: 'after:2000-01-01'}])
+            expect(v.passes()).to.be.false
+        })
+        it('returns true when given date refer to another existing field', function() {
+            let v = Validator.make({start: '2012-01-01', ends: '2013-01-01'}, [
+                {name: 'start', rules: 'after:2000-01-01'},
+                {name: 'ends', rules: 'after:start'}
+            ])
+            expect(v.passes()).to.be.true
+
+            v = Validator.make({start: '2012-01-01', ends: '2000-01-01'}, [
+                {name: 'start', rules: 'after:2000-01-01'},
+                {name: 'ends', rules: 'after:start'}
+            ])
+            expect(v.fails()).to.be.true
+
+            v = Validator.make({start: new Date('2012-01-01'), ends: '2000-01-01'}, [
+                {name: 'start', rules: 'before:ends'},
+                {name: 'ends', rules: 'after:start'}
+            ])
+            expect(v.fails()).to.be.true
+
+            v = Validator.make({start: '2012-01-01', ends: new Date('2000-01-01')}, [
+                {name: 'start', rules: 'before:ends'},
+                {name: 'ends', rules: 'after:start'}
+            ])
+            expect(v.fails()).to.be.true
+        })
+    })
 })
 
 /*
@@ -713,11 +809,11 @@ size
 between
 ip
 url
-
-## untested
 alpha
 alpha_num
 alpha_dash
+
+## untested
 before (date)
 after (date)
 date_between (date)
@@ -725,7 +821,6 @@ date_between (date)
 array
 boolean
 date
-date_format
 dimensions
 distinct
 filled
@@ -743,4 +838,12 @@ string
 timezone
 exists (DB)
 unique (DB)
+
+## not available
+alphp -- other dialects
+alpha_num -- other dialects
+alpha_dash -- other dialects
+date_format
+after -- not work with string like 'today', 'tomorrow', etc.
+
  */

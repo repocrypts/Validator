@@ -44,6 +44,10 @@ export default class Validator {
         return this.implicitRules.indexOf(rule) > -1
     }
 
+    hasData(name) {
+        return typeof(this.data[name]) !== 'undefined'
+    }
+
     hasRule(name, rules) {
         return this.getRule(name, rules) !== null
     }
@@ -349,6 +353,14 @@ export default class Validator {
         return this.validateMatch(name, value, /^-?\d+$/)
     }
 
+    validateString(name, value) {
+        if (this.hasData(name)) {
+            return true
+        }
+
+        return value === null || typeof(value) === 'string'
+    }
+
     validateEmail(name, value) {
         return this.validateMatch(name, value, /^[A-Z0-9._%+\-]+@[A-Z0-9.\-]+\.[A-Z]{2,4}$/i)
     }
@@ -387,13 +399,47 @@ export default class Validator {
     validateBefore(name, value, params) {
         this.requireParameterCount(1, params, 'before')
 
-        return (Date.parse(value) < Date.parse(params[0]))
+        if (typeof(value) !== 'string' && typeof(value) !== 'number' && !(value instanceof Date)) {
+            return false
+        }
+
+        let date = this.hasData(params[0]) ? this.getValue(params[0]) : params[0]
+
+        if( ! this.validateDate(name, date)) {
+            console.error(params[0] + ' does not appear to be a date.')
+            return false
+        }
+
+        return (Date.parse(value) < Date.parse(date))
     }
 
     validateAfter(name, value, params) {
         this.requireParameterCount(1, params, 'after')
 
-        return (Date.parse(value) > Date.parse(params[0]))
+        if (typeof(value) !== 'string' && typeof(value) !== 'number' && !(value instanceof Date)) {
+            return false
+        }
+
+        let date = this.hasData(params[0]) ? this.getValue(params[0]) : params[0]
+
+        if( ! this.validateDate(name, date)) {
+            console.error(params[0] + ' does not appear to be a date.')
+            return false
+        }
+
+        return (Date.parse(value) > Date.parse(date))
+    }
+
+    validateDate(name, value) {
+        if (value instanceof Date) {
+            return true
+        }
+
+        if (typeof(value) !== 'string' && typeof(value) !== 'number') {
+            return false
+        }
+
+        return ! isNaN(Date.parse(value))
     }
 
     validateDateBetween(name, value, params) {
