@@ -221,18 +221,52 @@ describe('Validator', function() {
         })
     })
     describe('#validateRequired()', function() {
-        let rules = [{ name: 'email', rules: 'required'}]
-        it('return true when passes "required" validation', function() {
-            let v = Validator.make(
-                { email: 'rati@example.com' },rules
-            )
+        it('return false when the required field is not present', function() {
+            let v = Validator.make({}, [{name: 'name', rules: 'required'}])
+            expect(v.passes()).to.be.false
+        })
+        it('return false when the required field is present but empty', function() {
+            let v = Validator.make({name: ''}, [{name: 'name', rules: 'required'}])
+            expect(v.passes()).to.be.false
+        })
+        it('return true when the required field is present and has value', function() {
+            let v = Validator.make({name: 'foo'}, [{name: 'name', rules: 'required'}])
             expect(v.passes()).to.be.true
         })
-        it('returns false when fails "required" validation', function() {
-            let v = Validator.make(
-                { name: 'Rati' }, rules
-            )
-            expect(v.fails()).to.be.true
+    })
+    describe('#validateRequiredWith()', function() {
+        let rules = [
+            {name: 'last', rules: 'required_with:first'}
+        ]
+        it('returns false when the validated field is not present', function() {
+            let v = Validator.make({first: 'Taylor'}, rules)
+            expect(v.passes()).to.be.false
+        })
+        it('returns false when the validated field is empty', function() {
+            let v = Validator.make({first: 'Taylor', last: ''}, rules)
+            expect(v.passes()).to.be.false
+        })
+        it('returns true when the validated field is not present, butthe required_with field is empty', function() {
+            let v = Validator.make({first: ''}, rules)
+            expect(v.passes()).to.be.true
+        })
+        it('returns true when both validated field and required_with field are not present', function() {
+            let v = Validator.make({}, rules)
+            expect(v.passes()).to.be.true
+        })
+        it('returns true when the validated field is present and the required_with field can be validated', function() {
+            let v = Validator.make({first: 'Taylor', last: 'Otwell'}, rules)
+            expect(v.passes()).to.be.true
+        })
+    })
+    describe('#validateRequiredWithAll()', function() {
+        it('returns true when the field under validation must be present only if all of the other specified fields are present', function() {
+            let v = Validator.make({first: 'foo'}, [{name: 'last', rules: 'required_with_all:first,foo'}])
+            expect(v.passes()).to.be.true
+        })
+        it('returns false when the field under validation is not present', function() {
+            let v = Validator.make({first: 'foo'}, [{name: 'last', rules: 'required_with_all:first'}])
+            expect(v.passes()).to.be.false
         })
     })
     describe('#getSize()', function() {
@@ -882,15 +916,10 @@ before (date)
 after (date)
 array
 boolean
+json
 
 ## untested
 ## pending
-dimensions
-distinct
-filled
-image (File)
-in_array
-json
 mime_types
 required_if
 required_unless
@@ -902,6 +931,11 @@ string
 timezone
 exists (DB)
 unique (DB)
+dimensions
+distinct
+filled
+image (File)
+in_array
 
 ## not available
 alphp -- other dialects

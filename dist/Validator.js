@@ -233,6 +233,125 @@ var Validator = function () {
             return typeof this.data[name] !== 'undefined';
         }
     }, {
+        key: 'validateFilled',
+        value: function validateFilled(name, value) {
+            if (this.hasData(name)) {
+                return this.validateRequired(name, value);
+            }
+
+            return true;
+        }
+    }, {
+        key: 'anyFailingRequired',
+        value: function anyFailingRequired(names) {
+            var self = this;
+            var result = false;
+
+            names.forEach(function (name) {
+                if (!self.validateRequired(name, self.getValue(name))) {
+                    result = true;
+                    return;
+                }
+            });
+
+            return result;
+        }
+    }, {
+        key: 'allFailingRequired',
+        value: function allFailingRequired(names) {
+            var self = this;
+            var result = true;
+
+            names.forEach(function (name) {
+                if (self.validateRequired(name, self.getValue(name))) {
+                    result = false;
+                    return;
+                }
+            });
+
+            return result;
+        }
+    }, {
+        key: 'validateRequiredWith',
+        value: function validateRequiredWith(name, value, params) {
+            if (!this.allFailingRequired(params)) {
+                return this.validateRequired(name, value);
+            }
+
+            return true;
+        }
+    }, {
+        key: 'validateRequiredWithAll',
+        value: function validateRequiredWithAll(name, value, params) {
+            if (!this.anyFailingRequired(params)) {
+                return this.validateRequired(name, value);
+            }
+
+            return true;
+        }
+    }, {
+        key: 'validateRequiredWithout',
+        value: function validateRequiredWithout(name, value, params) {
+            if (this.anyFailingRequired(params)) {
+                return this.validateRequired(name, value);
+            }
+
+            return true;
+        }
+    }, {
+        key: 'validateRequiredWithoutAll',
+        value: function validateRequiredWithoutAll(name, value, params) {
+            if (this.allFailingRequired(params)) {
+                return this.validateRequired(name, value);
+            }
+
+            return true;
+        }
+    }, {
+        key: 'validateRequiredIf',
+        value: function validateRequiredIf(name, value, params) {
+            this.requireParameterCount(2, params, 'required_if');
+
+            var data = this.getValue(params[0]);
+
+            var values = params.slice(1);
+
+            if (values.indexOf(data) >= 0) {
+                return this.validateRequired(name, value);
+            }
+
+            return true;
+        }
+    }, {
+        key: 'validateRequiredUnless',
+        value: function validateRequiredUnless(name, value, params) {
+            this.requireParameterCount(2, params, 'required_unless');
+
+            var data = this.getValue(params[0]);
+
+            var values = params.slice(1);
+
+            if (values.indexOf(data) < 0) {
+                return this.validateRequired(name, value);
+            }
+
+            return true;
+        }
+    }, {
+        key: 'getPresentCount',
+        value: function getPresentCount(names) {
+            var self = this;
+            var count = 0;
+
+            names.forEach(function (name) {
+                if (typeof self.data[name] !== 'undefined') {
+                    count++;
+                }
+            });
+
+            return count;
+        }
+    }, {
         key: 'validateMatch',
         value: function validateMatch(name, value, params) {
             if (!(params instanceof Array)) {

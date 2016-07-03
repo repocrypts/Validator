@@ -223,6 +223,115 @@ export default class Validator {
         return typeof(this.data[name]) !== 'undefined'
     }
 
+    validateFilled(name, value) {
+        if (this.hasData(name)) {
+            return this.validateRequired(name, value)
+        }
+
+        return true
+    }
+
+    anyFailingRequired(names) {
+        let self = this
+        let result = false
+
+        names.forEach(function(name) {
+            if (! self.validateRequired(name, self.getValue(name))) {
+                result = true
+                return
+            }
+        })
+
+        return result
+    }
+
+    allFailingRequired(names) {
+        let self = this
+        let result = true
+
+        names.forEach(function(name) {
+            if (self.validateRequired(name, self.getValue(name))) {
+                result = false
+                return
+            }
+        })
+
+        return result
+    }
+
+    validateRequiredWith(name, value, params) {
+        if (! this.allFailingRequired(params)) {
+            return this.validateRequired(name, value)
+        }
+
+        return true
+    }
+
+    validateRequiredWithAll(name, value, params) {
+        if (! this.anyFailingRequired(params)) {
+            return this.validateRequired(name, value)
+        }
+
+        return true
+    }
+
+    validateRequiredWithout(name, value, params) {
+        if (this.anyFailingRequired(params)) {
+            return this.validateRequired(name, value)
+        }
+
+        return true
+    }
+
+    validateRequiredWithoutAll(name, value, params) {
+        if (this.allFailingRequired(params)) {
+            return this.validateRequired(name, value)
+        }
+
+        return true
+    }
+
+    validateRequiredIf(name, value, params) {
+        this.requireParameterCount(2, params, 'required_if')
+
+        let data = this.getValue(params[0])
+
+        let values = params.slice(1)
+
+        if (values.indexOf(data) >= 0) {
+            return this.validateRequired(name, value)
+        }
+
+        return true
+    }
+
+    validateRequiredUnless(name, value, params) {
+        this.requireParameterCount(2, params, 'required_unless')
+
+        let data = this.getValue(params[0])
+
+        let values = params.slice(1)
+
+        if (values.indexOf(data) < 0) {
+            return this.validateRequired(name, value)
+        }
+
+        return true
+    }
+
+    getPresentCount(names) {
+        let self = this
+        let count = 0
+
+        names.forEach(function(name) {
+            if (typeof(self.data[name]) !== 'undefined') {
+                count++
+            }
+        })
+
+        return count
+    }
+
     validateMatch(name, value, params) {
         if (!(params instanceof Array)) {
             params = [params];
