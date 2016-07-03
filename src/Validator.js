@@ -99,11 +99,13 @@ export default class Validator {
         let arr = []
 
         rule.split('|').forEach(function(ruleAndArgs) {
-            let args = ruleAndArgs.split(':')
-            arr.push({
-                name: self.titleCase(args[0], '_'),
-                params: args[1] ? args[1].split(',') : []
-            })
+            if (ruleAndArgs.trim()) {
+                let args = ruleAndArgs.split(':')
+                arr.push({
+                    name: self.titleCase(args[0], '_'),
+                    params: args[1] ? args[1].split(',') : []
+                })
+            }
         })
 
         return arr

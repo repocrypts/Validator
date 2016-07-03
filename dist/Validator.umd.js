@@ -153,11 +153,13 @@ return /******/ (function(modules) { // webpackBootstrap
 	            var arr = [];
 	
 	            rule.split('|').forEach(function (ruleAndArgs) {
-	                var args = ruleAndArgs.split(':');
-	                arr.push({
-	                    name: self.titleCase(args[0], '_'),
-	                    params: args[1] ? args[1].split(',') : []
-	                });
+	                if (ruleAndArgs.trim()) {
+	                    var args = ruleAndArgs.split(':');
+	                    arr.push({
+	                        name: self.titleCase(args[0], '_'),
+	                        params: args[1] ? args[1].split(',') : []
+	                    });
+	                }
 	            });
 	
 	            return arr;

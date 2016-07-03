@@ -305,6 +305,7 @@ describe('Validator', function() {
             let v = Validator.make({foo: [1, 2]}, [{name: 'foo', rules: 'array|min:3'}])
             expect(v.passes()).to.be.false
         })
+        /* SKIP file related tests */
     })
     describe('#validateMax()', function() {
         let rules = [
@@ -334,6 +335,7 @@ describe('Validator', function() {
             let v = Validator.make({foo: [1, 2, 3]}, [{name: 'foo', rules: 'array|max:2'}])
             expect(v.passes()).to.be.false
         })
+        /* SKIP file related tests */
     })
     describe('#validateIn()', function() {
         it('returns false when given value is not in the list', function() {
@@ -640,6 +642,7 @@ describe('Validator', function() {
             let v = Validator.make({foo: [1, 2, 3]}, [{name: 'foo', rules: 'array|size:4'}])
             expect(v.passes()).to.be.false
         })
+        /* SKIP file related tests */
     })
     describe('#validateBetween()', function() {
         it('returns false when given string length is not in the range', function() {
@@ -672,6 +675,7 @@ describe('Validator', function() {
             let v = Validator.make({foo: [1, 2, 3]}, [{name: 'foo', rules: 'array|between:1,2'}])
             expect(v.passes()).to.be.false
         })
+        /* SKIP file related tests */
     })
     describe('#validateIp()', function() {
         it('returns false when given string that does not look like IP address', function() {
@@ -1039,6 +1043,12 @@ describe('Validator', function() {
 
             v = Validator.make({x: true}, [{name: 'x', rules: 'string'}])
             expect(v.passes()).to.be.false
+        })
+    })
+    describe('# Others', function() {
+        it('tests that empty rules are skipped', function() {
+            let v = Validator.make({x: 'asksksks'}, [{name: 'x', rules: '|||required|'}])
+            expect(v.passes()).to.be.true
         })
     })
 })
