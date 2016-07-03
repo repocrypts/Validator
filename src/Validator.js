@@ -451,5 +451,14 @@ export default class Validator {
 
         return value === null || acceptable.indexOf(value) >= 0
     }
+
+    validateJson(name, value) {
+        try {
+            JSON.parse(value)
+            return true
+        } catch(err) {
+            return false
+        }
+    }
 }
 

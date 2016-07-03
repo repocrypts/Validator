@@ -484,6 +484,16 @@ var Validator = function () {
             return value === null || acceptable.indexOf(value) >= 0;
         }
     }, {
+        key: 'validateJson',
+        value: function validateJson(name, value) {
+            try {
+                JSON.parse(value);
+                return true;
+            } catch (err) {
+                return false;
+            }
+        }
+    }, {
         key: 'dateRules',
         get: function get() {
             return ['Before', 'After', 'DateBetween'];

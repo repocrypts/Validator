@@ -838,6 +838,19 @@ describe('Validator', function() {
             expect(v.passes()).to.be.true
         })
     })
+    describe('#validateJson()', function() {
+        it('returns false when given string is not parsable to JSON', function() {
+            let v = Validator.make({foo: 'aksdkd'}, [{name: 'foo', rules: 'json'}])
+            expect(v.passes()).to.be.false
+        })
+        it('returns true when given string is parsable to JSON', function() {
+            let v = Validator.make({foo: '[]'}, [{name: 'foo', rules: 'json'}])
+            expect(v.passes()).to.be.true
+
+            v = Validator.make({foo: '{"name":"John","age":"34"}'}, [{name: 'foo', rules: 'json'}])
+            expect(v.passes()).to.be.true
+        })
+    })
 })
 
 /*
