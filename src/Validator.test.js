@@ -915,7 +915,93 @@ describe('Validator', function() {
             let v = Validator.make({first: 'Taylor', last: 'Otwell'}, [{name: 'last', rules: 'required_without:first'}])
             expect(v.passes()).to.be.true
         })
+        it('tests required_without multiple', function() {
+            let rules = [
+                { name: 'f1', rules: 'required_without:f2,f3'},
+                { name: 'f2', rules: 'required_without:f1,f3'},
+                { name: 'f3', rules: 'required_without:f1,f2'}
+            ]
+            let v = Validator.make({}, rules)
+            expect(v.fails()).to.be.true
 
+            v = Validator.make({f1: 'foo'}, rules)
+            expect(v.fails()).to.be.true
+
+            v = Validator.make({f2: 'foo'}, rules)
+            expect(v.fails()).to.be.true
+
+            v = Validator.make({f3: 'foo'}, rules)
+            expect(v.fails()).to.be.true
+
+            v = Validator.make({f1: 'foo', f2: 'bar'}, rules)
+            expect(v.passes()).to.be.true
+
+            v = Validator.make({f1: 'foo', f3: 'bar'}, rules)
+            expect(v.passes()).to.be.true
+
+            v = Validator.make({f2: 'foo', f3: 'bar'}, rules)
+            expect(v.passes()).to.be.true
+
+            v = Validator.make({f1: 'foo', f2: 'bar', f3: 'baz'}, rules)
+            expect(v.passes()).to.be.true
+        })
+    })
+    describe('#validateRequiredWithoutAll()', function() {
+        let rules = [
+            { name: 'f1', rules: 'required_without_all:f2,f3'},
+            { name: 'f2', rules: 'required_without_all:f1,f3'},
+            { name: 'f3', rules: 'required_without_all:f1,f2'}
+        ]
+        it('returns false when given data is empty', function() {
+            let v = Validator.make({}, rules)
+            expect(v.fails()).to.be.true
+        })
+        it('returns true when the other specified fields are not present', function() {
+            let v = Validator.make({f1: 'foo'}, rules)
+            expect(v.passes()).to.be.true
+
+            v = Validator.make({f2: 'foo'}, rules)
+            expect(v.passes()).to.be.true
+
+            v = Validator.make({f3: 'foo'}, rules)
+            expect(v.passes()).to.be.true
+        })
+        it('returns true when the other specified fields are not required', function() {
+            let v = Validator.make({f1: 'foo', f2: 'bar'}, rules)
+            expect(v.passes()).to.be.true
+
+            v = Validator.make({f1: 'foo', f3: 'bar'}, rules)
+            expect(v.passes()).to.be.true
+
+            v = Validator.make({f2: 'foo', f3: 'bar'}, rules)
+            expect(v.passes()).to.be.true
+
+            v = Validator.make({f1: 'foo', f2: 'bar', f3: 'baz'}, rules)
+            expect(v.passes()).to.be.true
+        })
+    })
+    describe('#validateRequiredIf()', function() {
+        it('returns false when the field under validation is not present', function() {
+            let v = Validator.make({first: 'taylor'}, [{name: 'last', rules: 'required_if:first,taylor'}])
+            expect(v.fails()).to.be.true
+        })
+        it('returns true when the field under validation must be present if the anotherfield field is equal to any value', function() {
+            let v = Validator.make({first: 'taylor', last: 'otwell'}, [{name: 'last', rules: 'required_if:first,taylor'}])
+            expect(v.passes()).to.be.true
+
+            v = Validator.make({first: 'taylor', last: 'otwell'}, [{name: 'last', rules: 'required_if:first,taylor,dayle'}])
+            expect(v.passes()).to.be.true
+
+            v = Validator.make({first: 'dayle', last: 'rees'}, [{name: 'last', rules: 'required_if:first,taylor,dayle'}])
+            expect(v.passes()).to.be.true
+
+            v = Validator.make({foo: true}, [{name: 'bar', rules: 'required_if:foo,false'}])
+            expect(v.passes()).to.be.true
+
+            v = Validator.make({foo: true}, [{name: 'bar', rules: 'required_if:foo,true'}])
+            expect(v.fails()).to.be.true
+        })
+        /* SKIP test for error message when passed multiple values */
     })
 })
 

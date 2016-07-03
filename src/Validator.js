@@ -299,6 +299,9 @@ export default class Validator {
         this.requireParameterCount(2, params, 'required_if')
 
         let data = this.getValue(params[0])
+        if (typeof(data) === 'boolean') {
+            data = data.toString()
+        }
 
         let values = params.slice(1)
 
