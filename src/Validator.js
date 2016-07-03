@@ -483,7 +483,7 @@ export default class Validator {
     }
 
     validateString(name, value) {
-        if (this.hasData(name)) {
+        if (! this.hasData(name)) {
             return true
         }
 

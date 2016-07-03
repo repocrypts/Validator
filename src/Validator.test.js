@@ -233,6 +233,7 @@ describe('Validator', function() {
             let v = Validator.make({name: 'foo'}, [{name: 'name', rules: 'required'}])
             expect(v.passes()).to.be.true
         })
+        /* SKIP File related test */
     })
     describe('#validateRequiredWith()', function() {
         let rules = [
@@ -258,6 +259,7 @@ describe('Validator', function() {
             let v = Validator.make({first: 'Taylor', last: 'Otwell'}, rules)
             expect(v.passes()).to.be.true
         })
+        /* SKIP File related test */
     })
     describe('#validateRequiredWithAll()', function() {
         it('returns true when the field under validation must be present only if all of the other specified fields are present', function() {
@@ -915,6 +917,7 @@ describe('Validator', function() {
             let v = Validator.make({first: 'Taylor', last: 'Otwell'}, [{name: 'last', rules: 'required_without:first'}])
             expect(v.passes()).to.be.true
         })
+        /* SKIP File related test */
         it('tests required_without multiple', function() {
             let rules = [
                 { name: 'f1', rules: 'required_without:f2,f3'},
@@ -1003,6 +1006,41 @@ describe('Validator', function() {
         })
         /* SKIP test for error message when passed multiple values */
     })
+    describe('#validateRequiredUnless()', function() {
+        it('checks the field under validation must be present unless the anotherfield field is equal to any value', function() {
+            let v = Validator.make({first: 'sven'}, [{name: 'last', rules: 'required_unless:first,taylor'}])
+            expect(v.fails()).to.be.true
+
+            v = Validator.make({first: 'taylor'}, [{name: 'last', rules: 'required_unless:first,taylor'}])
+            expect(v.passes()).to.be.true
+
+            v = Validator.make({first: 'sven', last: 'wittevrongel'}, [{name: 'last', rules: 'required_unless:first,taylor'}])
+            expect(v.passes()).to.be.true
+
+            v = Validator.make({first: 'taylor'}, [{name: 'last', rules: 'required_unless:first,taylor,sven'}])
+            expect(v.passes()).to.be.true
+
+            v = Validator.make({first: 'sven'}, [{name: 'last', rules: 'required_unless:first,taylor,sven'}])
+            expect(v.passes()).to.be.true
+        })
+        /* SKIP test error message when passed multiple values */
+    })
+    describe('#validateString()', function() {
+        it('returns true when given value is a string', function() {
+            let v = Validator.make({x: 'aslsdlks'}, [{name: 'x', rules: 'string'}])
+            expect(v.passes()).to.be.true
+        })
+        it('returns false when given value is not of type string', function() {
+            let v = Validator.make({x: ['aa', 'bb']}, [{name: 'x', rules: 'string'}])
+            expect(v.passes()).to.be.false
+
+            v = Validator.make({x: {'aa': '123'}}, [{name: 'x', rules: 'string'}])
+            expect(v.passes()).to.be.false
+
+            v = Validator.make({x: true}, [{name: 'x', rules: 'string'}])
+            expect(v.passes()).to.be.false
+        })
+    })
 })
 
 /*
@@ -1039,13 +1077,13 @@ required_if
 required_unless
 required_with
 required_with_all
+required_without
+required_without_all
+string
 
 ## untested
 ## pending
 mime_types
-required_without
-required_without_all
-string
 timezone
 exists (DB)
 unique (DB)

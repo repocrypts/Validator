@@ -577,7 +577,7 @@ return /******/ (function(modules) { // webpackBootstrap
 	    }, {
 	        key: 'validateString',
 	        value: function validateString(name, value) {
-	            if (this.hasData(name)) {
+	            if (!this.hasData(name)) {
 	                return true;
 	            }
 	
