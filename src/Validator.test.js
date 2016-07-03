@@ -334,28 +334,37 @@ describe('Validator', function() {
         })
     })
     describe('#validateIn()', function() {
-        let rules = [
-            { name: 'name', rules: 'in:mom,dad,children'}
-        ]
-        it('returns true when passes "in" validation', function() {
-            let v = Validator.make({ name: 'dad' }, rules)
+        it('returns false when given value is not in the list', function() {
+            let v = Validator.make({name: 'foo'}, [{name: 'name', rules: 'in:bar,baz'}])
+            expect(v.passes()).to.be.false
+
+            v = Validator.make({name: 0}, [{name: 'name', rules: 'in:bar,baz'}])
+            expect(v.passes()).to.be.false
+        })
+        it('returns true when given value is in the last', function() {
+            let v = Validator.make({name: 'foo'}, [{name: 'name', rules: 'in:foo,baz'}])
             expect(v.passes()).to.be.true
         })
-        it('returns false when fails "in" validation', function() {
-            let v = Validator.make({ name: 'me' }, rules)
+        it('returns false when any value in the given array is not in the list', function() {
+            let v = Validator.make({name: ['foo', 'bar']}, [{name: 'name', rules: 'array|in:foo,baz'}])
+            expect(v.passes()).to.be.false
+        })
+        it('returns true when all value in given array are in the list', function() {
+            let v = Validator.make({name: ['foo', 'qux']}, [{name: 'name', rules: 'array|in:foo,baz,qux'}])
+            expect(v.passes()).to.be.true
+        })
+        it('returns false when the field under validation is not an array', function() {
+            let v = Validator.make({name: ['foo', 'bar']}, [{name: 'name', rules: 'alpha|in:foo,bar'}])
             expect(v.passes()).to.be.false
         })
     })
     describe('#validateNotIn()', function() {
-        let rules = [
-            { name: 'name', rules: 'not_in:mom,dad,children'}
-        ]
-        it('return true when pass "not_in" validation', function() {
-            let v = Validator.make({ name: 'me' }, rules)
+        it('return true when given value is not in the list', function() {
+            let v = Validator.make({ name: 'foo' }, [{name: 'name', rules: 'not_in:bar,baz'}])
             expect(v.passes()).to.be.true
         })
-        it('returns false when failes "not_in" validation', function() {
-            let v = Validator.make({ name: 'dad' }, rules)
+        it('returns false when given value is in the list', function() {
+            let v = Validator.make({ name: 'foo' }, [{name: 'name', rules: 'not_in:foo,baz'}])
             expect(v.passes()).to.be.false
         })
     })
@@ -405,11 +414,11 @@ describe('Validator', function() {
         let rules = [
             { name: 'email', rules: 'email' }
         ]
-        it('returns true when passes "email" validation', function() {
+        it('returns true when given value looks like an email address', function() {
             let v = Validator.make({ email: 'rati@example.com'}, rules)
             expect(v.passes()).to.be.true
         })
-        it('returns false when fails "email" validation', function() {
+        it('returns false when given value does not look like an email address', function() {
             let v = Validator.make({ email: 'example.com'}, rules)
             expect(v.passes()).to.be.false
         })
@@ -885,6 +894,29 @@ describe('Validator', function() {
             expect(v.passes()).to.be.true
         })
     })
+    describe('#validateRequiredWithout()', function() {
+        it('returns true when the field under validation is not present if the other specified field is present', function() {
+            let v = Validator.make({first: 'Taylor'}, [{name: 'last', rules: 'required_without:first'}])
+            expect(v.passes()).to.be.true
+        })
+        it('returns true when the field under validation is empty while the other specified field is present', function() {
+            let v = Validator.make({first: 'Taylor', last: ''}, [{name: 'last', rules: 'required_without:first'}])
+            expect(v.passes()).to.be.true
+        })
+        it('returns false when the field under validation is not present when the other specified field is empty', function() {
+            let v = Validator.make({first: ''}, [{name: 'last', rules: 'required_without:first'}])
+            expect(v.passes()).to.be.false
+        })
+        it('returns false when the data is empty (the field under validation is not present)', function() {
+            let v = Validator.make({}, [{name: 'last', rules: 'required_without:first'}])
+            expect(v.passes()).to.be.false
+        })
+        it('returns true when the field under validation is present, but the other specified field is not required', function() {
+            let v = Validator.make({first: 'Taylor', last: 'Otwell'}, [{name: 'last', rules: 'required_without:first'}])
+            expect(v.passes()).to.be.true
+        })
+
+    })
 })
 
 /*
@@ -917,14 +949,14 @@ after (date)
 array
 boolean
 json
-
-## untested
-## pending
-mime_types
 required_if
 required_unless
 required_with
 required_with_all
+
+## untested
+## pending
+mime_types
 required_without
 required_without_all
 string

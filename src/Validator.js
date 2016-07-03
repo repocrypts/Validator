@@ -63,6 +63,10 @@ export default class Validator {
             a = a[0]
         }
 
+        if (! Array.isArray(rulesToCheck)) {
+            rulesToCheck = [rulesToCheck]
+        }
+
         let b = a.rules.filter(function(rule) {
             return rulesToCheck.indexOf(rule.name) >= 0
         })
@@ -443,9 +447,22 @@ export default class Validator {
     }
 
     validateIn(name, value, params) {
-        this.requireParameterCount(1, params, 'in')
+        if (Array.isArray(value) && this.hasRule(name, 'Array')) {
+            let arr = this.arrayDiff(value, params)
+            return arr.length === 0
+        }
 
         return params.indexOf(value) >= 0
+    }
+
+    arrayDiff(arr1, arr2) {
+        let diff = []
+        arr1.forEach(function(item) {
+            if (arr2.indexOf(item) < 0) {
+                diff.push(item)
+            }
+        })
+        return diff
     }
 
     validateNotIn(name, value, params) {

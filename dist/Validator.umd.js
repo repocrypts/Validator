@@ -114,6 +114,10 @@ return /******/ (function(modules) { // webpackBootstrap
 	                a = a[0];
 	            }
 	
+	            if (!Array.isArray(rulesToCheck)) {
+	                rulesToCheck = [rulesToCheck];
+	            }
+	
 	            var b = a.rules.filter(function (rule) {
 	                return rulesToCheck.indexOf(rule.name) >= 0;
 	            });
@@ -532,9 +536,23 @@ return /******/ (function(modules) { // webpackBootstrap
 	    }, {
 	        key: 'validateIn',
 	        value: function validateIn(name, value, params) {
-	            this.requireParameterCount(1, params, 'in');
+	            if (Array.isArray(value) && this.hasRule(name, 'Array')) {
+	                var arr = this.arrayDiff(value, params);
+	                return arr.length === 0;
+	            }
 	
 	            return params.indexOf(value) >= 0;
+	        }
+	    }, {
+	        key: 'arrayDiff',
+	        value: function arrayDiff(arr1, arr2) {
+	            var diff = [];
+	            arr1.forEach(function (item) {
+	                if (arr2.indexOf(item) < 0) {
+	                    diff.push(item);
+	                }
+	            });
+	            return diff;
 	        }
 	    }, {
 	        key: 'validateNotIn',
