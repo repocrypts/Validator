@@ -1064,6 +1064,11 @@ describe('Validator', function() {
                     name: 'foo',
                     rule: 'Required',
                     message: 'The foo field is required.'
+                },
+                {
+                    name: 'age',
+                    rule: 'Min',
+                    message: 'The age must be at least 20.'
                 }
             ])
         })

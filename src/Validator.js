@@ -1,5 +1,4 @@
 import Messages from './Messages'
-import Replacers from './Replacers'
 
 export default class Validator {
     constructor(data, rules, customMessages = []) {
@@ -157,7 +156,6 @@ export default class Validator {
     }
 
     getErrorMsg(name, rule) {
-        let key = this.snakeCase(rule.name)
         let msg = this.getMessage(name, rule)
 
         return this.doReplacements(msg, name, rule)
@@ -171,6 +169,7 @@ export default class Validator {
             return msg
         }
 
+        msg = Messages[key]
         // message might has sub-rule
         if (typeof(msg) === 'object') {
             let type = this.getDataType(name)
@@ -201,11 +200,9 @@ export default class Validator {
             .replace(':attr', name)
 
         // call replacer
-        let replacer = Replacers['replace' + rule.name]
+        let replacer = this['replace' + rule.name]
         if (typeof replacer === 'function') {
-            msg = replacer.apply(Replacers, [msg, name, rule.name, rule.params])
-        } else {
-            throw new Error(replacer + ' function does not exist.')
+            msg = replacer.apply(this, [msg, name, rule.name, rule.params])
         }
 
         return msg
@@ -623,6 +620,137 @@ export default class Validator {
         } catch(err) {
             return false
         }
+    }
+
+    /*---- Replacers ----*/
+    strReplace(find, replace, string) {
+        if (! Array.isArray(find)) {
+            find = [find]
+        }
+        if (! Array.isArray(replace)) {
+            replace = [replace]
+        }
+        for (var i = 0; i < find.length; i++) {
+            string = string.replace(find[i], replace[i])
+        }
+
+        return string
+    }
+
+    getDisplayableValue(name, value) {
+        return value
+    }
+
+    getDataNameList(values) {
+        let names = []
+
+        for (var key in values) {
+            names.push({
+                key : this.getDataName(values[key])
+            })
+        }
+
+        return names
+    }
+
+    getDataName(name) {
+        return name
+    }
+
+    replaceBetween(msg, name, rule, params) {
+        return this.strReplace([':min', ':max'], params, msg)
+    }
+
+    replaceDifferent(msg, name, rule, params) {
+        return this.replaceSame(msg, name, rule, params)
+    }
+
+    replaceDigits(msg, name, rule, params) {
+        return this.strReplace(':digits', params[0], msg)
+    }
+
+    replaceDigitsBetween(msg, name, rule, params) {
+        return this.replaceBetween(msg, name, rule, params)
+    }
+
+    replaceMin(msg, name, rule, params) {
+      return this.strReplace(':min', params[0], msg)
+    }
+
+    replaceMax(msg, name, rule, params) {
+        return this.strReplace(':max', params[0], msg)
+    }
+
+    replaceIn(msg, name, rule, params) {
+        let self = this
+        params = params.map(function(value) {
+            return self.getDisplayableValue(name, value)
+        })
+
+        return this.strReplace(':values', params.join(', '), msg)
+    }
+
+    replaceNotIn(msg, name, rule, params) {
+        return this.replaceIn(msg, name, rule, params)
+    }
+
+    // replaceInArray()
+    // replaceMimes()
+
+    replaceRequiredWith(msg, name, rule, params) {
+        params = this.getDataNameList(params)
+
+        return this.strReplace(':values', params.join(' / '), msg)
+    }
+
+    replaceRequiredWithAll(msg, name, rule, params) {
+        return this.replaceRequiredWith(msg, name, rule, params)
+    }
+
+    replaceRequiredWithout(msg, name, rule, params) {
+        return this.replaceRequiredWith(msg, name, rule, params)
+    }
+
+    replaceRequiredWithoutAll(msg, name, rule, params) {
+        return this.replaceRequiredWith(msg, name, rule, params)
+    }
+
+    replaceRequiredIf(msg, name, rule, params) {
+        params[1] = this.getDisplayableValue(params[0], this.data[params[0]])
+
+        params[0] = this.getDataName(params[0])
+
+        return this.strReplace([':other', ':value'], params, msg)
+    }
+
+    replaceRequiredUnless(msg, name, rule, params) {
+        let other = this.getDataName(params.shift())
+
+        return this.strReplace([':other', ':values'], [other, params.join(', ')], msg)
+    }
+
+    replaceSame(msg, name, rule, params) {
+        return this.strReplace(':other', name, msg)
+    }
+
+    replaceSize(msg, name, rule, params) {
+        return this.strReplace(':size', params[0], msg)
+    }
+
+    replaceBefore(msg, name, rule, params) {
+        if (isNaN(Date.parse(params[0]))) {
+            return this.strReplace(':date', this.getDataName(params[0]), msg)
+        }
+
+        return this.strReplace(':date', params[0], msg)
+    }
+
+    replaceAfter(msg, name, rule, params) {
+        return this.replaceBefore(msg, name, rule, params)
+    }
+
+    dependsOnOtherFields(rule) {
+        return this.dependentRules.indexOf(rule)
     }
 }
 

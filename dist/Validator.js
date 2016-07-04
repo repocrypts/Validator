@@ -12,10 +12,6 @@ var _Messages = require('./Messages');
 
 var _Messages2 = _interopRequireDefault(_Messages);
 
-var _Replacers = require('./Replacers');
-
-var _Replacers2 = _interopRequireDefault(_Replacers);
-
 function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { default: obj }; }
 
 function _classCallCheck(instance, Constructor) { if (!(instance instanceof Constructor)) { throw new TypeError("Cannot call a class as a function"); } }
@@ -162,7 +158,6 @@ var Validator = function () {
     }, {
         key: 'getErrorMsg',
         value: function getErrorMsg(name, rule) {
-            var key = this.snakeCase(rule.name);
             var msg = this.getMessage(name, rule);
 
             return this.doReplacements(msg, name, rule);
@@ -177,6 +172,7 @@ var Validator = function () {
                 return msg;
             }
 
+            msg = _Messages2.default[key];
             // message might has sub-rule
             if ((typeof msg === 'undefined' ? 'undefined' : _typeof(msg)) === 'object') {
                 var type = this.getDataType(name);
@@ -207,11 +203,9 @@ var Validator = function () {
             msg = msg.replace(':ATTR', name.toUpperCase()).replace(':Attr', this.titleCase(name)).replace(':attr', name);
 
             // call replacer
-            var replacer = _Replacers2.default['replace' + rule.name];
+            var replacer = this['replace' + rule.name];
             if (typeof replacer === 'function') {
-                msg = replacer.apply(_Replacers2.default, [msg, name, rule.name, rule.params]);
-            } else {
-                throw new Error(replacer + ' function does not exist.');
+                msg = replacer.apply(this, [msg, name, rule.name, rule.params]);
             }
 
             return msg;
@@ -672,6 +666,163 @@ var Validator = function () {
             } catch (err) {
                 return false;
             }
+        }
+
+        /*---- Replacers ----*/
+
+    }, {
+        key: 'strReplace',
+        value: function strReplace(find, replace, string) {
+            if (!Array.isArray(find)) {
+                find = [find];
+            }
+            if (!Array.isArray(replace)) {
+                replace = [replace];
+            }
+            for (var i = 0; i < find.length; i++) {
+                string = string.replace(find[i], replace[i]);
+            }
+
+            return string;
+        }
+    }, {
+        key: 'getDisplayableValue',
+        value: function getDisplayableValue(name, value) {
+            return value;
+        }
+    }, {
+        key: 'getDataNameList',
+        value: function getDataNameList(values) {
+            var names = [];
+
+            for (var key in values) {
+                names.push({
+                    key: this.getDataName(values[key])
+                });
+            }
+
+            return names;
+        }
+    }, {
+        key: 'getDataName',
+        value: function getDataName(name) {
+            return name;
+        }
+    }, {
+        key: 'replaceBetween',
+        value: function replaceBetween(msg, name, rule, params) {
+            return this.strReplace([':min', ':max'], params, msg);
+        }
+    }, {
+        key: 'replaceDifferent',
+        value: function replaceDifferent(msg, name, rule, params) {
+            return this.replaceSame(msg, name, rule, params);
+        }
+    }, {
+        key: 'replaceDigits',
+        value: function replaceDigits(msg, name, rule, params) {
+            return this.strReplace(':digits', params[0], msg);
+        }
+    }, {
+        key: 'replaceDigitsBetween',
+        value: function replaceDigitsBetween(msg, name, rule, params) {
+            return this.replaceBetween(msg, name, rule, params);
+        }
+    }, {
+        key: 'replaceMin',
+        value: function replaceMin(msg, name, rule, params) {
+            return this.strReplace(':min', params[0], msg);
+        }
+    }, {
+        key: 'replaceMax',
+        value: function replaceMax(msg, name, rule, params) {
+            return this.strReplace(':max', params[0], msg);
+        }
+    }, {
+        key: 'replaceIn',
+        value: function replaceIn(msg, name, rule, params) {
+            var self = this;
+            params = params.map(function (value) {
+                return self.getDisplayableValue(name, value);
+            });
+
+            return this.strReplace(':values', params.join(', '), msg);
+        }
+    }, {
+        key: 'replaceNotIn',
+        value: function replaceNotIn(msg, name, rule, params) {
+            return this.replaceIn(msg, name, rule, params);
+        }
+
+        // replaceInArray()
+        // replaceMimes()
+
+    }, {
+        key: 'replaceRequiredWith',
+        value: function replaceRequiredWith(msg, name, rule, params) {
+            params = this.getDataNameList(params);
+
+            return this.strReplace(':values', params.join(' / '), msg);
+        }
+    }, {
+        key: 'replaceRequiredWithAll',
+        value: function replaceRequiredWithAll(msg, name, rule, params) {
+            return this.replaceRequiredWith(msg, name, rule, params);
+        }
+    }, {
+        key: 'replaceRequiredWithout',
+        value: function replaceRequiredWithout(msg, name, rule, params) {
+            return this.replaceRequiredWith(msg, name, rule, params);
+        }
+    }, {
+        key: 'replaceRequiredWithoutAll',
+        value: function replaceRequiredWithoutAll(msg, name, rule, params) {
+            return this.replaceRequiredWith(msg, name, rule, params);
+        }
+    }, {
+        key: 'replaceRequiredIf',
+        value: function replaceRequiredIf(msg, name, rule, params) {
+            params[1] = this.getDisplayableValue(params[0], this.data[params[0]]);
+
+            params[0] = this.getDataName(params[0]);
+
+            return this.strReplace([':other', ':value'], params, msg);
+        }
+    }, {
+        key: 'replaceRequiredUnless',
+        value: function replaceRequiredUnless(msg, name, rule, params) {
+            var other = this.getDataName(params.shift());
+
+            return this.strReplace([':other', ':values'], [other, params.join(', ')], msg);
+        }
+    }, {
+        key: 'replaceSame',
+        value: function replaceSame(msg, name, rule, params) {
+            return this.strReplace(':other', name, msg);
+        }
+    }, {
+        key: 'replaceSize',
+        value: function replaceSize(msg, name, rule, params) {
+            return this.strReplace(':size', params[0], msg);
+        }
+    }, {
+        key: 'replaceBefore',
+        value: function replaceBefore(msg, name, rule, params) {
+            if (isNaN(Date.parse(params[0]))) {
+                return this.strReplace(':date', this.getDataName(params[0]), msg);
+            }
+
+            return this.strReplace(':date', params[0], msg);
+        }
+    }, {
+        key: 'replaceAfter',
+        value: function replaceAfter(msg, name, rule, params) {
+            return this.replaceBefore(msg, name, rule, params);
+        }
+    }, {
+        key: 'dependsOnOtherFields',
+        value: function dependsOnOtherFields(rule) {
+            return this.dependentRules.indexOf(rule);
         }
     }, {
         key: 'dateRules',

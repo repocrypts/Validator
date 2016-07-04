@@ -68,10 +68,6 @@ return /******/ (function(modules) { // webpackBootstrap
 	
 	var _Messages2 = _interopRequireDefault(_Messages);
 	
-	var _Replacers = __webpack_require__(2);
-	
-	var _Replacers2 = _interopRequireDefault(_Replacers);
-	
 	function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { default: obj }; }
 	
 	function _classCallCheck(instance, Constructor) { if (!(instance instanceof Constructor)) { throw new TypeError("Cannot call a class as a function"); } }
@@ -218,7 +214,6 @@ return /******/ (function(modules) { // webpackBootstrap
 	    }, {
 	        key: 'getErrorMsg',
 	        value: function getErrorMsg(name, rule) {
-	            var key = this.snakeCase(rule.name);
 	            var msg = this.getMessage(name, rule);
 	
 	            return this.doReplacements(msg, name, rule);
@@ -233,6 +228,7 @@ return /******/ (function(modules) { // webpackBootstrap
 	                return msg;
 	            }
 	
+	            msg = _Messages2.default[key];
 	            // message might has sub-rule
 	            if ((typeof msg === 'undefined' ? 'undefined' : _typeof(msg)) === 'object') {
 	                var type = this.getDataType(name);
@@ -263,11 +259,9 @@ return /******/ (function(modules) { // webpackBootstrap
 	            msg = msg.replace(':ATTR', name.toUpperCase()).replace(':Attr', this.titleCase(name)).replace(':attr', name);
 	
 	            // call replacer
-	            var replacer = _Replacers2.default['replace' + rule.name];
+	            var replacer = this['replace' + rule.name];
 	            if (typeof replacer === 'function') {
-	                msg = replacer.apply(_Replacers2.default, [msg, name, rule.name, rule.params]);
-	            } else {
-	                throw new Error(replacer + ' function does not exist.');
+	                msg = replacer.apply(this, [msg, name, rule.name, rule.params]);
 	            }
 	
 	            return msg;
@@ -729,6 +723,163 @@ return /******/ (function(modules) { // webpackBootstrap
 	                return false;
 	            }
 	        }
+	
+	        /*---- Replacers ----*/
+	
+	    }, {
+	        key: 'strReplace',
+	        value: function strReplace(find, replace, string) {
+	            if (!Array.isArray(find)) {
+	                find = [find];
+	            }
+	            if (!Array.isArray(replace)) {
+	                replace = [replace];
+	            }
+	            for (var i = 0; i < find.length; i++) {
+	                string = string.replace(find[i], replace[i]);
+	            }
+	
+	            return string;
+	        }
+	    }, {
+	        key: 'getDisplayableValue',
+	        value: function getDisplayableValue(name, value) {
+	            return value;
+	        }
+	    }, {
+	        key: 'getDataNameList',
+	        value: function getDataNameList(values) {
+	            var names = [];
+	
+	            for (var key in values) {
+	                names.push({
+	                    key: this.getDataName(values[key])
+	                });
+	            }
+	
+	            return names;
+	        }
+	    }, {
+	        key: 'getDataName',
+	        value: function getDataName(name) {
+	            return name;
+	        }
+	    }, {
+	        key: 'replaceBetween',
+	        value: function replaceBetween(msg, name, rule, params) {
+	            return this.strReplace([':min', ':max'], params, msg);
+	        }
+	    }, {
+	        key: 'replaceDifferent',
+	        value: function replaceDifferent(msg, name, rule, params) {
+	            return this.replaceSame(msg, name, rule, params);
+	        }
+	    }, {
+	        key: 'replaceDigits',
+	        value: function replaceDigits(msg, name, rule, params) {
+	            return this.strReplace(':digits', params[0], msg);
+	        }
+	    }, {
+	        key: 'replaceDigitsBetween',
+	        value: function replaceDigitsBetween(msg, name, rule, params) {
+	            return this.replaceBetween(msg, name, rule, params);
+	        }
+	    }, {
+	        key: 'replaceMin',
+	        value: function replaceMin(msg, name, rule, params) {
+	            return this.strReplace(':min', params[0], msg);
+	        }
+	    }, {
+	        key: 'replaceMax',
+	        value: function replaceMax(msg, name, rule, params) {
+	            return this.strReplace(':max', params[0], msg);
+	        }
+	    }, {
+	        key: 'replaceIn',
+	        value: function replaceIn(msg, name, rule, params) {
+	            var self = this;
+	            params = params.map(function (value) {
+	                return self.getDisplayableValue(name, value);
+	            });
+	
+	            return this.strReplace(':values', params.join(', '), msg);
+	        }
+	    }, {
+	        key: 'replaceNotIn',
+	        value: function replaceNotIn(msg, name, rule, params) {
+	            return this.replaceIn(msg, name, rule, params);
+	        }
+	
+	        // replaceInArray()
+	        // replaceMimes()
+	
+	    }, {
+	        key: 'replaceRequiredWith',
+	        value: function replaceRequiredWith(msg, name, rule, params) {
+	            params = this.getDataNameList(params);
+	
+	            return this.strReplace(':values', params.join(' / '), msg);
+	        }
+	    }, {
+	        key: 'replaceRequiredWithAll',
+	        value: function replaceRequiredWithAll(msg, name, rule, params) {
+	            return this.replaceRequiredWith(msg, name, rule, params);
+	        }
+	    }, {
+	        key: 'replaceRequiredWithout',
+	        value: function replaceRequiredWithout(msg, name, rule, params) {
+	            return this.replaceRequiredWith(msg, name, rule, params);
+	        }
+	    }, {
+	        key: 'replaceRequiredWithoutAll',
+	        value: function replaceRequiredWithoutAll(msg, name, rule, params) {
+	            return this.replaceRequiredWith(msg, name, rule, params);
+	        }
+	    }, {
+	        key: 'replaceRequiredIf',
+	        value: function replaceRequiredIf(msg, name, rule, params) {
+	            params[1] = this.getDisplayableValue(params[0], this.data[params[0]]);
+	
+	            params[0] = this.getDataName(params[0]);
+	
+	            return this.strReplace([':other', ':value'], params, msg);
+	        }
+	    }, {
+	        key: 'replaceRequiredUnless',
+	        value: function replaceRequiredUnless(msg, name, rule, params) {
+	            var other = this.getDataName(params.shift());
+	
+	            return this.strReplace([':other', ':values'], [other, params.join(', ')], msg);
+	        }
+	    }, {
+	        key: 'replaceSame',
+	        value: function replaceSame(msg, name, rule, params) {
+	            return this.strReplace(':other', name, msg);
+	        }
+	    }, {
+	        key: 'replaceSize',
+	        value: function replaceSize(msg, name, rule, params) {
+	            return this.strReplace(':size', params[0], msg);
+	        }
+	    }, {
+	        key: 'replaceBefore',
+	        value: function replaceBefore(msg, name, rule, params) {
+	            if (isNaN(Date.parse(params[0]))) {
+	                return this.strReplace(':date', this.getDataName(params[0]), msg);
+	            }
+	
+	            return this.strReplace(':date', params[0], msg);
+	        }
+	    }, {
+	        key: 'replaceAfter',
+	        value: function replaceAfter(msg, name, rule, params) {
+	            return this.replaceBefore(msg, name, rule, params);
+	        }
+	    }, {
+	        key: 'dependsOnOtherFields',
+	        value: function dependsOnOtherFields(rule) {
+	            return this.dependentRules.indexOf(rule);
+	        }
 	    }, {
 	        key: 'dateRules',
 	        get: function get() {
@@ -772,80 +923,76 @@ return /******/ (function(modules) { // webpackBootstrap
 /* 1 */
 /***/ function(module, exports) {
 
-	"use strict";
+	'use strict';
 	
 	Object.defineProperty(exports, "__esModule", {
 	    value: true
 	});
-	
-	var _accepted$active_url$;
-	
-	function _defineProperty(obj, key, value) { if (key in obj) { Object.defineProperty(obj, key, { value: value, enumerable: true, configurable: true, writable: true }); } else { obj[key] = value; } return obj; }
-	
-	exports.default = (_accepted$active_url$ = {
-	    "accepted": "The :attr must be accepted.",
-	    "active_url": "The :attr is not a valid URL.",
-	    "after": "The :attr must be a date after :date.",
-	    "alpha": "The :attr may only contain letters.",
-	    "alpha_dash": "The :attr may only contain letters, numbers, and dashes.",
-	    "alpha_num": "The :attr may only contain letters and numbers.",
-	    "array": "The :attr must have selected elements.",
-	    "before": "The :attr must be a date before :date.",
-	    "between": "The :attr must be between :min - :max.",
-	    "confirmed": "The :attr confirmation does not match.",
-	    "count": "The :attr must have exactly :count selected elements.",
-	    "countbetween": "The :attr must have between :min and :max selected elements.",
-	    "countmax": "The :attr must have less than :max selected elements.",
-	    "countmin": "The :attr must have at least :min selected elements.",
-	    "date_between": "The :attr must be between :start and :end.",
-	    "date_format": "The :attr must have a valid date format.",
-	    "different": "The :attr and :other must be different.",
-	    "digits": "The :attr must be :digits digits.",
-	    "digits_between": "The :attr must be between :min and :max digits.",
-	    "email": "The :attr format is invalid",
-	    "integer": "The :attr must be an integer",
-	    "exists": "The selected :attr is invalid.",
-	    "greater_than": "The :attr must be > :value",
-	    "less_than": "The :attr must be < :value",
-	    "image": "The :attr must be an image.",
-	    "in": "The selected :attr is invalid."
-	}, _defineProperty(_accepted$active_url$, "integer", "The :attr must be an integer."), _defineProperty(_accepted$active_url$, "ip", "The :attr must be a valid IP address."), _defineProperty(_accepted$active_url$, "match", "The :attr format is invalid."), _defineProperty(_accepted$active_url$, "max", "The :attr must not exceed :max."), _defineProperty(_accepted$active_url$, "min", {
-	    numeric: "The :attr must be at least :min.",
-	    file: "The :attr must be at least :min kilobytes.",
-	    string: "The :attr must be at least :min characters",
-	    array: "The :attr must have at least :min items."
-	}), _defineProperty(_accepted$active_url$, "not_in", "The selected :attr is invalid."), _defineProperty(_accepted$active_url$, "numeric", "The :attr must be a number."), _defineProperty(_accepted$active_url$, "regex", "The :attr format is invalid."), _defineProperty(_accepted$active_url$, "required", "The :attr field is required."), _defineProperty(_accepted$active_url$, "required_if", "The :attr field is required when :other is :value."), _defineProperty(_accepted$active_url$, "required_with", "The :attr field is required when :values is present."), _defineProperty(_accepted$active_url$, "required_without", "The :attr field is required when :values is not present."), _defineProperty(_accepted$active_url$, "same", "The :attr and :other must match."), _defineProperty(_accepted$active_url$, "size", "The :attr must be :size."), _defineProperty(_accepted$active_url$, "unique", "The :attr has already been taken."), _defineProperty(_accepted$active_url$, "url", "The :attr format is invalid."), _accepted$active_url$);
-
-/***/ },
-/* 2 */
-/***/ function(module, exports) {
-
-	'use strict';
-	
-	Object.defineProperty(exports, "__esModule", {
-	  value: true
-	});
-	
-	var _createClass = function () { function defineProperties(target, props) { for (var i = 0; i < props.length; i++) { var descriptor = props[i]; descriptor.enumerable = descriptor.enumerable || false; descriptor.configurable = true; if ("value" in descriptor) descriptor.writable = true; Object.defineProperty(target, descriptor.key, descriptor); } } return function (Constructor, protoProps, staticProps) { if (protoProps) defineProperties(Constructor.prototype, protoProps); if (staticProps) defineProperties(Constructor, staticProps); return Constructor; }; }();
-	
-	function _classCallCheck(instance, Constructor) { if (!(instance instanceof Constructor)) { throw new TypeError("Cannot call a class as a function"); } }
-	
-	var Replacers = function () {
-	  function Replacers() {
-	    _classCallCheck(this, Replacers);
-	  }
-	
-	  _createClass(Replacers, null, [{
-	    key: 'replaceMin',
-	    value: function replaceMin(msg, attr, rule, params) {
-	      return msg.replace(':min', params[0]);
-	    }
-	  }]);
-	
-	  return Replacers;
-	}();
-	
-	exports.default = Replacers;
+	exports.default = {
+	    'accepted': 'The :attr must be accepted.',
+	    // 'active_url'           : 'The :attr is not a valid URL.',
+	    'after': 'The :attr must be a date after :date.',
+	    'alpha': 'The :attr may only contain letters.',
+	    'alpha_dash': 'The :attr may only contain letters, numbers, and dashes.',
+	    'alpha_num': 'The :attr may only contain letters and numbers.',
+	    'array': 'The :attr must be an array.',
+	    'before': 'The :attr must be a date before :date.',
+	    'between': {
+	        'numeric': 'The :attr must be between :min and :max.',
+	        'file': 'The :attr must be between :min and :max kilobytes.',
+	        'string': 'The :attr must be between :min and :max characters.',
+	        'array': 'The :attr must have between :min and :max items.'
+	    },
+	    'boolean': 'The :attr field must be true or false.',
+	    'confirmed': 'The :attr confirmation does not match.',
+	    'date': 'The :attr is not a valid date.',
+	    'date_format': 'The :attr does not match the format :format.',
+	    'different': 'The :attr and :other must be different.',
+	    'digits': 'The :attr must be :digits digits.',
+	    'digits_between': 'The :attr must be between :min and :max digits.',
+	    'email': 'The :attr must be a valid email address.',
+	    'exists': 'The selected :attr is invalid.',
+	    'filled': 'The :attr field is required.',
+	    'image': 'The :attr must be an image.',
+	    'in': 'The selected :attr is invalid.',
+	    'integer': 'The :attr must be an integer.',
+	    'ip': 'The :attr must be a valid IP address.',
+	    'json': 'The :attr must be a valid JSON string.',
+	    'max': {
+	        'numeric': 'The :attr may not be greater than :max.',
+	        'file': 'The :attr may not be greater than :max kilobytes.',
+	        'string': 'The :attr may not be greater than :max characters.',
+	        'array': 'The :attr may not have more than :max items.'
+	    },
+	    'mimes': 'The :attr must be a file of type: :values.',
+	    'min': {
+	        'numeric': 'The :attr must be at least :min.',
+	        'file': 'The :attr must be at least :min kilobytes.',
+	        'string': 'The :attr must be at least :min characters.',
+	        'array': 'The :attr must have at least :min items.'
+	    },
+	    'not_in': 'The selected :attr is invalid.',
+	    'numeric': 'The :attr must be a number.',
+	    'regex': 'The :attr format is invalid.',
+	    'required': 'The :attr field is required.',
+	    'required_if': 'The :attr field is required when :other is :value.',
+	    'required_unless': 'The :attr field is required unless :other is in :values.',
+	    'required_with': 'The :attr field is required when :values is present.',
+	    'required_with_all': 'The :attr field is required when :values is present.',
+	    'required_without': 'The :attr field is required when :values is not present.',
+	    'required_without_all': 'The :attr field is required when none of :values are present.',
+	    'same': 'The :attr and :other must match.',
+	    'size': {
+	        'numeric': 'The :attr must be :size.',
+	        'file': 'The :attr must be :size kilobytes.',
+	        'string': 'The :attr must be :size characters.',
+	        'array': 'The :attr must contain :size items.'
+	    },
+	    'string': 'The :attr must be a string.',
+	    // 'timezone'             : 'The :attr must be a valid zone.',
+	    // 'unique'               : 'The :attr has already been taken.',
+	    'url': 'The :attr format is invalid.'
+	};
 
 /***/ }
 /******/ ])
