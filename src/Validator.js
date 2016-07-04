@@ -157,22 +157,55 @@ export default class Validator {
     }
 
     getErrorMsg(name, rule) {
-        let self = this
-        let key = self.snakeCase(rule.name)
-        let msg = self.customMessages[name + '.' + key]
-        msg = msg || Messages[key]
-        if (msg) {
-            msg = msg.replace(':ATTR', name.toUpperCase())
-                .replace(':Attr', self.titleCase(name))
-                .replace(':attr', name)
-        } else {
-            msg = ''
+        let key = this.snakeCase(rule.name)
+        let msg = this.getMessage(name, rule)
+
+        return this.doReplacements(msg, name, rule)
+    }
+
+    getMessage(name, rule) {
+        let key = this.snakeCase(rule.name)
+        let msg = this.customMessages[name + '.' + key]
+
+        if (typeof(msg) !== 'undefined') {
+            return msg
         }
+
+        // message might has sub-rule
+        if (typeof(msg) === 'object') {
+            let type = this.getDataType(name)
+            msg = Messages[key][type]
+        }
+
+        return typeof(msg) === 'undefined' ? '' : msg
+    }
+
+    getDataType(name) {
+        if (this.hasRule(name, this.numericRules)) {
+            return 'numeric'
+        } else if (this.hasRule(name, ['Array'])) {
+            return 'array'
+        }
+        /* SKIP file type */
+
+        return 'string'
+    }
+
+    doReplacements(msg, name, rule) {
+        if (msg.trim() === '') {
+            return ''
+        }
+
+        msg = msg.replace(':ATTR', name.toUpperCase())
+            .replace(':Attr', this.titleCase(name))
+            .replace(':attr', name)
 
         // call replacer
         let replacer = Replacers['replace' + rule.name]
         if (typeof replacer === 'function') {
             msg = replacer.apply(Replacers, [msg, name, rule.name, rule.params])
+        } else {
+            throw new Error(replacer + ' function does not exist.')
         }
 
         return msg

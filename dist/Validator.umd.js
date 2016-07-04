@@ -60,6 +60,8 @@ return /******/ (function(modules) { // webpackBootstrap
 	    value: true
 	});
 	
+	var _typeof = typeof Symbol === "function" && typeof Symbol.iterator === "symbol" ? function (obj) { return typeof obj; } : function (obj) { return obj && typeof Symbol === "function" && obj.constructor === Symbol ? "symbol" : typeof obj; };
+	
 	var _createClass = function () { function defineProperties(target, props) { for (var i = 0; i < props.length; i++) { var descriptor = props[i]; descriptor.enumerable = descriptor.enumerable || false; descriptor.configurable = true; if ("value" in descriptor) descriptor.writable = true; Object.defineProperty(target, descriptor.key, descriptor); } } return function (Constructor, protoProps, staticProps) { if (protoProps) defineProperties(Constructor.prototype, protoProps); if (staticProps) defineProperties(Constructor, staticProps); return Constructor; }; }();
 	
 	var _Messages = __webpack_require__(1);
@@ -216,20 +218,56 @@ return /******/ (function(modules) { // webpackBootstrap
 	    }, {
 	        key: 'getErrorMsg',
 	        value: function getErrorMsg(name, rule) {
-	            var self = this;
-	            var key = self.snakeCase(rule.name);
-	            var msg = self.customMessages[name + '.' + key];
-	            msg = msg || _Messages2.default[key];
-	            if (msg) {
-	                msg = msg.replace(':ATTR', name.toUpperCase()).replace(':Attr', self.titleCase(name)).replace(':attr', name);
-	            } else {
-	                msg = '';
+	            var key = this.snakeCase(rule.name);
+	            var msg = this.getMessage(name, rule);
+	
+	            return this.doReplacements(msg, name, rule);
+	        }
+	    }, {
+	        key: 'getMessage',
+	        value: function getMessage(name, rule) {
+	            var key = this.snakeCase(rule.name);
+	            var msg = this.customMessages[name + '.' + key];
+	
+	            if (typeof msg !== 'undefined') {
+	                return msg;
 	            }
+	
+	            // message might has sub-rule
+	            if ((typeof msg === 'undefined' ? 'undefined' : _typeof(msg)) === 'object') {
+	                var type = this.getDataType(name);
+	                msg = _Messages2.default[key][type];
+	            }
+	
+	            return typeof msg === 'undefined' ? '' : msg;
+	        }
+	    }, {
+	        key: 'getDataType',
+	        value: function getDataType(name) {
+	            if (this.hasRule(name, this.numericRules)) {
+	                return 'numeric';
+	            } else if (this.hasRule(name, ['Array'])) {
+	                return 'array';
+	            }
+	            /* SKIP file type */
+	
+	            return 'string';
+	        }
+	    }, {
+	        key: 'doReplacements',
+	        value: function doReplacements(msg, name, rule) {
+	            if (msg.trim() === '') {
+	                return '';
+	            }
+	
+	            msg = msg.replace(':ATTR', name.toUpperCase()).replace(':Attr', this.titleCase(name)).replace(':attr', name);
 	
 	            // call replacer
 	            var replacer = _Replacers2.default['replace' + rule.name];
 	            if (typeof replacer === 'function') {
 	                msg = replacer.apply(_Replacers2.default, [msg, name, rule.name, rule.params]);
+	            } else {
+	                throw new Error(replacer + ' function does not exist.');
 	            }
 	
 	            return msg;
@@ -766,13 +804,17 @@ return /******/ (function(modules) { // webpackBootstrap
 	    "digits_between": "The :attr must be between :min and :max digits.",
 	    "email": "The :attr format is invalid",
 	    "integer": "The :attr must be an integer",
-	    "min": "The :attr must be at least :min characters",
 	    "exists": "The selected :attr is invalid.",
 	    "greater_than": "The :attr must be > :value",
 	    "less_than": "The :attr must be < :value",
 	    "image": "The :attr must be an image.",
 	    "in": "The selected :attr is invalid."
-	}, _defineProperty(_accepted$active_url$, "integer", "The :attr must be an integer."), _defineProperty(_accepted$active_url$, "ip", "The :attr must be a valid IP address."), _defineProperty(_accepted$active_url$, "match", "The :attr format is invalid."), _defineProperty(_accepted$active_url$, "max", "The :attr must not exceed :max."), _defineProperty(_accepted$active_url$, "not_in", "The selected :attr is invalid."), _defineProperty(_accepted$active_url$, "numeric", "The :attr must be a number."), _defineProperty(_accepted$active_url$, "regex", "The :attr format is invalid."), _defineProperty(_accepted$active_url$, "required", "The :attr field is required."), _defineProperty(_accepted$active_url$, "required_if", "The :attr field is required when :other is :value."), _defineProperty(_accepted$active_url$, "required_with", "The :attr field is required when :values is present."), _defineProperty(_accepted$active_url$, "required_without", "The :attr field is required when :values is not present."), _defineProperty(_accepted$active_url$, "same", "The :attr and :other must match."), _defineProperty(_accepted$active_url$, "size", "The :attr must be :size."), _defineProperty(_accepted$active_url$, "unique", "The :attr has already been taken."), _defineProperty(_accepted$active_url$, "url", "The :attr format is invalid."), _accepted$active_url$);
+	}, _defineProperty(_accepted$active_url$, "integer", "The :attr must be an integer."), _defineProperty(_accepted$active_url$, "ip", "The :attr must be a valid IP address."), _defineProperty(_accepted$active_url$, "match", "The :attr format is invalid."), _defineProperty(_accepted$active_url$, "max", "The :attr must not exceed :max."), _defineProperty(_accepted$active_url$, "min", {
+	    numeric: "The :attr must be at least :min.",
+	    file: "The :attr must be at least :min kilobytes.",
+	    string: "The :attr must be at least :min characters",
+	    array: "The :attr must have at least :min items."
+	}), _defineProperty(_accepted$active_url$, "not_in", "The selected :attr is invalid."), _defineProperty(_accepted$active_url$, "numeric", "The :attr must be a number."), _defineProperty(_accepted$active_url$, "regex", "The :attr format is invalid."), _defineProperty(_accepted$active_url$, "required", "The :attr field is required."), _defineProperty(_accepted$active_url$, "required_if", "The :attr field is required when :other is :value."), _defineProperty(_accepted$active_url$, "required_with", "The :attr field is required when :values is present."), _defineProperty(_accepted$active_url$, "required_without", "The :attr field is required when :values is not present."), _defineProperty(_accepted$active_url$, "same", "The :attr and :other must match."), _defineProperty(_accepted$active_url$, "size", "The :attr must be :size."), _defineProperty(_accepted$active_url$, "unique", "The :attr has already been taken."), _defineProperty(_accepted$active_url$, "url", "The :attr format is invalid."), _accepted$active_url$);
 
 /***/ },
 /* 2 */

@@ -20,7 +20,6 @@ export default {
     "digits_between"   : "The :attr must be between :min and :max digits.",
     "email"            : "The :attr format is invalid",
     "integer"          : "The :attr must be an integer",
-    "min"              : "The :attr must be at least :min characters",
     "exists"           : "The selected :attr is invalid.",
     "greater_than"     : "The :attr must be > :value",
     "less_than"        : "The :attr must be < :value",
@@ -30,6 +29,12 @@ export default {
     "ip"               : "The :attr must be a valid IP address.",
     "match"            : "The :attr format is invalid.",
     "max"              : "The :attr must not exceed :max.",
+    "min"              : {
+        numeric : "The :attr must be at least :min.",
+        file    : "The :attr must be at least :min kilobytes.",
+        string  : "The :attr must be at least :min characters",
+        array   : "The :attr must have at least :min items."
+    },
     "not_in"           : "The selected :attr is invalid.",
     "numeric"          : "The :attr must be a number.",
     "regex"            : "The :attr format is invalid.",

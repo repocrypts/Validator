@@ -1051,6 +1051,23 @@ describe('Validator', function() {
             expect(v.passes()).to.be.true
         })
     })
+    describe('# Messages', function() {
+        let rules = [
+            { name: 'foo', rules: 'required'},
+            { name: 'age', rules: 'numeric|min:20'}
+        ]
+        it('tests', function() {
+            let v = Validator.make({age: 15}, rules)
+            v.passes()
+            expect(v.getErrors()).to.deep.equal([
+                {
+                    name: 'foo',
+                    rule: 'Required',
+                    message: 'The foo field is required.'
+                }
+            ])
+        })
+    })
 })
 
 /*

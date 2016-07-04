@@ -4,6 +4,8 @@ Object.defineProperty(exports, "__esModule", {
     value: true
 });
 
+var _typeof = typeof Symbol === "function" && typeof Symbol.iterator === "symbol" ? function (obj) { return typeof obj; } : function (obj) { return obj && typeof Symbol === "function" && obj.constructor === Symbol ? "symbol" : typeof obj; };
+
 var _createClass = function () { function defineProperties(target, props) { for (var i = 0; i < props.length; i++) { var descriptor = props[i]; descriptor.enumerable = descriptor.enumerable || false; descriptor.configurable = true; if ("value" in descriptor) descriptor.writable = true; Object.defineProperty(target, descriptor.key, descriptor); } } return function (Constructor, protoProps, staticProps) { if (protoProps) defineProperties(Constructor.prototype, protoProps); if (staticProps) defineProperties(Constructor, staticProps); return Constructor; }; }();
 
 var _Messages = require('./Messages');
@@ -160,20 +162,56 @@ var Validator = function () {
     }, {
         key: 'getErrorMsg',
         value: function getErrorMsg(name, rule) {
-            var self = this;
-            var key = self.snakeCase(rule.name);
-            var msg = self.customMessages[name + '.' + key];
-            msg = msg || _Messages2.default[key];
-            if (msg) {
-                msg = msg.replace(':ATTR', name.toUpperCase()).replace(':Attr', self.titleCase(name)).replace(':attr', name);
-            } else {
-                msg = '';
+            var key = this.snakeCase(rule.name);
+            var msg = this.getMessage(name, rule);
+
+            return this.doReplacements(msg, name, rule);
+        }
+    }, {
+        key: 'getMessage',
+        value: function getMessage(name, rule) {
+            var key = this.snakeCase(rule.name);
+            var msg = this.customMessages[name + '.' + key];
+
+            if (typeof msg !== 'undefined') {
+                return msg;
             }
+
+            // message might has sub-rule
+            if ((typeof msg === 'undefined' ? 'undefined' : _typeof(msg)) === 'object') {
+                var type = this.getDataType(name);
+                msg = _Messages2.default[key][type];
+            }
+
+            return typeof msg === 'undefined' ? '' : msg;
+        }
+    }, {
+        key: 'getDataType',
+        value: function getDataType(name) {
+            if (this.hasRule(name, this.numericRules)) {
+                return 'numeric';
+            } else if (this.hasRule(name, ['Array'])) {
+                return 'array';
+            }
+            /* SKIP file type */
+
+            return 'string';
+        }
+    }, {
+        key: 'doReplacements',
+        value: function doReplacements(msg, name, rule) {
+            if (msg.trim() === '') {
+                return '';
+            }
+
+            msg = msg.replace(':ATTR', name.toUpperCase()).replace(':Attr', this.titleCase(name)).replace(':attr', name);
 
             // call replacer
             var replacer = _Replacers2.default['replace' + rule.name];
             if (typeof replacer === 'function') {
                 msg = replacer.apply(_Replacers2.default, [msg, name, rule.name, rule.params]);
+            } else {
+                throw new Error(replacer + ' function does not exist.');
             }
 
             return msg;
