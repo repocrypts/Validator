@@ -4,7 +4,8 @@ export default class Validator {
     constructor(data, rules, customMessages = []) {
         this.data = data
         this.rules = this.parseRules(rules)
-        this.errors = []
+        this.failedRules = []
+        this.errors = null
         this.customMessages = customMessages
     }
 
@@ -132,27 +133,51 @@ export default class Validator {
 
     passes() {
         let self = this
-        let allValid = true
         this.errors = []
+        this.failedRules = []
 
         this.rules.forEach(function(item) {
             let name = item.name.toLowerCase()
             item.rules.forEach(function(rule) {
-                let isValid = self.validate(name, rule)
-                allValid = allValid && isValid
-
-                if (!isValid) {
-                    // console.log(rule.name, rule.params + '** invalid')
-                    self.errors.push({
-                        name: name,
-                        rule: rule.name,
-                        message: self.getErrorMsg(name, rule)
-                    })
-                }
+                self.validate(name, rule)
             })
         })
 
-        return allValid
+        return this.errors.length === 0
+    }
+
+    fails() {
+        return !this.passes()
+    }
+
+    valid() {
+        if (! this.errors) {
+            this.passes()
+        }
+
+        let arr = []
+        for (key in this.data) {
+            if (! this.hasError(key)) {
+                arr.push(key)
+            }
+        }
+
+        return arr
+    }
+
+    invalid() {
+        if (! this.errors) {
+            this.passes()
+        }
+
+        let arr = []
+        for (key in this.data) {
+            if (this.hasError(key)) {
+                arr.push(key)
+            }
+        }
+
+        return arr
     }
 
     getErrorMsg(name, rule) {
@@ -208,10 +233,6 @@ export default class Validator {
         return msg
     }
 
-    fails() {
-        return !this.passes()
-    }
-
     hasError(name = null) {
         if (name === null) {
             return this.errors.length > 0
@@ -229,19 +250,77 @@ export default class Validator {
     }
 
     validate(name, rule) {
-        let method = this['validate' + rule.name]
         let value = this.getValue(name)
+        let method = this['validate' + rule.name]
 
-        if (typeof method === 'function') {
-            return method.apply(this, [name, value, rule.params])
-        } else {
+        if (typeof method !== 'function') {
             console.error('"' + rule.name + '" validation rule does not exist!')
         }
 
-        return false
+        // return method.apply(this, [name, value, rule.params])
+        if (! method.apply(this, [name, value, rule.params])) {
+            this.addFailure(name, rule)
+        }
+    }
+/*
+    isValidatable(rule, name, value) {
+        return this.presentOrRuleIsImplicit(rule, name, value) &&
+               this.passesOptionalCheck(name) &&
+               this.hasNotFailedPreviousRuleIfPresenceRule(rule, name)
+    }
+
+    presentOrRuleIsImplicit(rule, name, value) {
+        return this.validateRequired(name, value) || this.isImplicit(rule)
+    }
+
+    passesOptionalCheck(name) {
+        return true
+    }
+
+    hasNotFailedPreviousRuleIfPresenceRule(rule, name) {
+        return true
+    }
+*/
+
+    addFailure(name, rule) {
+        this.addError(name, rule)
+
+        this.failedRules.push({
+            name: name,
+            rule: rule.name,
+            params: rule.params
+        })
+    }
+
+    addError(name, rule) {
+        let msg = this.getMessage(name, rule)
+
+        msg = this.doReplacements(msg, name, rule)
+
+        this.errors.push({
+            name: name,
+            rule: rule.name,
+            message: msg
+        })
     }
 
     /** Validation Rules **/
+
+    validateSometimes() {
+        return true
+    }
+
+    validateBail() {
+        return true
+    }
+
+    shouldStopValidating(name) {
+        if (! this.hasRule(name, ['Bail'])) {
+            return false
+        }
+
+        return this.hasError(name)
+    }
 
     validateRequired(name, value, params) {
         if (value === null) {

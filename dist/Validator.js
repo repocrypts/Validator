@@ -24,7 +24,8 @@ var Validator = function () {
 
         this.data = data;
         this.rules = this.parseRules(rules);
-        this.errors = [];
+        this.failedRules = [];
+        this.errors = null;
         this.customMessages = customMessages;
     }
 
@@ -133,27 +134,54 @@ var Validator = function () {
         key: 'passes',
         value: function passes() {
             var self = this;
-            var allValid = true;
             this.errors = [];
+            this.failedRules = [];
 
             this.rules.forEach(function (item) {
                 var name = item.name.toLowerCase();
                 item.rules.forEach(function (rule) {
-                    var isValid = self.validate(name, rule);
-                    allValid = allValid && isValid;
-
-                    if (!isValid) {
-                        // console.log(rule.name, rule.params + '** invalid')
-                        self.errors.push({
-                            name: name,
-                            rule: rule.name,
-                            message: self.getErrorMsg(name, rule)
-                        });
-                    }
+                    self.validate(name, rule);
                 });
             });
 
-            return allValid;
+            return this.errors.length === 0;
+        }
+    }, {
+        key: 'fails',
+        value: function fails() {
+            return !this.passes();
+        }
+    }, {
+        key: 'valid',
+        value: function valid() {
+            if (!this.errors) {
+                this.passes();
+            }
+
+            var arr = [];
+            for (key in this.data) {
+                if (!this.hasError(key)) {
+                    arr.push(key);
+                }
+            }
+
+            return arr;
+        }
+    }, {
+        key: 'invalid',
+        value: function invalid() {
+            if (!this.errors) {
+                this.passes();
+            }
+
+            var arr = [];
+            for (key in this.data) {
+                if (this.hasError(key)) {
+                    arr.push(key);
+                }
+            }
+
+            return arr;
         }
     }, {
         key: 'getErrorMsg',
@@ -211,11 +239,6 @@ var Validator = function () {
             return msg;
         }
     }, {
-        key: 'fails',
-        value: function fails() {
-            return !this.passes();
-        }
-    }, {
         key: 'hasError',
         value: function hasError() {
             var name = arguments.length <= 0 || arguments[0] === undefined ? null : arguments[0];
@@ -238,20 +261,84 @@ var Validator = function () {
     }, {
         key: 'validate',
         value: function validate(name, rule) {
-            var method = this['validate' + rule.name];
             var value = this.getValue(name);
+            var method = this['validate' + rule.name];
 
-            if (typeof method === 'function') {
-                return method.apply(this, [name, value, rule.params]);
-            } else {
+            if (typeof method !== 'function') {
                 console.error('"' + rule.name + '" validation rule does not exist!');
             }
 
-            return false;
+            // return method.apply(this, [name, value, rule.params])
+            if (!method.apply(this, [name, value, rule.params])) {
+                this.addFailure(name, rule);
+            }
+        }
+        /*
+            isValidatable(rule, name, value) {
+                return this.presentOrRuleIsImplicit(rule, name, value) &&
+                       this.passesOptionalCheck(name) &&
+                       this.hasNotFailedPreviousRuleIfPresenceRule(rule, name)
+            }
+        
+            presentOrRuleIsImplicit(rule, name, value) {
+                return this.validateRequired(name, value) || this.isImplicit(rule)
+            }
+        
+            passesOptionalCheck(name) {
+                return true
+            }
+        
+            hasNotFailedPreviousRuleIfPresenceRule(rule, name) {
+                return true
+            }
+        */
+
+    }, {
+        key: 'addFailure',
+        value: function addFailure(name, rule) {
+            this.addError(name, rule);
+
+            this.failedRules.push({
+                name: name,
+                rule: rule.name,
+                params: rule.params
+            });
+        }
+    }, {
+        key: 'addError',
+        value: function addError(name, rule) {
+            var msg = this.getMessage(name, rule);
+
+            msg = this.doReplacements(msg, name, rule);
+
+            this.errors.push({
+                name: name,
+                rule: rule.name,
+                message: msg
+            });
         }
 
         /** Validation Rules **/
 
+    }, {
+        key: 'validateSometimes',
+        value: function validateSometimes() {
+            return true;
+        }
+    }, {
+        key: 'validateBail',
+        value: function validateBail() {
+            return true;
+        }
+    }, {
+        key: 'shouldStopValidating',
+        value: function shouldStopValidating(name) {
+            if (!this.hasRule(name, ['Bail'])) {
+                return false;
+            }
+
+            return this.hasError(name);
+        }
     }, {
         key: 'validateRequired',
         value: function validateRequired(name, value, params) {
