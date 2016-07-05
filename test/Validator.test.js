@@ -1,5 +1,5 @@
-import { expect } from 'chai'
-import Validator from './Validator'
+import { expect } from 'chai';
+import Validator from '../src/Validator.js';
 
 let rules = [
     {name: 'name', rules: 'required|min:3'},

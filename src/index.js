@@ -2,7 +2,7 @@ import Validator from './Validator'
 
 let rules = [
     {name: 'name', rules: 'required|min:3'},
-    {name: 'email', rules: 'required|email|unique:users'},
+    {name: 'email', rules: 'required|email'},
     {name: 'age', rules: 'integer'}
 ]
 

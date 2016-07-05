@@ -6,7 +6,6 @@ export default {
     entry: './src/Validator',
     output: {
         path: join(__dirname, 'dist'),
-        libraryTarget: 'umd',
         library: 'Validator',
     },
     devtool: 'source-map',

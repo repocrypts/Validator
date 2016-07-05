@@ -4,12 +4,10 @@
   "description": "",
   "main": "dist/Validator.js",
   "scripts": {
-    "test": "mocha src/Validator.test.js --compilers js:babel-register",
+    "test": "mocha",
     "prebuild": "rimraf dist",
-    "build": "npm-run-all --parallel build:*",
-    "build:main": "babel --out-dir dist --ignore *.test.js src",
-    "build:umd": "webpack --output-filename Validator.umd.js",
-    "build:umd.min": "webpack --output-filename Validator.umd.min.js -p"
+    "build": "webpack --output-filename Validator.js",
+    "prepublish": "npm test"
   },
   "author": "Rati Wannapanop <rati.wannapanop@gmail.com>",
   "license": "MIT",
@@ -20,14 +18,12 @@
     "babel-preset-stage-2": "^6.5.0",
     "chai": "^3.5.0",
     "mocha": "^2.5.3",
-    "npm-run-all": "^2.2.2",
     "rimraf": "^2.5.2",
     "webpack": "^1.13.1"
   },
   "babel": {
     "presets": [
-      "es2015",
-      "stage-2"
+      "es2015"
     ]
   }
 }
