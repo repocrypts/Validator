@@ -156,7 +156,7 @@ export default class Validator {
         }
 
         let arr = []
-        for (key in this.data) {
+        for (let key in this.data) {
             if (! this.hasError(key)) {
                 arr.push(key)
             }
@@ -171,7 +171,7 @@ export default class Validator {
         }
 
         let arr = []
-        for (key in this.data) {
+        for (let key in this.data) {
             if (this.hasError(key)) {
                 arr.push(key)
             }
@@ -459,7 +459,7 @@ export default class Validator {
             value = [value]
         }
 
-        var re = params[0]
+        let re = params[0]
 
         if (!(re instanceof RegExp)) {
             re = re.split('/')
@@ -474,7 +474,7 @@ export default class Validator {
     }
 
     validateAccepted(name, value) {
-        var acceptable = ['yes', 'on', '1', 1, true, 'true']
+        let acceptable = ['yes', 'on', '1', 1, true, 'true']
 
         return this.validateRequired(name, value) && (acceptable.indexOf(value) >= 0)
     }
@@ -494,7 +494,7 @@ export default class Validator {
     validateSame(name, value, params) {
         this.requireParameterCount(1, params, 'same')
 
-        var other = this.data[params[0]]
+        let other = this.data[params[0]]
 
         return typeof(other) !== 'undefined' && value === other
     }
@@ -502,7 +502,7 @@ export default class Validator {
     validateDifferent(name, value, params) {
         this.requireParameterCount(1, params, 'different')
 
-        var other = this.data[params[0]]
+        let other = this.data[params[0]]
 
         return typeof(other) !== 'undefined' && value !== other
     }
@@ -517,7 +517,7 @@ export default class Validator {
     validateDigitsBetween(name, value, params) {
         this.requireParameterCount(2, params, 'digits_between')
 
-        var len = value.toString().length
+        let len = value.toString().length
 
         return this.validateNumeric(name, value)
             && len >= params[0] && len <= params[1]
@@ -532,7 +532,7 @@ export default class Validator {
     validateBetween(name, value, params) {
         this.requireParameterCount(2, params, 'between')
 
-        var size = this.getSize(name, value)
+        let size = this.getSize(name, value)
 
         return size >= params[0] && size <= params[1]
     }
@@ -550,7 +550,7 @@ export default class Validator {
     }
 
     getSize(name, value) {
-        var hasNumeric = this.hasRule(name, this.numericRules)
+        let hasNumeric = this.hasRule(name, this.numericRules)
 
         if (hasNumeric && !isNaN(parseFloat(value))) {
             return parseFloat(value)
@@ -606,7 +606,7 @@ export default class Validator {
     }
 
     validateIp(name, value) {
-        var segments = value.split('.')
+        let segments = value.split('.')
 
         if (segments.length === 4 &&
                 this.validateBetween(name, segments[0], [1, 255]) &&
@@ -709,7 +709,7 @@ export default class Validator {
         if (! Array.isArray(replace)) {
             replace = [replace]
         }
-        for (var i = 0; i < find.length; i++) {
+        for (let i = 0; i < find.length; i++) {
             string = string.replace(find[i], replace[i])
         }
 
@@ -723,7 +723,7 @@ export default class Validator {
     getDataNameList(values) {
         let names = []
 
-        for (var key in values) {
+        for (let key in values) {
             names.push({
                 key : this.getDataName(values[key])
             })

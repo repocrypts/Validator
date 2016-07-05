@@ -1056,7 +1056,7 @@ describe('Validator', function() {
             { name: 'foo', rules: 'required'},
             { name: 'age', rules: 'numeric|min:20'}
         ]
-        it('tests', function() {
+        it('checks that errors are returned correctly when validation failed', function() {
             let v = Validator.make({age: 15}, rules)
             v.passes()
             expect(v.getErrors()).to.deep.equal([
@@ -1071,6 +1071,8 @@ describe('Validator', function() {
                     message: 'The age must be at least 20.'
                 }
             ])
+            console.log(v.valid())
+            console.log(v.invalid())
         })
     })
 })

@@ -159,7 +159,7 @@ var Validator = function () {
             }
 
             var arr = [];
-            for (key in this.data) {
+            for (var key in this.data) {
                 if (!this.hasError(key)) {
                     arr.push(key);
                 }
@@ -175,7 +175,7 @@ var Validator = function () {
             }
 
             var arr = [];
-            for (key in this.data) {
+            for (var key in this.data) {
                 if (this.hasError(key)) {
                     arr.push(key);
                 }

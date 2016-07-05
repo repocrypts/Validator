@@ -215,7 +215,7 @@ return /******/ (function(modules) { // webpackBootstrap
 	            }
 	
 	            var arr = [];
-	            for (key in this.data) {
+	            for (var key in this.data) {
 	                if (!this.hasError(key)) {
 	                    arr.push(key);
 	                }
@@ -231,7 +231,7 @@ return /******/ (function(modules) { // webpackBootstrap
 	            }
 	
 	            var arr = [];
-	            for (key in this.data) {
+	            for (var key in this.data) {
 	                if (this.hasError(key)) {
 	                    arr.push(key);
 	                }
