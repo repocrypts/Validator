@@ -849,6 +849,8 @@ var Validator = function () {
             for (var key in customValues) {
                 this.customValues[key] = customValues[key];
             }
+
+            return this;
         }
     }, {
         key: 'setValueNames',

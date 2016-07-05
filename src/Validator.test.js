@@ -1154,6 +1154,20 @@ describe('Validator', function() {
             expect(v.getErrors()).to.deep.equal(expectedResult)
         })
     })
+    describe('# Displayable values are replaced', function() {
+        it('...', function() {
+            let v = Validator.make({color: '1', bar: ''}, [{name: 'bar', rules: 'required_if:color,1'}])
+            v.addCustomValues({ 'color': {'1': 'Red'} })
+            expect(v.passes()).to.be.false
+            expect(v.getErrors()).to.deep.equal([
+                {
+                    name: 'bar',
+                    rule: 'RequiredIf',
+                    message: 'The bar field is required when color is Red.'
+                }
+            ])
+        })
+    })
 })
 
 /*

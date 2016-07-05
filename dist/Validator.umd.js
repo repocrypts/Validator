@@ -905,6 +905,8 @@ return /******/ (function(modules) { // webpackBootstrap
 	            for (var key in customValues) {
 	                this.customValues[key] = customValues[key];
 	            }
+	
+	            return this;
 	        }
 	    }, {
 	        key: 'setValueNames',

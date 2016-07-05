@@ -778,6 +778,8 @@ export default class Validator {
         for (let key in customValues) {
             this.customValues[key] = customValues[key]
         }
+
+        return this
     }
 
     setValueNames(values) {
