@@ -1155,7 +1155,7 @@ describe('Validator', function() {
         })
     })
     describe('# Displayable values are replaced', function() {
-        it('...', function() {
+        it('tests required_if:foo,bar', function() {
             let v = Validator.make({color: '1', bar: ''}, [{name: 'bar', rules: 'required_if:color,1'}])
             v.addCustomValues({ 'color': {'1': 'Red'} })
             expect(v.passes()).to.be.false
@@ -1167,47 +1167,52 @@ describe('Validator', function() {
                 }
             ])
         })
+        it('tests in:foo,bar using addCustomValues()', function() {
+            let v = Validator.make(
+                { type: '4' },
+                [ { name: 'type', rules: 'in:5,300' } ],
+                { 'type.in': ':attr must be included in :values.'}
+            )
+            v.addCustomValues({
+                'type': {
+                    '5': 'Short',
+                    '300': 'Long'
+                }
+            })
+            expect(v.passes()).to.be.false
+            expect(v.getErrors()).to.deep.equal([
+                {
+                    name: 'type',
+                    rule: 'In',
+                    message: 'type must be included in Short, Long.'
+                }
+            ])
+        })
+        it('tests in:foo,bar using setValueNames()', function() {
+            let v = Validator.make(
+                { type: '4' },
+                [ { name: 'type', rules: 'in:5,300' } ],
+                { 'type.in': ':attr must be included in :values.'}
+            )
+            v.setValueNames({
+                'type': {
+                    '5': 'Short',
+                    '300': 'Long'
+                }
+            })
+            expect(v.passes()).to.be.false
+            expect(v.getErrors()).to.deep.equal([
+                {
+                    name: 'type',
+                    rule: 'In',
+                    message: 'type must be included in Short, Long.'
+                }
+            ])
+        })
     })
 })
 
 /*
-## tested
-required
-min
-max
-in
-not_in
-numeric
-integer
-email
-present
-regex
-same
-different
-confirmed
-accepted
-digits
-digits_between
-size
-between
-ip
-url
-alpha
-alpha_num
-alpha_dash
-before (date)
-after (date)
-array
-boolean
-json
-required_if
-required_unless
-required_with
-required_with_all
-required_without
-required_without_all
-string
-
 ## untested
 ## pending
 mime_types
