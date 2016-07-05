@@ -231,11 +231,11 @@ return /******/ (function(modules) { // webpackBootstrap
 	            }
 	
 	            var arr = [];
-	            for (var key in this.data) {
-	                if (this.hasError(key)) {
-	                    arr.push(key);
+	            this.errors.forEach(function (error) {
+	                if (arr.indexOf(error.name) < 0) {
+	                    arr.push(error.name);
 	                }
-	            }
+	            });
 	
 	            return arr;
 	        }

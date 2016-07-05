@@ -1053,17 +1053,25 @@ describe('Validator', function() {
     })
     describe('# Messages', function() {
         let rules = [
-            { name: 'foo', rules: 'required'},
-            { name: 'age', rules: 'numeric|min:20'}
+            { name: 'name', rules: 'required|min:3'},
+            { name: 'age', rules: 'numeric|min:20'},
+            { name: 'email', rules: 'required|email'}
         ]
         it('checks that errors are returned correctly when validation failed', function() {
-            let v = Validator.make({age: 15}, rules)
+            let v = Validator.make({age: 15, email: 'rati@example.com'}, rules)
             v.passes()
+            expect(v.valid()).to.deep.equal(['email'])
+            expect(v.invalid()).to.deep.equal(['name', 'age'])
             expect(v.getErrors()).to.deep.equal([
                 {
-                    name: 'foo',
+                    name: 'name',
                     rule: 'Required',
-                    message: 'The foo field is required.'
+                    message: 'The name field is required.'
+                },
+                {
+                    name: 'name',
+                    rule: 'Min',
+                    message: 'The name must be at least 3 characters.'
                 },
                 {
                     name: 'age',
@@ -1071,8 +1079,6 @@ describe('Validator', function() {
                     message: 'The age must be at least 20.'
                 }
             ])
-            console.log(v.valid())
-            console.log(v.invalid())
         })
     })
 })
