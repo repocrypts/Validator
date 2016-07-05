@@ -844,6 +844,16 @@ describe('Validator', function() {
             expect(v.passes()).to.be.false
         })
     })
+    describe('#validateFilled()', function() {
+        it('returns true when the field is not present', function() {
+            let v = Validator.make({}, [{name: 'name', rules: 'filled'}])
+            expect(v.passes()).to.be.true
+        })
+        it('returns false when the field is present but empty', function() {
+            let v = Validator.make({name: ''}, [{name: 'name', rules: 'filled'}])
+            expect(v.passes()).to.be.false
+        })
+    })
     describe('#validateBoolean()', function() {
         it('returns false when given string "no"', function() {
             let v = Validator.make({foo: 'no'}, [{name: 'foo', rules: 'boolean'}])
@@ -1071,6 +1081,27 @@ describe('Validator', function() {
                     name: 'age',
                     rule: 'Min',
                     message: 'The age must be at least 20.'
+                }
+            ])
+        })
+        it('checks proper messages are returned for sizes rule', function() {
+            let v = Validator.make({name: '3'}, [{name: 'name', rules: 'numeric|min:5'}])
+            expect(v.passes()).to.be.false
+            expect(v.getErrors()).to.deep.equal([
+                {
+                    name: 'name',
+                    rule: 'Min',
+                    message: 'The name must be at least 5.'
+                }
+            ])
+
+            v = Validator.make({name: 'asdfkjlsd'}, [{name: 'name', rules: 'size:2'}])
+            expect(v.passes()).to.be.false
+            expect(v.getErrors()).to.deep.equal([
+                {
+                    name: 'name',
+                    rule: 'Size',
+                    message: 'The name must be 2 characters.'
                 }
             ])
         })
