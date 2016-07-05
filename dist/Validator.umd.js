@@ -83,6 +83,8 @@ return /******/ (function(modules) { // webpackBootstrap
 	        this.failedRules = [];
 	        this.errors = null;
 	        this.customMessages = customMessages;
+	        this.customNames = {};
+	        this.customValues = {};
 	    }
 	
 	    _createClass(Validator, [{
@@ -831,8 +833,15 @@ return /******/ (function(modules) { // webpackBootstrap
 	    }, {
 	        key: 'getDisplayableValue',
 	        value: function getDisplayableValue(name, value) {
+	            if (typeof this.customValues[name] !== 'undefined' && typeof this.customValues[name][value] !== 'undefined') {
+	                return this.customValues[name][value];
+	            }
+	
 	            return value;
 	        }
+	
+	        // getAttributeList
+	
 	    }, {
 	        key: 'getDataNameList',
 	        value: function getDataNameList(values) {
@@ -846,10 +855,48 @@ return /******/ (function(modules) { // webpackBootstrap
 	
 	            return names;
 	        }
+	
+	        // getAttribute
+	
 	    }, {
 	        key: 'getDataName',
 	        value: function getDataName(name) {
-	            return name;
+	            if (this.customNames.length > 0 && typeof this.customNames[name] !== 'undefined') {
+	                return this.customNames[name];
+	            }
+	
+	            return this.strReplace('_', ' ', this.snakeCase(name));
+	        }
+	
+	        // setAttributeNames
+	
+	    }, {
+	        key: 'setDataNames',
+	        value: function setDataNames(names) {
+	            this.customNames = names;
+	
+	            return this;
+	        }
+	    }, {
+	        key: 'addDataNames',
+	        value: function addDataNames(customNames) {
+	            for (var key in customNames) {
+	                this.customNames[key] = customNames[key];
+	            }
+	
+	            return this;
+	        }
+	    }, {
+	        key: 'getCustomValues',
+	        value: function getCustomValues() {
+	            return this.customValues;
+	        }
+	    }, {
+	        key: 'setValueNames',
+	        value: function setValueNames(values) {
+	            this.customValues = values;
+	
+	            return this;
 	        }
 	    }, {
 	        key: 'replaceBetween',

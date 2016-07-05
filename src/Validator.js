@@ -7,6 +7,8 @@ export default class Validator {
         this.failedRules = []
         this.errors = null
         this.customMessages = customMessages
+        this.customNames = {}
+        this.customValues = {}
     }
 
     get dateRules() {
@@ -717,9 +719,15 @@ export default class Validator {
     }
 
     getDisplayableValue(name, value) {
+        if (typeof(this.customValues[name]) !== 'undefined' &&
+            typeof(this.customValues[name][value]) !== 'undefined') {
+            return this.customValues[name][value]
+        }
+
         return value
     }
 
+    // getAttributeList
     getDataNameList(values) {
         let names = []
 
@@ -732,8 +740,38 @@ export default class Validator {
         return names
     }
 
+    // getAttribute
     getDataName(name) {
-        return name
+        if (this.customNames.length > 0 && typeof(this.customNames[name]) !== 'undefined') {
+            return this.customNames[name]
+        }
+
+        return this.strReplace('_', ' ', this.snakeCase(name))
+    }
+
+    // setAttributeNames
+    setDataNames(names) {
+        this.customNames = names
+
+        return this
+    }
+
+    addDataNames(customNames) {
+        for (let key in customNames) {
+            this.customNames[key] = customNames[key]
+        }
+
+        return this
+    }
+
+    getCustomValues() {
+        return this.customValues
+    }
+
+    setValueNames(values) {
+        this.customValues = values
+
+        return this
     }
 
     replaceBetween(msg, name, rule, params) {
