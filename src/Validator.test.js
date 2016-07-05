@@ -1045,13 +1045,7 @@ describe('Validator', function() {
             expect(v.passes()).to.be.false
         })
     })
-    describe('# Others', function() {
-        it('tests that empty rules are skipped', function() {
-            let v = Validator.make({x: 'asksksks'}, [{name: 'x', rules: '|||required|'}])
-            expect(v.passes()).to.be.true
-        })
-    })
-    describe('# Messages', function() {
+    describe('# Error Messages', function() {
         let rules = [
             { name: 'name', rules: 'required|min:3'},
             { name: 'age', rules: 'numeric|min:20'},
@@ -1079,6 +1073,85 @@ describe('Validator', function() {
                     message: 'The age must be at least 20.'
                 }
             ])
+        })
+    })
+    describe('# Others', function() {
+        it('tests that empty rules are skipped', function() {
+            let v = Validator.make({x: 'asksksks'}, [{name: 'x', rules: '|||required|'}])
+            expect(v.passes()).to.be.true
+        })
+    })
+    describe('# Custom Names', function() {
+        let customNames = {
+            name: 'Name',
+            age: 'Age'
+        }
+        let rules = [
+            { name: 'name', rules: 'required'},
+            { name: 'age', rules: 'required' }
+        ]
+        let expectedResult = [
+            {
+                name: 'name',
+                rule: 'Required',
+                message: 'The Name field is required.'
+            },
+            {
+                name: 'age',
+                rule: 'Required',
+                message: 'The Age field is required.'
+            }
+        ]
+        it('tests custom name being applied using constructor', function() {
+            let v = Validator.make({}, rules, {}, customNames)
+            expect(v.passes()).to.be.false
+            expect(v.getErrors()).to.deep.equal(expectedResult)
+        })
+        it('tests custom name being applied using addCustomNames()', function() {
+            let v = Validator.make({name: ''}, rules)
+            v.addCustomNames(customNames)
+            expect(v.passes()).to.be.false
+            expect(v.getErrors()).to.deep.equal(expectedResult)
+        })
+        it('tests custom name being applied using setCustomNames()', function() {
+            let v = Validator.make({name: ''}, rules)
+            v.setCustomNames(customNames)
+            expect(v.passes()).to.be.false
+            expect(v.getErrors()).to.deep.equal(expectedResult)
+        })
+    })
+    describe('# Custom Messages', function() {
+        let rules = [
+            { name: 'name', rules: 'required'},
+            { name: 'age', rules: 'required' },
+            { name: 'email', rules: 'required'}
+        ]
+        let customMessages = {
+            'name.required': ':attr is required.',
+            'age.required': ':Attr field is required.',
+            'email.required': ':ATTR field must not be blank.'
+        }
+        let expectedResult = [
+            {
+                name: 'name',
+                rule: 'Required',
+                message: 'name is required.'
+            },
+            {
+                name: 'age',
+                rule: 'Required',
+                message: 'Age field is required.'
+            },
+            {
+                name: 'email',
+                rule: 'Required',
+                message: 'EMAIL field must not be blank.'
+            }
+        ]
+        it('tests custom message for rules being applied correctly', function() {
+            let v = Validator.make({name: ''}, rules, customMessages)
+            expect(v.passes()).to.be.false
+            expect(v.getErrors()).to.deep.equal(expectedResult)
         })
     })
 })

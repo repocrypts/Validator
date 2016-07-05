@@ -1,13 +1,13 @@
 import Messages from './Messages'
 
 export default class Validator {
-    constructor(data, rules, customMessages = []) {
+    constructor(data, rules, customMessages = {}, customNames = {}) {
         this.data = data
         this.rules = this.parseRules(rules)
         this.failedRules = []
         this.errors = null
         this.customMessages = customMessages
-        this.customNames = {}
+        this.customNames = customNames
         this.customValues = {}
     }
 
@@ -38,8 +38,12 @@ export default class Validator {
         ]
     }
 
-    static make(data, rules, customMessages = []) {
-        return new Validator(data, rules, customMessages)
+    static make(data, rules, customMessages = [], customNames) {
+        return new Validator(data, rules, customMessages, customNames)
+    }
+
+    isEmptyObject(obj) {
+        return Object.getOwnPropertyNames(obj).length === 0
     }
 
     isImplicit(rule) {
@@ -221,6 +225,8 @@ export default class Validator {
         if (msg.trim() === '') {
             return ''
         }
+
+        name = this.getDataName(name)
 
         msg = msg.replace(':ATTR', name.toUpperCase())
             .replace(':Attr', this.titleCase(name))
@@ -742,7 +748,7 @@ export default class Validator {
 
     // getAttribute
     getDataName(name) {
-        if (this.customNames.length > 0 && typeof(this.customNames[name]) !== 'undefined') {
+        if (typeof(this.customNames[name]) !== 'undefined') {
             return this.customNames[name]
         }
 
@@ -750,13 +756,13 @@ export default class Validator {
     }
 
     // setAttributeNames
-    setDataNames(names) {
+    setCustomNames(names) {
         this.customNames = names
 
         return this
     }
 
-    addDataNames(customNames) {
+    addCustomNames(customNames) {
         for (let key in customNames) {
             this.customNames[key] = customNames[key]
         }
@@ -768,10 +774,20 @@ export default class Validator {
         return this.customValues
     }
 
+    addCustomValues(customValues) {
+        for (let key in customValues) {
+            this.customValues[key] = customValues[key]
+        }
+    }
+
     setValueNames(values) {
         this.customValues = values
 
         return this
+    }
+
+    failed() {
+        return this.failedRules
     }
 
     replaceBetween(msg, name, rule, params) {

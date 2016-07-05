@@ -74,7 +74,8 @@ return /******/ (function(modules) { // webpackBootstrap
 	
 	var Validator = function () {
 	    function Validator(data, rules) {
-	        var customMessages = arguments.length <= 2 || arguments[2] === undefined ? [] : arguments[2];
+	        var customMessages = arguments.length <= 2 || arguments[2] === undefined ? {} : arguments[2];
+	        var customNames = arguments.length <= 3 || arguments[3] === undefined ? {} : arguments[3];
 	
 	        _classCallCheck(this, Validator);
 	
@@ -83,11 +84,16 @@ return /******/ (function(modules) { // webpackBootstrap
 	        this.failedRules = [];
 	        this.errors = null;
 	        this.customMessages = customMessages;
-	        this.customNames = {};
+	        this.customNames = customNames;
 	        this.customValues = {};
 	    }
 	
 	    _createClass(Validator, [{
+	        key: 'isEmptyObject',
+	        value: function isEmptyObject(obj) {
+	            return Object.getOwnPropertyNames(obj).length === 0;
+	        }
+	    }, {
 	        key: 'isImplicit',
 	        value: function isImplicit(rule) {
 	            return this.implicitRules.indexOf(rule) > -1;
@@ -285,6 +291,8 @@ return /******/ (function(modules) { // webpackBootstrap
 	            if (msg.trim() === '') {
 	                return '';
 	            }
+	
+	            name = this.getDataName(name);
 	
 	            msg = msg.replace(':ATTR', name.toUpperCase()).replace(':Attr', this.titleCase(name)).replace(':attr', name);
 	
@@ -861,7 +869,7 @@ return /******/ (function(modules) { // webpackBootstrap
 	    }, {
 	        key: 'getDataName',
 	        value: function getDataName(name) {
-	            if (this.customNames.length > 0 && typeof this.customNames[name] !== 'undefined') {
+	            if (typeof this.customNames[name] !== 'undefined') {
 	                return this.customNames[name];
 	            }
 	
@@ -871,15 +879,15 @@ return /******/ (function(modules) { // webpackBootstrap
 	        // setAttributeNames
 	
 	    }, {
-	        key: 'setDataNames',
-	        value: function setDataNames(names) {
+	        key: 'setCustomNames',
+	        value: function setCustomNames(names) {
 	            this.customNames = names;
 	
 	            return this;
 	        }
 	    }, {
-	        key: 'addDataNames',
-	        value: function addDataNames(customNames) {
+	        key: 'addCustomNames',
+	        value: function addCustomNames(customNames) {
 	            for (var key in customNames) {
 	                this.customNames[key] = customNames[key];
 	            }
@@ -892,11 +900,23 @@ return /******/ (function(modules) { // webpackBootstrap
 	            return this.customValues;
 	        }
 	    }, {
+	        key: 'addCustomValues',
+	        value: function addCustomValues(customValues) {
+	            for (var key in customValues) {
+	                this.customValues[key] = customValues[key];
+	            }
+	        }
+	    }, {
 	        key: 'setValueNames',
 	        value: function setValueNames(values) {
 	            this.customValues = values;
 	
 	            return this;
+	        }
+	    }, {
+	        key: 'failed',
+	        value: function failed() {
+	            return this.failedRules;
 	        }
 	    }, {
 	        key: 'replaceBetween',
@@ -1043,8 +1063,9 @@ return /******/ (function(modules) { // webpackBootstrap
 	        key: 'make',
 	        value: function make(data, rules) {
 	            var customMessages = arguments.length <= 2 || arguments[2] === undefined ? [] : arguments[2];
+	            var customNames = arguments[3];
 	
-	            return new Validator(data, rules, customMessages);
+	            return new Validator(data, rules, customMessages, customNames);
 	        }
 	    }]);
 	
