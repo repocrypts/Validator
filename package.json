@@ -1,7 +1,7 @@
 {
-  "name": "js-validator",
+  "name": "ratiw/Validator",
   "version": "1.0.0",
-  "description": "",
+  "description": "Client-side Javascript Validator. Ports from Laravel 5.2",
   "main": "dist/Validator.js",
   "scripts": {
     "test": "mocha",
