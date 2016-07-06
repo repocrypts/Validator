@@ -1,5 +1,6 @@
+;
 import { expect } from 'chai';
-import Validator from '../src/Validator.js';
+import Validator from '../dist/Validator.js';
 
 let rules = [
     {name: 'name', rules: 'required|min:3'},
