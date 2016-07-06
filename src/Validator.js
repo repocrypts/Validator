@@ -42,6 +42,63 @@ export default class Validator {
         return new Validator(data, rules, customMessages, customNames)
     }
 
+    parseRules(rules) {
+        let self = this
+        let arr = []
+
+        // rules.forEach(function(item) {
+        //     arr.push({
+        //         name: item.name,
+        //         rules: self.parseItemRules(item.rules)
+        //     })
+        // })
+        for (let key in rules) {
+            arr.push({
+                name: key,
+                rules: self.parseItemRules(rules[key])
+            })
+        }
+
+        return arr
+    }
+
+    parseItemRules(rule) {
+        let self = this
+        let arr = []
+
+        rule.split('|').forEach(function(ruleAndArgs) {
+            if (ruleAndArgs.trim()) {
+                let args = ruleAndArgs.split(':')
+                arr.push({
+                    name: self.titleCase(args[0], '_'),
+                    params: args[1] ? args[1].split(',') : []
+                })
+            }
+        })
+
+        return arr
+    }
+
+    titleCase(str, delimiter) {
+        delimiter = delimiter || ' '
+        return str.split(delimiter).map(function(item) {
+            return item[0].toUpperCase() + item.slice(1).toLowerCase()
+        }).join('')
+    }
+
+    snakeCase(str, delimiter) {
+        delimiter = delimiter || '_'
+        return str.replace(/(.)(?=[A-Z])/ug, '$1'+delimiter).toLowerCase()
+    }
+
+    getValue(name) {
+        if (typeof this.data[name] === 'undefined') {
+            return ''
+        }
+
+        return this.data[name]
+    }
+
     isEmptyObject(obj) {
         return Object.getOwnPropertyNames(obj).length === 0
     }
@@ -84,57 +141,6 @@ export default class Validator {
         if (params.length < count) {
             throw new Error('Validation rule '+rule+' requires at least '+count+' parameters')
         }
-    }
-
-    parseRules(rules) {
-        let self = this
-        let arr = []
-
-        rules.forEach(function(item) {
-            arr.push({
-                name: item.name,
-                rules: self.parseItemRules(item.rules)
-            })
-        })
-
-        return arr
-    }
-
-    parseItemRules(rule) {
-        let self = this
-        let arr = []
-
-        rule.split('|').forEach(function(ruleAndArgs) {
-            if (ruleAndArgs.trim()) {
-                let args = ruleAndArgs.split(':')
-                arr.push({
-                    name: self.titleCase(args[0], '_'),
-                    params: args[1] ? args[1].split(',') : []
-                })
-            }
-        })
-
-        return arr
-    }
-
-    titleCase(str, delimiter) {
-        delimiter = delimiter || ' '
-        return str.split(delimiter).map(function(item) {
-            return item[0].toUpperCase() + item.slice(1).toLowerCase()
-        }).join('')
-    }
-
-    snakeCase(str, delimiter) {
-        delimiter = delimiter || '_'
-        return str.replace(/(.)(?=[A-Z])/ug, '$1'+delimiter).toLowerCase()
-    }
-
-    getValue(name) {
-        if (typeof this.data[name] === 'undefined') {
-            return ''
-        }
-
-        return this.data[name]
     }
 
     passes() {

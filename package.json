@@ -18,6 +18,7 @@
     "chai": "^3.5.0",
     "mocha": "^2.5.3",
     "rimraf": "^2.5.2",
-    "rollup-plugin-babel": "^2.6.1"
+    "rollup-plugin-babel": "^2.6.1",
+    "rollup-watch": "^2.4.0"
   }
 }

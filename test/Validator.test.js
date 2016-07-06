@@ -1,12 +1,11 @@
-;
 import { expect } from 'chai';
 import Validator from '../dist/Validator.js';
 
-let rules = [
-    {name: 'name', rules: 'required|min:3'},
-    {name: 'email', rules: 'required|email|unique:users'},
-    {name: 'age', rules: 'integer'}
-]
+let rules = {
+    name: 'required|min:3',
+    email: 'required|email',
+    age: 'integer'
+}
 
 let data = {
     name: 'Rati',
@@ -25,14 +24,14 @@ describe('Validator', function() {
         })
     })
     describe('#parseItemRules()', function() {
-        let rules = [
-            { name: 'name', rules: 'required|min:3' },
-            { name: 'group', rules: 'not_in:admin,exec'},
-        ]
+        let rules = {
+            name: 'required|min:3',
+            group: 'not_in:admin,exec'
+        }
         let v = Validator.make({name: 'Rati'}, rules)
 
         it('parses multiple rules correctly', function() {
-            let arr = v.parseItemRules(rules[0].rules)
+            let arr = v.parseItemRules(rules['name'])
             expect(arr).to.be.lengthOf(2)
             expect(arr).to.deep.equal([
                 { name: 'Required', params: [] },
@@ -40,17 +39,17 @@ describe('Validator', function() {
             ])
         })
         it('parses rule with array argument (not_in)', function() {
-            let arr = v.parseItemRules(rules[1].rules)
+            let arr = v.parseItemRules(rules['group'])
             expect(arr).to.deep.equal([
                 { name: 'NotIn', params: ['admin', 'exec'] }
             ])
         })
     })
     describe('#parseRules()', function() {
-        let rules = [
-            { name: 'name', rules: 'required|min:3' },
-            { name: 'group', rules: 'not_in:admin,exec'}
-        ]
+        let rules = {
+            name: 'required|min:3',
+            'group': 'not_in:admin,exec'
+        }
         let v = Validator.make({name: 'Rati'}, rules)
 
         it('parses rules on every item correctly', function() {
@@ -73,10 +72,10 @@ describe('Validator', function() {
         })
     })
     describe('#getRule()', function() {
-        let rules = [
-            { name: 'name', rules: 'required|min:3' },
-            { name: 'group', rules: 'in:admin,exec'}
-        ]
+        let rules = {
+            name: 'required|min:3',
+            group: 'in:admin,exec'
+        }
         let data = {
             name: 'Rati',
             group: 'admin'
@@ -96,18 +95,16 @@ describe('Validator', function() {
     })
     describe('#hasError()', function() {
         it('returns true if there is any error', function() {
-            let v = Validator.make({name: 'Test'}, [{
-                name: 'name',
-                rules: 'required|min:6'
-            }])
+            let v = Validator.make({name: 'Test'}, {
+                name: 'required|min:6'
+            })
             v.passes()
             expect(v.hasError()).to.be.true
         })
         it('returns false if there is no error', function() {
-            let v = Validator.make({name: 'Testing'}, [{
-                name: 'name',
-                rules: 'required|min:6'
-            }])
+            let v = Validator.make({name: 'Testing'}, {
+                name: 'required|min:6'
+            })
             v.passes()
             expect(v.hasError()).to.be.false
         })
@@ -155,10 +152,10 @@ describe('Validator', function() {
         })
     })
     describe('#passes()', function() {
-        let rules = [
-            { name: 'name', rules: 'required' },
-            { name: 'email', rules: 'required|email' }
-        ]
+        let rules = {
+            name: 'required',
+            email: 'required|email'
+        }
         it('returns true when all validations are valid', function() {
             var v = Validator.make({
                 name: 'Rati', email: 'rati@example.com'
@@ -173,10 +170,10 @@ describe('Validator', function() {
         })
     })
     describe('#fails()', function() {
-        let rules = [
-            { name: 'name', rules: 'required' },
-            { name: 'email', rules: 'required|email' }
-        ]
+        let rules = {
+            name: 'required',
+            email: 'required|email'
+        }
         it('returns true when any validation fails', function() {
             var v = Validator.make({
                 name: 'Rati'
@@ -191,16 +188,13 @@ describe('Validator', function() {
         })
     })
     describe('#getErrors()', function() {
-        let rules = [
-            { name: 'name', rules: 'required' },
-            { name: 'email', rules: 'required|email' },
-            { name: 'age', rules: 'required' }
-        ]
+        let rules = {
+            name: 'required',
+            email: 'required|email',
+            age: 'required'
+        }
         it('returns errors when validation fails', function() {
-            let v = Validator.make(
-                {
-                    name: 'Rati', email: 'rati@example.com'
-                }, rules)
+            let v = Validator.make({ name: 'Rati', email: 'rati@example.com' }, rules)
 
             v.fails()
             expect(v.getErrors()).to.have.lengthOf(1)
@@ -210,12 +204,11 @@ describe('Validator', function() {
             expect(v.getErrors()).to.have.lengthOf(3)
         })
         it('returns empty array when all validation pass', function() {
-            let v = Validator.make(
-                {
-                    name: 'Rati',
-                    email: 'rati@example.com',
-                    age: '45'
-                }, rules)
+            let v = Validator.make({
+                name: 'Rati',
+                email: 'rati@example.com',
+                age: '45'
+            }, rules)
 
             v.fails()
             expect(v.getErrors()).to.have.lengthOf(0)
@@ -223,23 +216,23 @@ describe('Validator', function() {
     })
     describe('#validateRequired()', function() {
         it('return false when the required field is not present', function() {
-            let v = Validator.make({}, [{name: 'name', rules: 'required'}])
+            let v = Validator.make({}, {name: 'required'})
             expect(v.passes()).to.be.false
         })
         it('return false when the required field is present but empty', function() {
-            let v = Validator.make({name: ''}, [{name: 'name', rules: 'required'}])
+            let v = Validator.make({name: ''}, {name: 'required'})
             expect(v.passes()).to.be.false
         })
         it('return true when the required field is present and has value', function() {
-            let v = Validator.make({name: 'foo'}, [{name: 'name', rules: 'required'}])
+            let v = Validator.make({name: 'foo'}, {name: 'required'})
             expect(v.passes()).to.be.true
         })
-        /* SKIP File related test */
+        // SKIP File related test
     })
     describe('#validateRequiredWith()', function() {
-        let rules = [
-            {name: 'last', rules: 'required_with:first'}
-        ]
+        let rules = {
+            last: 'required_with:first'
+        }
         it('returns false when the validated field is not present', function() {
             let v = Validator.make({first: 'Taylor'}, rules)
             expect(v.passes()).to.be.false
@@ -260,28 +253,28 @@ describe('Validator', function() {
             let v = Validator.make({first: 'Taylor', last: 'Otwell'}, rules)
             expect(v.passes()).to.be.true
         })
-        /* SKIP File related test */
+        // SKIP File related test
     })
     describe('#validateRequiredWithAll()', function() {
         it('returns true when the field under validation must be present only if all of the other specified fields are present', function() {
-            let v = Validator.make({first: 'foo'}, [{name: 'last', rules: 'required_with_all:first,foo'}])
+            let v = Validator.make({first: 'foo'}, {last: 'required_with_all:first,foo'})
             expect(v.passes()).to.be.true
         })
         it('returns false when the field under validation is not present', function() {
-            let v = Validator.make({first: 'foo'}, [{name: 'last', rules: 'required_with_all:first'}])
+            let v = Validator.make({first: 'foo'}, {last: 'required_with_all:first'})
             expect(v.passes()).to.be.false
         })
     })
     describe('#getSize()', function() {
         it('returns correct parameter value', function() {
-            let v = Validator.make({name: 'Rati'}, [])
+            let v = Validator.make({name: 'Rati'}, {})
             expect(v.getSize('name', 'Rati')).to.equal(4)
         })
     })
     describe('#validateMin()', function() {
-        let rules = [
-            { name: 'name', rules: 'min:3'}
-        ]
+        let rules = {
+            name: 'min:3'
+        }
         it('returns true when the length of given string is >= the specified "min"', function() {
             let v = Validator.make({ name: 'Rati' }, rules)
             expect(v.passes()).to.be.true
@@ -291,27 +284,27 @@ describe('Validator', function() {
             expect(v.passes()).to.be.false
         })
         it('returns false when the given value is < the numeric min', function() {
-            let v = Validator.make({foo: '2'}, [{name: 'foo', rules: 'numeric|min:3'}])
+            let v = Validator.make({foo: '2'}, {foo: 'numeric|min:3'})
             expect(v.passes()).to.be.false
         })
         it('returns true when the given value is >= the numeric min', function() {
-            let v = Validator.make({foo: '5'}, [{name: 'foo', rules: 'numeric|min:3'}])
+            let v = Validator.make({foo: '5'}, {foo: 'numeric|min:3'})
             expect(v.passes()).to.be.true
         })
         it('returns true when size of given array is >= the array min', function() {
-            let v = Validator.make({foo: [1, 2, 3, 4]}, [{name: 'foo', rules: 'array|min:3'}])
+            let v = Validator.make({foo: [1, 2, 3, 4]}, {foo: 'array|min:3'})
             expect(v.passes()).to.be.true
         })
         it('returns false when size of given array is < the array min', function() {
-            let v = Validator.make({foo: [1, 2]}, [{name: 'foo', rules: 'array|min:3'}])
+            let v = Validator.make({foo: [1, 2]}, {foo: 'array|min:3'})
             expect(v.passes()).to.be.false
         })
-        /* SKIP file related tests */
+        // SKIP file related tests
     })
     describe('#validateMax()', function() {
-        let rules = [
-            { name: 'name', rules: 'max:3'}
-        ]
+        let rules = {
+            name: 'max:3'
+        }
         it('returns true when length of the given string is <= the specified max', function() {
             let v = Validator.make({ name: 'Rat' }, rules)
             expect(v.passes()).to.be.true
@@ -321,62 +314,62 @@ describe('Validator', function() {
             expect(v.passes()).to.be.false
         })
         it('returns false when the given value is > the specified numeric max', function() {
-            let v = Validator.make({foo: '211'}, [{name: 'foo', rules: 'numeric|max:100'}])
+            let v = Validator.make({foo: '211'}, {foo: 'numeric|max:100'})
             expect(v.passes()).to.be.false
         })
         it('returns true when the given value is <= the specified numeric max', function() {
-            let v = Validator.make({foo: '22'}, [{name: 'foo', rules: 'numeric|max:33'}])
+            let v = Validator.make({foo: '22'}, {foo: 'numeric|max:33'})
             expect(v.passes()).to.be.true
         })
         it('returns true when size of given array is <= the specified array max size', function() {
-            let v = Validator.make({foo: [1, 2, 3]}, [{name: 'foo', rules: 'array|max:4'}])
+            let v = Validator.make({foo: [1, 2, 3]}, {foo: 'array|max:4'})
             expect(v.passes()).to.be.true
         })
         it('returns false when size of given array is > the specified array max size', function() {
-            let v = Validator.make({foo: [1, 2, 3]}, [{name: 'foo', rules: 'array|max:2'}])
+            let v = Validator.make({foo: [1, 2, 3]}, {foo: 'array|max:2'})
             expect(v.passes()).to.be.false
         })
-        /* SKIP file related tests */
+        // SKIP file related tests
     })
     describe('#validateIn()', function() {
         it('returns false when given value is not in the list', function() {
-            let v = Validator.make({name: 'foo'}, [{name: 'name', rules: 'in:bar,baz'}])
+            let v = Validator.make({name: 'foo'}, {name: 'in:bar,baz'})
             expect(v.passes()).to.be.false
 
-            v = Validator.make({name: 0}, [{name: 'name', rules: 'in:bar,baz'}])
+            v = Validator.make({name: 0}, {name: 'in:bar,baz'})
             expect(v.passes()).to.be.false
         })
         it('returns true when given value is in the last', function() {
-            let v = Validator.make({name: 'foo'}, [{name: 'name', rules: 'in:foo,baz'}])
+            let v = Validator.make({name: 'foo'}, {name: 'in:foo,baz'})
             expect(v.passes()).to.be.true
         })
         it('returns false when any value in the given array is not in the list', function() {
-            let v = Validator.make({name: ['foo', 'bar']}, [{name: 'name', rules: 'array|in:foo,baz'}])
+            let v = Validator.make({name: ['foo', 'bar']}, {name: 'array|in:foo,baz'})
             expect(v.passes()).to.be.false
         })
         it('returns true when all value in given array are in the list', function() {
-            let v = Validator.make({name: ['foo', 'qux']}, [{name: 'name', rules: 'array|in:foo,baz,qux'}])
+            let v = Validator.make({name: ['foo', 'qux']}, {name: 'array|in:foo,baz,qux'})
             expect(v.passes()).to.be.true
         })
         it('returns false when the field under validation is not an array', function() {
-            let v = Validator.make({name: ['foo', 'bar']}, [{name: 'name', rules: 'alpha|in:foo,bar'}])
+            let v = Validator.make({name: ['foo', 'bar']}, {name: 'alpha|in:foo,bar'})
             expect(v.passes()).to.be.false
         })
     })
     describe('#validateNotIn()', function() {
         it('return true when given value is not in the list', function() {
-            let v = Validator.make({ name: 'foo' }, [{name: 'name', rules: 'not_in:bar,baz'}])
+            let v = Validator.make({ name: 'foo' }, {name: 'not_in:bar,baz'})
             expect(v.passes()).to.be.true
         })
         it('returns false when given value is in the list', function() {
-            let v = Validator.make({ name: 'foo' }, [{name: 'name', rules: 'not_in:foo,baz'}])
+            let v = Validator.make({ name: 'foo' }, {name: 'not_in:foo,baz'})
             expect(v.passes()).to.be.false
         })
     })
     describe('#validateNumeric()', function() {
-        let rules = [
-            { name: 'foo', rules: 'numeric' }
-        ]
+        let rules = {
+            foo: 'numeric'
+        }
         it('return false when given string is not numeric', function() {
             let v = Validator.make({foo: 'asdad'}, rules)
             expect(v.passes()).to.be.false
@@ -395,9 +388,9 @@ describe('Validator', function() {
         })
     })
     describe('#validateInteger()', function() {
-        let rules = [
-            { name: 'foo', rules: 'integer' }
-        ]
+        let rules = {
+            foo: 'integer'
+        }
         it('returns false when given string is text value', function() {;
             let v = Validator.make({ foo: 'asdad'}, rules)
             expect(v.passes()).to.be.false
@@ -416,9 +409,9 @@ describe('Validator', function() {
         })
     })
     describe('#validateEmail()', function() {
-        let rules = [
-            { name: 'email', rules: 'email' }
-        ]
+        let rules = {
+            email: 'email'
+        }
         it('returns true when given value looks like an email address', function() {
             let v = Validator.make({ email: 'rati@example.com'}, rules)
             expect(v.passes()).to.be.true
@@ -429,9 +422,9 @@ describe('Validator', function() {
         })
     })
     describe('#validatePresent()', function() {
-        let rules = [
-            { name: 'name', rules: 'present' }
-        ]
+        let rules = {
+            name: 'present'
+        }
         it('returns true when the given data is present', function() {
             let v = Validator.make({ name: ''}, rules)
             expect(v.passes()).to.be.true
@@ -443,26 +436,24 @@ describe('Validator', function() {
     })
     describe('#validateRegex()', function() {
         it('returns true when the given data passes regex validation', function() {
-            let v = Validator.make({ x: 'asdasdf'}, [ { name: 'x', rules: 'regex:/^([a-z])+$/i' }])
+            let v = Validator.make({ x: 'asdasdf'}, { x: 'regex:/^([a-z])+$/i' })
             let result = v.passes()
-            // console.log(v.getRules('x')[0]['rules'])
-            // console.log(v.getErrors())
             expect(result).to.be.true
         })
         it('returns false when the given data fails regex validation', function() {
-            let v = Validator.make({ x: 'aasd234fsd1'}, [ {name: 'x', rules: 'regex:/^([a-z])+$/i'}])
+            let v = Validator.make({ x: 'aasd234fsd1'}, { x: 'regex:/^([a-z])+$/i'})
             expect(v.passes()).to.be.false
         })
         it('returns true when given data has comma delimited value', function() {
-            let v = Validator.make({x: 'a,b'}, [{name: 'x', rules: 'regex:/^a,b$/i'}])
+            let v = Validator.make({x: 'a,b'}, { x: 'regex:/^a,b$/i'})
             expect(v.passes()).to.be.true
         })
         it('returns true when given data is a string value of "12"', function() {
-            let v = Validator.make({x: '12'}, [{name: 'x', rules: 'regex:/^12$/i'}])
+            let v = Validator.make({x: '12'}, { x: 'regex:/^12$/i'})
             expect(v.passes()).to.be.true
         })
         it('returns true when given data is numeric 123', function() {
-            let v = Validator.make({x: 123}, [{name: 'x', rules: 'regex:/^123$/i'}])
+            let v = Validator.make({x: 123}, { x: 'regex:/^123$/i'})
             expect(v.passes()).to.be.true
         })
     })
@@ -471,474 +462,488 @@ describe('Validator', function() {
             let v = Validator.make({
                 'foo': 'bar',
                 'baz': 'boom'
-            }, [{name: 'foo', rules: 'same:baz'}])
+            }, {foo: 'same:baz'})
             expect(v.passes()).to.be.false
         })
         it('returns false when the specified field does not present', function() {
             let v = Validator.make({
                 'foo': 'bar',
-            }, [{name: 'foo', rules: 'same:baz'}])
+            }, {foo: 'same:baz'})
             expect(v.passes()).to.be.false
         })
         it('returns true when the specified field is present and has the same value', function() {
             let v = Validator.make({
                 'foo': 'bar',
                 'baz': 'bar'
-            }, [{name: 'foo', rules: 'same:baz'}])
+            }, {foo: 'same:baz'})
             expect(v.passes()).to.be.true
         })
         it('returns false when the specified field has different numeric value', function() {
             let v = Validator.make({
                 'foo': '1e2',
                 'baz': '100'
-            }, [{name: 'foo', rules: 'same:baz'}])
+            }, {foo: 'same:baz'})
             expect(v.passes()).to.be.false
         })
     })
     describe('#validateDifferent()', function() {
+        let rules = { foo: 'different:baz' }
         it('returns true when the specified field has different value', function() {
             let v = Validator.make({
                 'foo': 'bar',
                 'baz': 'boom'
-            }, [{name: 'foo', rules: 'different:baz'}])
+            }, rules)
             expect(v.passes()).to.be.true
         })
         it('returns false when the specified field does not present', function() {
             let v = Validator.make({
                 'foo': 'bar',
-            }, [{name: 'foo', rules: 'different:baz'}])
+            }, rules)
             expect(v.passes()).to.be.false
         })
         it('returns false when the specified field is present and has the same value', function() {
             let v = Validator.make({
                 'foo': 'bar',
                 'baz': 'bar'
-            }, [{name: 'foo', rules: 'different:baz'}])
+            }, rules)
             expect(v.passes()).to.be.false
         })
         it('returns true when the specified field has different numeric value', function() {
             let v = Validator.make({
                 'foo': '1e2',
                 'baz': '100'
-            }, [{name: 'foo', rules: 'different:baz'}])
+            }, rules)
             expect(v.passes()).to.be.true
         })
     })
     describe('#validateConfirm()', function() {
+        let rules = { password: 'confirmed' }
         it('returns false when confirmation field is not present', function() {
-            let v = Validator.make({password: 'foo'}, [ {name: 'password', rules: 'confirmed'}])
+            let v = Validator.make({password: 'foo'}, rules)
             expect(v.passes()).to.be.false
         })
         it('returns false when confirmation field value does not match', function() {
             let v = Validator.make({
                 'password': 'foo',
                 'password_confirmation': 'bar'
-            }, [ {name: 'password', rules: 'confirmed'}])
+            }, rules)
             expect(v.passes()).to.be.false
         })
         it('returns true when confirmation field value does match', function() {
             let v = Validator.make({
                 'password': 'foo',
                 'password_confirmation': 'foo'
-            }, [ {name: 'password', rules: 'confirmed'}])
+            }, rules)
             expect(v.passes()).to.be.true
         })
     })
     describe('#validateAccepted()', function() {
+        let rules = { foo: 'accepted' }
         it('returns false when given value is "no"', function() {
-            let v = Validator.make({ foo: 'no'}, [{name: 'foo', rules: 'accepted'}])
+            let v = Validator.make({ foo: 'no'}, rules)
             expect(v.passes()).to.be.false
         })
         it('returns false when given value is null', function() {
-            let v = Validator.make({ foo: null}, [{name: 'foo', rules: 'accepted'}])
+            let v = Validator.make({ foo: null}, rules)
             expect(v.passes()).to.be.false
         })
         it('returns false when the field is not present', function() {
-            let v = Validator.make({}, [{name: 'foo', rules: 'accepted'}])
+            let v = Validator.make({}, rules)
             expect(v.passes()).to.be.false
         })
         it('returns false when given value is 0', function() {
-            let v = Validator.make({ foo: 0}, [{name: 'foo', rules: 'accepted'}])
+            let v = Validator.make({ foo: 0}, rules)
             expect(v.passes()).to.be.false
         })
         it('returns false when given value is false', function() {
-            let v = Validator.make({ foo: false}, [{name: 'foo', rules: 'accepted'}])
+            let v = Validator.make({ foo: false}, rules)
             expect(v.passes()).to.be.false
         })
         it('returns false when given value is string "false"', function() {
-            let v = Validator.make({ foo: 'false'}, [{name: 'foo', rules: 'accepted'}])
+            let v = Validator.make({ foo: 'false'}, rules)
             expect(v.passes()).to.be.false
         })
         it('returns true when given value is string "yes"', function() {
-            let v = Validator.make({ foo: 'yes'}, [{name: 'foo', rules: 'accepted'}])
+            let v = Validator.make({ foo: 'yes'}, rules)
             expect(v.passes()).to.be.true
         })
         it('returns true when given value is string "on"', function() {
-            let v = Validator.make({ foo: 'on'}, [{name: 'foo', rules: 'accepted'}])
+            let v = Validator.make({ foo: 'on'}, rules)
             expect(v.passes()).to.be.true
         })
         it('returns true when given value is string "1"', function() {
-            let v = Validator.make({ foo: '1'}, [{name: 'foo', rules: 'accepted'}])
+            let v = Validator.make({ foo: '1'}, rules)
             expect(v.passes()).to.be.true
         })
         it('returns true when given value is numeric 1', function() {
-            let v = Validator.make({ foo: 1}, [{name: 'foo', rules: 'accepted'}])
+            let v = Validator.make({ foo: 1}, rules)
             expect(v.passes()).to.be.true
         })
         it('returns true when given value is true', function() {
-            let v = Validator.make({ foo: true}, [{name: 'foo', rules: 'accepted'}])
+            let v = Validator.make({ foo: true}, rules)
             expect(v.passes()).to.be.true
         })
         it('returns true when given value is string "true"', function() {
-            let v = Validator.make({ foo: 'true'}, [{name: 'foo', rules: 'accepted'}])
+            let v = Validator.make({ foo: 'true'}, rules)
             expect(v.passes()).to.be.true
         })
     })
     describe('#validateDigits()', function() {
         it('returns true when the number of digits given matched', function() {
-            let v = Validator.make({foo: '12345'}, [{name: 'foo', rules: 'digits:5'}])
+            let v = Validator.make({foo: '12345'}, {foo: 'digits:5'})
             expect(v.passes()).to.be.true
         })
         it('returns false when the number of digits given does not match', function() {
-            let v = Validator.make({foo: '123'}, [{name: 'foo', rules: 'digits:200'}])
+            let v = Validator.make({foo: '123'}, {foo: 'digits:200'})
             expect(v.passes()).to.be.false
         })
     })
     describe('$validateDigitsBetween()', function() {
         it('returns true when the number of digits given is between the range', function() {
-            let v = Validator.make({foo: '12345'}, [{name: 'foo', rules: 'digits_between:1,6'}])
+            let v = Validator.make({foo: '12345'}, {foo: 'digits_between:1,6'})
             expect(v.passes()).to.be.true
         })
         it('returns false when the given value is not numeric', function() {
-            let v = Validator.make({foo: 'bar'}, [{name: 'foo', rules: 'digits_between:1,10'}])
+            let v = Validator.make({foo: 'bar'}, {foo: 'digits_between:1,10'})
             expect(v.passes()).to.be.false
         })
         it('returns false when the number of digits given is not in the range', function() {
-            let v = Validator.make({foo: '123'}, [{name: 'foo', rules: 'digits_between:4,5'}])
+            let v = Validator.make({foo: '123'}, {foo: 'digits_between:4,5'})
             expect(v.passes()).to.be.false
         })
     })
     describe('#validateSize()', function() {
         it('returns false when string length is more than the given size', function() {
-            let v = Validator.make({foo: 'asdad'}, [{name: 'foo', rules: 'size:3'}])
+            let v = Validator.make({foo: 'asdad'}, {foo: 'size:3'})
             expect(v.passes()).to.be.false
         })
         it('returns true when string length is equal to the given size', function() {
-            let v = Validator.make({foo: 'asd'}, [{name: 'foo', rules: 'size:3'}])
+            let v = Validator.make({foo: 'asd'}, {foo: 'size:3'})
             expect(v.passes()).to.be.true
         })
         it('returns false when numeric value is not equal to the given size', function() {
-            let v = Validator.make({foo: '123'}, [{name: 'foo', rules: 'numeric|size:3'}])
+            let v = Validator.make({foo: '123'}, {foo: 'numeric|size:3'})
             expect(v.passes()).to.be.false
         })
         it('returns true when numeric value is equal to the given size', function() {
-            let v = Validator.make({foo: '3'}, [{name: 'foo', rules: 'numeric|size:3'}])
+            let v = Validator.make({foo: '3'}, {foo: 'numeric|size:3'})
             expect(v.passes()).to.be.true
         })
         it('returns true when given value is array of the given size', function() {
-            let v = Validator.make({foo: [1, 2, 3]}, [{name: 'foo', rules: 'array|size:3'}])
+            let v = Validator.make({foo: [1, 2, 3]}, {foo: 'array|size:3'})
             expect(v.passes()).to.be.true
         })
         it('returns false when given value is array of different size', function() {
-            let v = Validator.make({foo: [1, 2, 3]}, [{name: 'foo', rules: 'array|size:4'}])
+            let v = Validator.make({foo: [1, 2, 3]}, {foo: 'array|size:4'})
             expect(v.passes()).to.be.false
         })
-        /* SKIP file related tests */
+        // SKIP file related tests
     })
     describe('#validateBetween()', function() {
         it('returns false when given string length is not in the range', function() {
-            let v = Validator.make({foo: 'asdad'}, [{name: 'foo', rules: 'between:3,4'}])
+            let v = Validator.make({foo: 'asdad'}, {foo: 'between:3,4'})
             expect(v.passes()).to.be.false
         })
         it('returns true when given string length is in the range', function() {
-            let v = Validator.make({foo: 'asd'}, [{name: 'foo', rules: 'between:3,5'}])
+            let v = Validator.make({foo: 'asd'}, {foo: 'between:3,5'})
             expect(v.passes()).to.be.true
 
-            v = Validator.make({foo: 'asda'}, [{name: 'foo', rules: 'between:3,5'}])
+            v = Validator.make({foo: 'asda'}, {foo: 'between:3,5'})
             expect(v.passes()).to.be.true
 
-            v = Validator.make({foo: 'asdad'}, [{name: 'foo', rules: 'between:3,5'}])
+            v = Validator.make({foo: 'asdad'}, {foo: 'between:3,5'})
             expect(v.passes()).to.be.true
         })
         it('returns false when the given numeric value is not in the specified range', function() {
-            let v = Validator.make({foo: '123'}, [{name: 'foo', rules: 'numeric|between:50,100'}])
+            let v = Validator.make({foo: '123'}, {foo: 'numeric|between:50,100'})
             expect(v.passes()).to.be.false
         })
         it('returns true when the given numeric value is in the specified range', function() {
-            let v = Validator.make({foo: '3'}, [{name: 'foo', rules: 'numeric|between:1,5'}])
+            let v = Validator.make({foo: '3'}, {foo: 'numeric|between:1,5'})
             expect(v.passes()).to.be.true
         })
         it('returns true when the given array size is in the specified range', function() {
-            let v = Validator.make({foo: [1, 2, 3]}, [{name: 'foo', rules: 'array|between:1,5'}])
+            let v = Validator.make({foo: [1, 2, 3]}, {foo: 'array|between:1,5'})
             expect(v.passes()).to.be.true
         })
         it('returns false when the given array size is not in the specified range', function() {
-            let v = Validator.make({foo: [1, 2, 3]}, [{name: 'foo', rules: 'array|between:1,2'}])
+            let v = Validator.make({foo: [1, 2, 3]}, {foo: 'array|between:1,2'})
             expect(v.passes()).to.be.false
         })
-        /* SKIP file related tests */
+        // SKIP file related tests
     })
     describe('#validateIp()', function() {
+        let rules = { ip: 'ip' }
         it('returns false when given string that does not look like IP address', function() {
-            let v = Validator.make({ip: 'asdfsdfsd'}, [{name: 'ip', rules: 'ip'}])
+            let v = Validator.make({ip: 'asdfsdfsd'}, rules)
             expect(v.passes()).to.be.false
         })
         it('returns true when given string that looks loke IP address', function() {
-            let v = Validator.make({ip: '127.0.0.1'}, [{name: 'ip', rules: 'ip'}])
+            let v = Validator.make({ip: '127.0.0.1'}, rules)
             expect(v.passes()).to.be.true
         })
     })
     describe('#validateUrl()', function() {
+        let rules = { url: 'url' }
         it('returns false when given string that does not look like URL', function() {
-            let v = Validator.make({url: 'skd:kssk.slsls.sl'}, [{name: 'url', rules: 'url'}])
+            let v = Validator.make({url: 'skd:kssk.slsls.sl'}, rules)
             expect(v.passes()).to.be.false
         })
         it('returns true when given string that looks like URL', function() {
-            let v = Validator.make({url: 'http://kssk.slsls.sl'}, [{name: 'url', rules: 'url'}])
+            let v = Validator.make({url: 'http://kssk.slsls.sl'}, rules)
             expect(v.passes()).to.be.true
 
-            v = Validator.make({url: 'http://kssk.slsls.sl/'}, [{name: 'url', rules: 'url'}])
+            v = Validator.make({url: 'http://kssk.slsls.sl/'}, rules)
             expect(v.passes()).to.be.true
 
-            v = Validator.make({url: 'http://kssk.slsls.sl/sksk'}, [{name: 'url', rules: 'url'}])
+            v = Validator.make({url: 'http://kssk.slsls.sl/sksk'}, rules)
             expect(v.passes()).to.be.true
 
-            v = Validator.make({url: 'https://kssk.slsls.sl/sksk'}, [{name: 'url', rules: 'url'}])
+            v = Validator.make({url: 'https://kssk.slsls.sl/sksk'}, rules)
             expect(v.passes()).to.be.true
         })
     })
     describe('#validateAlpha()', function() {
+        let rules = { x: 'alpha' }
         it('returns false when given string contains linebreak and number character', function() {
-            let v = Validator.make({x: "asdfsd2fkl"}, [{name: 'x', rules: 'alpha'}])
+            let v = Validator.make({x: "asdfsd2fkl"}, rules)
             expect(v.passes()).to.be.false
 
-            v = Validator.make({x: "asdfsdfk\nsd"}, [{name: 'x', rules: 'alpha'}])
+            v = Validator.make({x: "asdfsdfk\nsd"}, rules)
             expect(v.passes()).to.be.false
 
-            v = Validator.make({x: "asdfsdfk\tsd"}, [{name: 'x', rules: 'alpha'}])
+            v = Validator.make({x: "asdfsdfk\tsd"}, rules)
             expect(v.passes()).to.be.false
 
-            v = Validator.make({x: "http://google.com"}, [{name: 'x', rules: 'alpha'}])
+            v = Validator.make({x: "http://google.com"}, rules)
             expect(v.passes()).to.be.false
 
-            v = Validator.make({x: "123"}, [{name: 'x', rules: 'alpha'}])
+            v = Validator.make({x: "123"}, rules)
             expect(v.passes()).to.be.false
 
-            v = Validator.make({x: 123}, [{name: 'x', rules: 'alpha'}])
+            v = Validator.make({x: 123}, rules)
             expect(v.passes()).to.be.false
         })
         it('returns true when given string contains only alphabet character', function() {
-            let v = Validator.make({x: 'asdfsdfkl'}, [{name: 'x', rules: 'alpha'}])
+            let v = Validator.make({x: 'asdfsdfkl'}, rules)
             expect(v.passes()).to.be.true
         })
     })
     describe('#validateAlphaNum()', function() {
+        let rules = { x: 'alpha_num' }
         it('returns true when given string contains alphabet and numeric characters', function() {
-            let v = Validator.make({x: 'asdfs234dfk'}, [{name: 'x', rules: 'alpha_num'}])
+            let v = Validator.make({x: 'asdfs234dfk'}, rules)
             expect(v.passes()).to.be.true
         })
         it('returns false when given string contains other non-alpha_num', function() {
-            v = Validator.make({x: "http://222.google.com"}, [{name: 'x', rules: 'alpha_num'}])
+            v = Validator.make({x: "http://222.google.com"}, rules)
             expect(v.passes()).to.be.false
         })
     })
     describe('#validateAlphaDash()', function() {
+        let rules = { x: 'alpha_dash' }
         it('returns true when given string contains alphabet, hyphen, and underscore char', function() {
-            let v = Validator.make({x: 'aslsl-_3dlks'}, [{name: 'x', rules: 'alpha_dash'}])
+            let v = Validator.make({x: 'aslsl-_3dlks'}, rules)
             expect(v.passes()).to.be.true
         })
         it('returns false when given string contains characters other than alpha_dash', function() {
-            let v = Validator.make({x: 'http://-g232oogle.com'}, [{name: 'x', rules: 'alpha_dash'}])
+            let v = Validator.make({x: 'http://-g232oogle.com'}, rules)
             expect(v.passes()).to.be.false
         })
     })
     describe('#validateDate()', function() {
+        let rules = { x: 'date' }
         it('returns true when given string can be converted to a Date', function() {
-            let v = Validator.make({x: '2000-01-01'}, [{name: 'x', rules: 'date'}])
+            let v = Validator.make({x: '2000-01-01'}, rules)
             expect(v.passes()).to.be.true
 
-            v = Validator.make({x: '01/01/2000'}, [{name: 'x', rules: 'date'}])
+            v = Validator.make({x: '01/01/2000'}, rules)
             expect(v.passes()).to.be.true
 
-            v = Validator.make({x: new Date()}, [{name: 'x', rules: 'date'}])
+            v = Validator.make({x: new Date()}, rules)
             expect(v.passes()).to.be.true
         })
         it('return false when given string cannot be converted to a Date', function() {
-            let v = Validator.make({x: '1325376000'}, [{name: 'x', rules: 'date'}])
+            let v = Validator.make({x: '1325376000'}, rules)
             expect(v.fails()).to.be.true
 
-            v = Validator.make({x: 'Not a date'}, [{name: 'x', rules: 'date'}])
+            v = Validator.make({x: 'Not a date'}, rules)
             expect(v.fails()).to.be.true
 
-            v = Validator.make({x: ['Not', 'a', 'date']}, [{name: 'x', rules: 'date'}])
+            v = Validator.make({x: ['Not', 'a', 'date']}, rules)
             expect(v.fails()).to.be.true
         })
     })
     describe('#validateBefore()', function() {
         it('returns true when given date is before the specified one', function() {
-            let v = Validator.make({x: '2000-01-01'}, [{name: 'x', rules: 'before:2012-01-01'}])
+            let v = Validator.make({x: '2000-01-01'}, {x: 'before:2012-01-01'})
             expect(v.passes()).to.be.true
 
-            v = Validator.make({x: new Date('2000-01-01')}, [{name: 'x', rules: 'before:2012-01-01'}])
+            v = Validator.make({x: new Date('2000-01-01')}, {x: 'before:2012-01-01'})
             expect(v.passes()).to.be.true
         })
         it('returns false when given date is not a string or number', function() {
-            let v = Validator.make({x: ['2000-01-01']}, [{name: 'x', rules: 'before:2012-01-01'}])
+            let v = Validator.make({x: ['2000-01-01']}, {x: 'before:2012-01-01'})
             expect(v.passes()).to.be.false
         })
         it('returns true when given date refer to another existing field', function() {
-            let v = Validator.make({start: '2012-01-01', ends: '2013-01-01'}, [
-                {name: 'start', rules: 'before:ends'},
-                {name: 'ends', rules: 'after:start'}
-            ])
+            let v = Validator.make({start: '2012-01-01', ends: '2013-01-01'}, {
+                start: 'before:ends',
+                ends: 'after:start'
+            })
             expect(v.passes()).to.be.true
 
-            v = Validator.make({start: '2012-01-01', ends: '2000-01-01'}, [
-                {name: 'start', rules: 'before:ends'},
-                {name: 'ends', rules: 'after:start'}
-            ])
+            v = Validator.make({start: '2012-01-01', ends: '2000-01-01'}, {
+                start: 'before:ends',
+                ends: 'after:start'
+            })
             expect(v.fails()).to.be.true
         })
     })
     describe('#validateAfter()', function() {
         it('returns true when given date is after the specified one', function() {
-            let v = Validator.make({x: '2012-01-01'}, [{name: 'x', rules: 'after:2000-01-01'}])
+            let v = Validator.make({x: '2012-01-01'}, {x: 'after:2000-01-01'})
             expect(v.passes()).to.be.true
         })
         it('returns false when given date is not a string or number', function() {
-            let v = Validator.make({x: ['2012-01-01']}, [{name: 'x', rules: 'after:2000-01-01'}])
+            let v = Validator.make({x: ['2012-01-01']}, {x: 'after:2000-01-01'})
             expect(v.passes()).to.be.false
         })
         it('returns true when given date refer to another existing field', function() {
-            let v = Validator.make({start: '2012-01-01', ends: '2013-01-01'}, [
-                {name: 'start', rules: 'after:2000-01-01'},
-                {name: 'ends', rules: 'after:start'}
-            ])
+            let v = Validator.make({start: '2012-01-01', ends: '2013-01-01'}, {
+                start: 'after:2000-01-01',
+                ends: 'after:start'
+            })
             expect(v.passes()).to.be.true
 
-            v = Validator.make({start: '2012-01-01', ends: '2000-01-01'}, [
-                {name: 'start', rules: 'after:2000-01-01'},
-                {name: 'ends', rules: 'after:start'}
-            ])
+            v = Validator.make({start: '2012-01-01', ends: '2000-01-01'}, {
+                start: 'after:2000-01-01',
+                ends: 'after:start'
+            })
             expect(v.fails()).to.be.true
 
-            v = Validator.make({start: new Date('2012-01-01'), ends: '2000-01-01'}, [
-                {name: 'start', rules: 'before:ends'},
-                {name: 'ends', rules: 'after:start'}
-            ])
+            v = Validator.make({start: new Date('2012-01-01'), ends: '2000-01-01'}, {
+                start: 'before:ends',
+                ends: 'after:start'
+            })
             expect(v.fails()).to.be.true
 
-            v = Validator.make({start: '2012-01-01', ends: new Date('2000-01-01')}, [
-                {name: 'start', rules: 'before:ends'},
-                {name: 'ends', rules: 'after:start'}
-            ])
+            v = Validator.make({start: '2012-01-01', ends: new Date('2000-01-01')}, {
+                start: 'before:ends',
+                ends: 'after:start'
+            })
             expect(v.fails()).to.be.true
         })
     })
     describe('#validateArray()', function() {
+        let rules = { foo: 'array' }
         it('returns true when given data is an array', function() {
-            let v = Validator.make({foo: [1, 2, 3]}, [{name: 'foo', rules: 'array'}])
+            let v = Validator.make({foo: [1, 2, 3]}, rules)
             expect(v.passes()).to.be.true
         })
         it('returns false when given data is not an array', function() {
-            let v = Validator.make({foo: 'xyz'}, [{name: 'foo', rules: 'array'}])
+            let v = Validator.make({foo: 'xyz'}, rules)
             expect(v.passes()).to.be.false
         })
     })
     describe('#validateFilled()', function() {
+        let rules = { name: 'filled' }
         it('returns true when the field is not present', function() {
-            let v = Validator.make({}, [{name: 'name', rules: 'filled'}])
+            let v = Validator.make({}, rules)
             expect(v.passes()).to.be.true
         })
         it('returns false when the field is present but empty', function() {
-            let v = Validator.make({name: ''}, [{name: 'name', rules: 'filled'}])
+            let v = Validator.make({name: ''}, rules)
             expect(v.passes()).to.be.false
         })
     })
     describe('#validateBoolean()', function() {
+        let rules = { foo: 'boolean' }
         it('returns false when given string "no"', function() {
-            let v = Validator.make({foo: 'no'}, [{name: 'foo', rules: 'boolean'}])
+            let v = Validator.make({foo: 'no'}, rules)
             expect(v.passes()).to.be.false
         })
         it('returns false when given string "yes"', function() {
-            let v = Validator.make({foo: 'yes'}, [{name: 'foo', rules: 'boolean'}])
+            let v = Validator.make({foo: 'yes'}, rules)
             expect(v.passes()).to.be.false
         })
         it('returns false when given string "false"', function() {
-            let v = Validator.make({foo: 'false'}, [{name: 'foo', rules: 'boolean'}])
+            let v = Validator.make({foo: 'false'}, rules)
             expect(v.passes()).to.be.false
         })
         it('returns false when given string "true"', function() {
-            let v = Validator.make({foo: 'true'}, [{name: 'foo', rules: 'boolean'}])
+            let v = Validator.make({foo: 'true'}, rules)
             expect(v.passes()).to.be.false
         })
         it('returns true when passing empty data', function() {
-            let v = Validator.make({}, [{name: 'foo', rules: 'boolean'}])
+            let v = Validator.make({}, rules)
             expect(v.passes()).to.be.true
         })
         it('returns true when given boolean value true or false', function() {
-            let v = Validator.make({foo: true}, [{name: 'foo', rules: 'boolean'}])
+            let v = Validator.make({foo: true}, rules)
             expect(v.passes()).to.be.true
 
-            v = Validator.make({foo: false}, [{name: 'foo', rules: 'boolean'}])
+            v = Validator.make({foo: false}, rules)
             expect(v.passes()).to.be.true
         })
         it('returns true when given value 1 or "1"', function() {
-            let v = Validator.make({foo: 1}, [{name: 'foo', rules: 'boolean'}])
+            let v = Validator.make({foo: 1}, rules)
             expect(v.passes()).to.be.true
 
-            v = Validator.make({foo: '1'}, [{name: 'foo', rules: 'boolean'}])
+            v = Validator.make({foo: '1'}, rules)
             expect(v.passes()).to.be.true
         })
         it('returns true when given value 0 or "0"', function() {
-            let v = Validator.make({foo: 0}, [{name: 'foo', rules: 'boolean'}])
+            let v = Validator.make({foo: 0}, rules)
             expect(v.passes()).to.be.true
 
-            v = Validator.make({foo: '0'}, [{name: 'foo', rules: 'boolean'}])
+            v = Validator.make({foo: '0'}, rules)
             expect(v.passes()).to.be.true
         })
     })
     describe('#validateJson()', function() {
+        let rules = { foo: 'json' }
         it('returns false when given string is not parsable to JSON', function() {
-            let v = Validator.make({foo: 'aksdkd'}, [{name: 'foo', rules: 'json'}])
+            let v = Validator.make({foo: 'aksdkd'}, rules)
             expect(v.passes()).to.be.false
         })
         it('returns true when given string is parsable to JSON', function() {
-            let v = Validator.make({foo: '[]'}, [{name: 'foo', rules: 'json'}])
+            let v = Validator.make({foo: '[]'}, rules)
             expect(v.passes()).to.be.true
 
-            v = Validator.make({foo: '{"name":"John","age":"34"}'}, [{name: 'foo', rules: 'json'}])
+            v = Validator.make({foo: '{"name":"John","age":"34"}'}, rules)
             expect(v.passes()).to.be.true
         })
     })
     describe('#validateRequiredWithout()', function() {
+        let rules = { last: 'required_without:first' }
         it('returns true when the field under validation is not present if the other specified field is present', function() {
-            let v = Validator.make({first: 'Taylor'}, [{name: 'last', rules: 'required_without:first'}])
+            let v = Validator.make({first: 'Taylor'}, rules)
             expect(v.passes()).to.be.true
         })
         it('returns true when the field under validation is empty while the other specified field is present', function() {
-            let v = Validator.make({first: 'Taylor', last: ''}, [{name: 'last', rules: 'required_without:first'}])
+            let v = Validator.make({first: 'Taylor', last: ''}, rules)
             expect(v.passes()).to.be.true
         })
         it('returns false when the field under validation is not present when the other specified field is empty', function() {
-            let v = Validator.make({first: ''}, [{name: 'last', rules: 'required_without:first'}])
+            let v = Validator.make({first: ''}, rules)
             expect(v.passes()).to.be.false
         })
         it('returns false when the data is empty (the field under validation is not present)', function() {
-            let v = Validator.make({}, [{name: 'last', rules: 'required_without:first'}])
+            let v = Validator.make({}, rules)
             expect(v.passes()).to.be.false
         })
         it('returns true when the field under validation is present, but the other specified field is not required', function() {
-            let v = Validator.make({first: 'Taylor', last: 'Otwell'}, [{name: 'last', rules: 'required_without:first'}])
+            let v = Validator.make({first: 'Taylor', last: 'Otwell'}, rules)
             expect(v.passes()).to.be.true
         })
-        /* SKIP File related test */
+        // SKIP File related test
         it('tests required_without multiple', function() {
-            let rules = [
-                { name: 'f1', rules: 'required_without:f2,f3'},
-                { name: 'f2', rules: 'required_without:f1,f3'},
-                { name: 'f3', rules: 'required_without:f1,f2'}
-            ]
+            let rules = {
+                f1: 'required_without:f2,f3',
+                f2: 'required_without:f1,f3',
+                f3: 'required_without:f1,f2'
+            }
             let v = Validator.make({}, rules)
             expect(v.fails()).to.be.true
 
@@ -965,11 +970,11 @@ describe('Validator', function() {
         })
     })
     describe('#validateRequiredWithoutAll()', function() {
-        let rules = [
-            { name: 'f1', rules: 'required_without_all:f2,f3'},
-            { name: 'f2', rules: 'required_without_all:f1,f3'},
-            { name: 'f3', rules: 'required_without_all:f1,f2'}
-        ]
+        let rules = {
+            f1: 'required_without_all:f2,f3',
+            f2: 'required_without_all:f1,f3',
+            f3: 'required_without_all:f1,f2'
+        }
         it('returns false when given data is empty', function() {
             let v = Validator.make({}, rules)
             expect(v.fails()).to.be.true
@@ -1000,68 +1005,69 @@ describe('Validator', function() {
     })
     describe('#validateRequiredIf()', function() {
         it('returns false when the field under validation is not present', function() {
-            let v = Validator.make({first: 'taylor'}, [{name: 'last', rules: 'required_if:first,taylor'}])
+            let v = Validator.make({first: 'taylor'}, {last: 'required_if:first,taylor'})
             expect(v.fails()).to.be.true
         })
         it('returns true when the field under validation must be present if the anotherfield field is equal to any value', function() {
-            let v = Validator.make({first: 'taylor', last: 'otwell'}, [{name: 'last', rules: 'required_if:first,taylor'}])
+            let v = Validator.make({first: 'taylor', last: 'otwell'}, {last: 'required_if:first,taylor'})
             expect(v.passes()).to.be.true
 
-            v = Validator.make({first: 'taylor', last: 'otwell'}, [{name: 'last', rules: 'required_if:first,taylor,dayle'}])
+            v = Validator.make({first: 'taylor', last: 'otwell'}, {last: 'required_if:first,taylor,dayle'})
             expect(v.passes()).to.be.true
 
-            v = Validator.make({first: 'dayle', last: 'rees'}, [{name: 'last', rules: 'required_if:first,taylor,dayle'}])
+            v = Validator.make({first: 'dayle', last: 'rees'}, {last: 'required_if:first,taylor,dayle'})
             expect(v.passes()).to.be.true
 
-            v = Validator.make({foo: true}, [{name: 'bar', rules: 'required_if:foo,false'}])
+            v = Validator.make({foo: true}, {bar: 'required_if:foo,false'})
             expect(v.passes()).to.be.true
 
-            v = Validator.make({foo: true}, [{name: 'bar', rules: 'required_if:foo,true'}])
+            v = Validator.make({foo: true}, {bar: 'required_if:foo,true'})
             expect(v.fails()).to.be.true
         })
-        /* SKIP test for error message when passed multiple values */
+        // SKIP test for error message when passed multiple values
     })
     describe('#validateRequiredUnless()', function() {
         it('checks the field under validation must be present unless the anotherfield field is equal to any value', function() {
-            let v = Validator.make({first: 'sven'}, [{name: 'last', rules: 'required_unless:first,taylor'}])
+            let v = Validator.make({first: 'sven'}, {last: 'required_unless:first,taylor'})
             expect(v.fails()).to.be.true
 
-            v = Validator.make({first: 'taylor'}, [{name: 'last', rules: 'required_unless:first,taylor'}])
+            v = Validator.make({first: 'taylor'}, {last: 'required_unless:first,taylor'})
             expect(v.passes()).to.be.true
 
-            v = Validator.make({first: 'sven', last: 'wittevrongel'}, [{name: 'last', rules: 'required_unless:first,taylor'}])
+            v = Validator.make({first: 'sven', last: 'wittevrongel'}, {last: 'required_unless:first,taylor'})
             expect(v.passes()).to.be.true
 
-            v = Validator.make({first: 'taylor'}, [{name: 'last', rules: 'required_unless:first,taylor,sven'}])
+            v = Validator.make({first: 'taylor'}, {last: 'required_unless:first,taylor,sven'})
             expect(v.passes()).to.be.true
 
-            v = Validator.make({first: 'sven'}, [{name: 'last', rules: 'required_unless:first,taylor,sven'}])
+            v = Validator.make({first: 'sven'}, {last: 'required_unless:first,taylor,sven'})
             expect(v.passes()).to.be.true
         })
-        /* SKIP test error message when passed multiple values */
+        // SKIP test error message when passed multiple values
     })
     describe('#validateString()', function() {
+        let rules = { x: 'string' }
         it('returns true when given value is a string', function() {
-            let v = Validator.make({x: 'aslsdlks'}, [{name: 'x', rules: 'string'}])
+            let v = Validator.make({x: 'aslsdlks'}, rules)
             expect(v.passes()).to.be.true
         })
         it('returns false when given value is not of type string', function() {
-            let v = Validator.make({x: ['aa', 'bb']}, [{name: 'x', rules: 'string'}])
+            let v = Validator.make({x: ['aa', 'bb']}, rules)
             expect(v.passes()).to.be.false
 
-            v = Validator.make({x: {'aa': '123'}}, [{name: 'x', rules: 'string'}])
+            v = Validator.make({x: {'aa': '123'}}, rules)
             expect(v.passes()).to.be.false
 
-            v = Validator.make({x: true}, [{name: 'x', rules: 'string'}])
+            v = Validator.make({x: true}, rules)
             expect(v.passes()).to.be.false
         })
     })
     describe('# Error Messages', function() {
-        let rules = [
-            { name: 'name', rules: 'required|min:3'},
-            { name: 'age', rules: 'numeric|min:20'},
-            { name: 'email', rules: 'required|email'}
-        ]
+        let rules = {
+            name: 'required|min:3',
+            age: 'numeric|min:20',
+            email: 'required|email'
+        }
         it('checks that errors are returned correctly when validation failed', function() {
             let v = Validator.make({age: 15, email: 'rati@example.com'}, rules)
             v.passes()
@@ -1086,7 +1092,7 @@ describe('Validator', function() {
             ])
         })
         it('checks proper messages are returned for sizes rule', function() {
-            let v = Validator.make({name: '3'}, [{name: 'name', rules: 'numeric|min:5'}])
+            let v = Validator.make({name: '3'}, {name: 'numeric|min:5'})
             expect(v.passes()).to.be.false
             expect(v.getErrors()).to.deep.equal([
                 {
@@ -1096,7 +1102,7 @@ describe('Validator', function() {
                 }
             ])
 
-            v = Validator.make({name: 'asdfkjlsd'}, [{name: 'name', rules: 'size:2'}])
+            v = Validator.make({name: 'asdfkjlsd'}, {name: 'size:2'})
             expect(v.passes()).to.be.false
             expect(v.getErrors()).to.deep.equal([
                 {
@@ -1109,7 +1115,7 @@ describe('Validator', function() {
     })
     describe('# Others', function() {
         it('tests that empty rules are skipped', function() {
-            let v = Validator.make({x: 'asksksks'}, [{name: 'x', rules: '|||required|'}])
+            let v = Validator.make({x: 'asksksks'}, { x: '|||required|'})
             expect(v.passes()).to.be.true
         })
     })
@@ -1118,10 +1124,10 @@ describe('Validator', function() {
             name: 'Name',
             age: 'Age'
         }
-        let rules = [
-            { name: 'name', rules: 'required'},
-            { name: 'age', rules: 'required' }
-        ]
+        let rules = {
+            name: 'required',
+            age: 'required'
+        }
         let expectedResult = [
             {
                 name: 'name',
@@ -1153,11 +1159,11 @@ describe('Validator', function() {
         })
     })
     describe('# Custom Messages', function() {
-        let rules = [
-            { name: 'name', rules: 'required'},
-            { name: 'age', rules: 'required' },
-            { name: 'email', rules: 'required'}
-        ]
+        let rules = {
+            name: 'required',
+            age: 'required' ,
+            email: 'required'
+        }
         let customMessages = {
             'name.required': ':attr is required.',
             'age.required': ':Attr field is required.',
@@ -1188,7 +1194,7 @@ describe('Validator', function() {
     })
     describe('# Displayable values are replaced', function() {
         it('tests required_if:foo,bar', function() {
-            let v = Validator.make({color: '1', bar: ''}, [{name: 'bar', rules: 'required_if:color,1'}])
+            let v = Validator.make({color: '1', bar: ''}, {bar: 'required_if:color,1'})
             v.addCustomValues({ 'color': {'1': 'Red'} })
             expect(v.passes()).to.be.false
             expect(v.getErrors()).to.deep.equal([
@@ -1202,7 +1208,7 @@ describe('Validator', function() {
         it('tests in:foo,bar using addCustomValues()', function() {
             let v = Validator.make(
                 { type: '4' },
-                [ { name: 'type', rules: 'in:5,300' } ],
+                { type: 'in:5,300' },
                 { 'type.in': ':attr must be included in :values.'}
             )
             v.addCustomValues({
@@ -1223,7 +1229,7 @@ describe('Validator', function() {
         it('tests in:foo,bar using setValueNames()', function() {
             let v = Validator.make(
                 { type: '4' },
-                [ { name: 'type', rules: 'in:5,300' } ],
+                { type: 'in:5,300' },
                 { 'type.in': ':attr must be included in :values.'}
             )
             v.setValueNames({

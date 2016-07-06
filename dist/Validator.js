@@ -112,6 +112,68 @@ var Validator = function () {
     }
 
     createClass(Validator, [{
+        key: 'parseRules',
+        value: function parseRules(rules) {
+            var self = this;
+            var arr = [];
+
+            // rules.forEach(function(item) {
+            //     arr.push({
+            //         name: item.name,
+            //         rules: self.parseItemRules(item.rules)
+            //     })
+            // })
+            for (var key in rules) {
+                arr.push({
+                    name: key,
+                    rules: self.parseItemRules(rules[key])
+                });
+            }
+
+            return arr;
+        }
+    }, {
+        key: 'parseItemRules',
+        value: function parseItemRules(rule) {
+            var self = this;
+            var arr = [];
+
+            rule.split('|').forEach(function (ruleAndArgs) {
+                if (ruleAndArgs.trim()) {
+                    var args = ruleAndArgs.split(':');
+                    arr.push({
+                        name: self.titleCase(args[0], '_'),
+                        params: args[1] ? args[1].split(',') : []
+                    });
+                }
+            });
+
+            return arr;
+        }
+    }, {
+        key: 'titleCase',
+        value: function titleCase(str, delimiter) {
+            delimiter = delimiter || ' ';
+            return str.split(delimiter).map(function (item) {
+                return item[0].toUpperCase() + item.slice(1).toLowerCase();
+            }).join('');
+        }
+    }, {
+        key: 'snakeCase',
+        value: function snakeCase(str, delimiter) {
+            delimiter = delimiter || '_';
+            return str.replace(/((?:[\0-\t\x0B\f\x0E-\u2027\u202A-\uD7FF\uE000-\uFFFF]|[\uD800-\uDBFF][\uDC00-\uDFFF]|[\uD800-\uDBFF](?![\uDC00-\uDFFF])|(?:[^\uD800-\uDBFF]|^)[\uDC00-\uDFFF]))(?=[A-Z])/g, '$1' + delimiter).toLowerCase();
+        }
+    }, {
+        key: 'getValue',
+        value: function getValue(name) {
+            if (typeof this.data[name] === 'undefined') {
+                return '';
+            }
+
+            return this.data[name];
+        }
+    }, {
         key: 'isEmptyObject',
         value: function isEmptyObject(obj) {
             return Object.getOwnPropertyNames(obj).length === 0;
@@ -160,62 +222,6 @@ var Validator = function () {
             if (params.length < count) {
                 throw new Error('Validation rule ' + rule + ' requires at least ' + count + ' parameters');
             }
-        }
-    }, {
-        key: 'parseRules',
-        value: function parseRules(rules) {
-            var self = this;
-            var arr = [];
-
-            rules.forEach(function (item) {
-                arr.push({
-                    name: item.name,
-                    rules: self.parseItemRules(item.rules)
-                });
-            });
-
-            return arr;
-        }
-    }, {
-        key: 'parseItemRules',
-        value: function parseItemRules(rule) {
-            var self = this;
-            var arr = [];
-
-            rule.split('|').forEach(function (ruleAndArgs) {
-                if (ruleAndArgs.trim()) {
-                    var args = ruleAndArgs.split(':');
-                    arr.push({
-                        name: self.titleCase(args[0], '_'),
-                        params: args[1] ? args[1].split(',') : []
-                    });
-                }
-            });
-
-            return arr;
-        }
-    }, {
-        key: 'titleCase',
-        value: function titleCase(str, delimiter) {
-            delimiter = delimiter || ' ';
-            return str.split(delimiter).map(function (item) {
-                return item[0].toUpperCase() + item.slice(1).toLowerCase();
-            }).join('');
-        }
-    }, {
-        key: 'snakeCase',
-        value: function snakeCase(str, delimiter) {
-            delimiter = delimiter || '_';
-            return str.replace(/((?:[\0-\t\x0B\f\x0E-\u2027\u202A-\uD7FF\uE000-\uFFFF]|[\uD800-\uDBFF][\uDC00-\uDFFF]|[\uD800-\uDBFF](?![\uDC00-\uDFFF])|(?:[^\uD800-\uDBFF]|^)[\uDC00-\uDFFF]))(?=[A-Z])/g, '$1' + delimiter).toLowerCase();
-        }
-    }, {
-        key: 'getValue',
-        value: function getValue(name) {
-            if (typeof this.data[name] === 'undefined') {
-                return '';
-            }
-
-            return this.data[name];
         }
     }, {
         key: 'passes',
