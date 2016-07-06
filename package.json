@@ -1,5 +1,5 @@
 {
-  "name": "ratiw/Validator",
+  "name": "Validator",
   "version": "1.0.0",
   "description": "Client-side Javascript Validator. Ports from Laravel 5.2",
   "main": "dist/Validator.js",
