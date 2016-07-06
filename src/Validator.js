@@ -46,12 +46,6 @@ export default class Validator {
         let self = this
         let arr = []
 
-        // rules.forEach(function(item) {
-        //     arr.push({
-        //         name: item.name,
-        //         rules: self.parseItemRules(item.rules)
-        //     })
-        // })
         for (let key in rules) {
             arr.push({
                 name: key,

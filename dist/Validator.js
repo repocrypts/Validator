@@ -117,12 +117,6 @@ var Validator = function () {
             var self = this;
             var arr = [];
 
-            // rules.forEach(function(item) {
-            //     arr.push({
-            //         name: item.name,
-            //         rules: self.parseItemRules(item.rules)
-            //     })
-            // })
             for (var key in rules) {
                 arr.push({
                     name: key,
