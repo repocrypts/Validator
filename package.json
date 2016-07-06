@@ -1,7 +1,7 @@
 {
   "name": "Validator",
   "version": "1.0.0",
-  "description": "Client-side Javascript Validator. Ports from Laravel 5.2",
+  "description": "Client-side Javascript Validator library. Ports from Laravel 5.2",
   "main": "dist/Validator.js",
   "scripts": {
     "test": "mocha",
@@ -10,8 +10,18 @@
     "watch": "rollup -c -w",
     "prepublish": "npm test"
   },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/ratiw/Validator.git"
+  },
+  "keywords": [
+    "javascript",
+    "validator",
+    "laravel"
+  ],
   "author": "Rati Wannapanop <rati.wannapanop@gmail.com>",
   "license": "MIT",
+  "homepage": "https://github.com/ratiw/Validator#readme",
   "devDependencies": {
     "babel-preset-es2015": "^6.9.0",
     "babel-preset-es2015-rollup": "^1.1.1",
