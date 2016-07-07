@@ -221,8 +221,8 @@ var Validator = function () {
         key: 'passes',
         value: function passes() {
             var self = this;
-            this.errors = [];
-            this.failedRules = [];
+            this.errors = {};
+            this.failedRules = {};
 
             this.rules.forEach(function (item) {
                 var name = item.name.toLowerCase();
@@ -231,7 +231,7 @@ var Validator = function () {
                 });
             });
 
-            return this.errors.length === 0;
+            return this.isEmptyObject(this.errors);
         }
     }, {
         key: 'fails',
@@ -241,7 +241,7 @@ var Validator = function () {
     }, {
         key: 'valid',
         value: function valid() {
-            if (!this.errors) {
+            if (this.errors === null) {
                 this.passes();
             }
 
@@ -257,16 +257,14 @@ var Validator = function () {
     }, {
         key: 'invalid',
         value: function invalid() {
-            if (!this.errors) {
+            if (this.errors === null) {
                 this.passes();
             }
 
             var arr = [];
-            this.errors.forEach(function (error) {
-                if (arr.indexOf(error.name) < 0) {
-                    arr.push(error.name);
-                }
-            });
+            for (var key in this.errors) {
+                arr.push(key);
+            }
 
             return arr;
         }
@@ -328,26 +326,6 @@ var Validator = function () {
             return msg;
         }
     }, {
-        key: 'hasError',
-        value: function hasError() {
-            var name = arguments.length <= 0 || arguments[0] === undefined ? null : arguments[0];
-
-            if (name === null) {
-                return this.errors.length > 0;
-            }
-
-            var errors = this.errors.filter(function (error) {
-                return error.name === name.toLowerCase();
-            });
-
-            return errors.length > 0;
-        }
-    }, {
-        key: 'getErrors',
-        value: function getErrors() {
-            return this.errors;
-        }
-    }, {
         key: 'validate',
         value: function validate(name, rule) {
             var value = this.getValue(name);
@@ -387,11 +365,10 @@ var Validator = function () {
         value: function addFailure(name, rule) {
             this.addError(name, rule);
 
-            this.failedRules.push({
-                name: name,
-                rule: rule.name,
-                params: rule.params
-            });
+            if (typeof this.failedRules[name] === 'undefined') {
+                this.failedRules[name] = {};
+            }
+            this.failedRules[name][rule.name] = rule.params;
         }
     }, {
         key: 'addError',
@@ -400,11 +377,32 @@ var Validator = function () {
 
             msg = this.doReplacements(msg, name, rule);
 
-            this.errors.push({
-                name: name,
-                rule: rule.name,
-                message: msg
-            });
+            if (!this.hasError(name)) {
+                this.errors[name] = [];
+            }
+
+            this.errors[name].push(msg);
+        }
+    }, {
+        key: 'hasError',
+        value: function hasError() {
+            var name = arguments.length <= 0 || arguments[0] === undefined ? null : arguments[0];
+
+            if (name === null) {
+                return !this.isEmptyObject(this.errors);
+            }
+
+            return this.getError(name) === null ? false : true;
+        }
+    }, {
+        key: 'getError',
+        value: function getError(name) {
+            return typeof this.errors[name] === 'undefined' ? null : this.errors[name];
+        }
+    }, {
+        key: 'getErrors',
+        value: function getErrors() {
+            return this.errors;
         }
 
         /** Validation Rules **/

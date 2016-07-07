@@ -151,7 +151,7 @@ describe('Validator', function() {
             expect(v.getValue('wrong-key')).to.equal('')
         })
     })
-    describe('#passes()', function() {
+    describe('#passes() and valid()', function() {
         let rules = {
             name: 'required',
             email: 'required|email'
@@ -161,15 +161,17 @@ describe('Validator', function() {
                 name: 'Rati', email: 'rati@example.com'
             }, rules)
             expect(v.passes()).to.be.true
+            expect(v.valid()).to.deep.equal(['name', 'email'])
         })
         it('returns false when any validation rule is invalid', function() {
             var v = Validator.make({
                 name: 'Rati'
             }, rules)
             expect(v.passes()).to.be.false
+            expect(v.valid()).to.deep.equal(['name'])
         })
     })
-    describe('#fails()', function() {
+    describe('#fails() and invalid()', function() {
         let rules = {
             name: 'required',
             email: 'required|email'
@@ -179,12 +181,15 @@ describe('Validator', function() {
                 name: 'Rati'
             }, rules)
             expect(v.fails()).to.be.true
+            expect(v.invalid()).to.deep.equal(['email'])
+            expect(v.getError('email')).to.have.lengthOf(2)
         })
         it('returns false when all validations pass', function() {
             let v = Validator.make({
                 name: 'Rati', email: 'rati@example.com'
             }, rules)
             expect(v.fails()).to.be.false
+            expect(v.invalid()).to.be.empty
         })
     })
     describe('#getErrors()', function() {
@@ -197,11 +202,14 @@ describe('Validator', function() {
             let v = Validator.make({ name: 'Rati', email: 'rati@example.com' }, rules)
 
             v.fails()
-            expect(v.getErrors()).to.have.lengthOf(1)
+            console.log(v.getErrors())
+            expect(v.getErrors()).to.have.any.keys('age')
 
             v = Validator.make({ name: 'Rati' }, rules)
             v.fails()
-            expect(v.getErrors()).to.have.lengthOf(3)
+            expect(v.getErrors()).to.have.all.keys(['email', 'age'])
+            expect(v.getError('email')).to.have.lengthOf(2)
+            expect(v.getError('age')).to.have.lengthOf(1)
         })
         it('returns empty array when all validation pass', function() {
             let v = Validator.make({
@@ -211,7 +219,9 @@ describe('Validator', function() {
             }, rules)
 
             v.fails()
-            expect(v.getErrors()).to.have.lengthOf(0)
+            expect(v.getErrors()).to.empty
+            expect(v.hasError()).to.be.false
+            expect(v.getError('name')).to.be.null
         })
     })
     describe('#validateRequired()', function() {
@@ -1073,44 +1083,32 @@ describe('Validator', function() {
             v.passes()
             expect(v.valid()).to.deep.equal(['email'])
             expect(v.invalid()).to.deep.equal(['name', 'age'])
-            expect(v.getErrors()).to.deep.equal([
-                {
-                    name: 'name',
-                    rule: 'Required',
-                    message: 'The name field is required.'
-                },
-                {
-                    name: 'name',
-                    rule: 'Min',
-                    message: 'The name must be at least 3 characters.'
-                },
-                {
-                    name: 'age',
-                    rule: 'Min',
-                    message: 'The age must be at least 20.'
-                }
-            ])
+            expect(v.getErrors()).to.deep.equal({
+                name: [
+                    'The name field is required.',
+                    'The name must be at least 3 characters.'
+                ],
+                age: [
+                    'The age must be at least 20.'
+                ]
+            })
         })
         it('checks proper messages are returned for sizes rule', function() {
             let v = Validator.make({name: '3'}, {name: 'numeric|min:5'})
             expect(v.passes()).to.be.false
-            expect(v.getErrors()).to.deep.equal([
-                {
-                    name: 'name',
-                    rule: 'Min',
-                    message: 'The name must be at least 5.'
-                }
-            ])
+            expect(v.getErrors()).to.deep.equal({
+                'name': [
+                    'The name must be at least 5.'
+                ]
+            })
 
             v = Validator.make({name: 'asdfkjlsd'}, {name: 'size:2'})
             expect(v.passes()).to.be.false
-            expect(v.getErrors()).to.deep.equal([
-                {
-                    name: 'name',
-                    rule: 'Size',
-                    message: 'The name must be 2 characters.'
-                }
-            ])
+            expect(v.getErrors()).to.deep.equal({
+                name: [
+                    'The name must be 2 characters.'
+                ]
+            })
         })
     })
     describe('# Others', function() {
@@ -1128,18 +1126,14 @@ describe('Validator', function() {
             name: 'required',
             age: 'required'
         }
-        let expectedResult = [
-            {
-                name: 'name',
-                rule: 'Required',
-                message: 'The Name field is required.'
-            },
-            {
-                name: 'age',
-                rule: 'Required',
-                message: 'The Age field is required.'
-            }
-        ]
+        let expectedResult = {
+            'name': [
+                'The Name field is required.'
+            ],
+            'age': [
+                'The Age field is required.'
+            ]
+        }
         it('tests custom name being applied using constructor', function() {
             let v = Validator.make({}, rules, {}, customNames)
             expect(v.passes()).to.be.false
@@ -1169,23 +1163,17 @@ describe('Validator', function() {
             'age.required': ':Attr field is required.',
             'email.required': ':ATTR field must not be blank.'
         }
-        let expectedResult = [
-            {
-                name: 'name',
-                rule: 'Required',
-                message: 'name is required.'
-            },
-            {
-                name: 'age',
-                rule: 'Required',
-                message: 'Age field is required.'
-            },
-            {
-                name: 'email',
-                rule: 'Required',
-                message: 'EMAIL field must not be blank.'
-            }
-        ]
+        let expectedResult = {
+            'name': [
+                'name is required.'
+            ],
+            'age': [
+                'Age field is required.'
+            ],
+            'email': [
+                'EMAIL field must not be blank.'
+            ]
+        }
         it('tests custom message for rules being applied correctly', function() {
             let v = Validator.make({name: ''}, rules, customMessages)
             expect(v.passes()).to.be.false
@@ -1197,13 +1185,11 @@ describe('Validator', function() {
             let v = Validator.make({color: '1', bar: ''}, {bar: 'required_if:color,1'})
             v.addCustomValues({ 'color': {'1': 'Red'} })
             expect(v.passes()).to.be.false
-            expect(v.getErrors()).to.deep.equal([
-                {
-                    name: 'bar',
-                    rule: 'RequiredIf',
-                    message: 'The bar field is required when color is Red.'
-                }
-            ])
+            expect(v.getErrors()).to.deep.equal({
+                'bar': [
+                    'The bar field is required when color is Red.'
+                ]
+            })
         })
         it('tests in:foo,bar using addCustomValues()', function() {
             let v = Validator.make(
@@ -1218,13 +1204,11 @@ describe('Validator', function() {
                 }
             })
             expect(v.passes()).to.be.false
-            expect(v.getErrors()).to.deep.equal([
-                {
-                    name: 'type',
-                    rule: 'In',
-                    message: 'type must be included in Short, Long.'
-                }
-            ])
+            expect(v.getErrors()).to.deep.equal({
+                'type': [
+                    'type must be included in Short, Long.'
+                ]
+            })
         })
         it('tests in:foo,bar using setValueNames()', function() {
             let v = Validator.make(
@@ -1239,13 +1223,11 @@ describe('Validator', function() {
                 }
             })
             expect(v.passes()).to.be.false
-            expect(v.getErrors()).to.deep.equal([
-                {
-                    name: 'type',
-                    rule: 'In',
-                    message: 'type must be included in Short, Long.'
-                }
-            ])
+            expect(v.getErrors()).to.deep.equal({
+                'type': [
+                    'type must be included in Short, Long.'
+                ]
+            })
         })
     })
 })

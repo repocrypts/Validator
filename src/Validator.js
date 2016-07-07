@@ -139,8 +139,8 @@ export default class Validator {
 
     passes() {
         let self = this
-        this.errors = []
-        this.failedRules = []
+        this.errors = {}
+        this.failedRules = {}
 
         this.rules.forEach(function(item) {
             let name = item.name.toLowerCase()
@@ -149,7 +149,7 @@ export default class Validator {
             })
         })
 
-        return this.errors.length === 0
+        return this.isEmptyObject(this.errors)
     }
 
     fails() {
@@ -157,7 +157,7 @@ export default class Validator {
     }
 
     valid() {
-        if (! this.errors) {
+        if (this.errors === null) {
             this.passes()
         }
 
@@ -172,16 +172,14 @@ export default class Validator {
     }
 
     invalid() {
-        if (! this.errors) {
+        if (this.errors === null) {
             this.passes()
         }
 
         let arr = []
-        this.errors.forEach(function(error) {
-            if (arr.indexOf(error.name) < 0) {
-                arr.push(error.name)
-            }
-        })
+        for (let key in this.errors) {
+            arr.push(key)
+        }
 
         return arr
     }
@@ -241,22 +239,6 @@ export default class Validator {
         return msg
     }
 
-    hasError(name = null) {
-        if (name === null) {
-            return this.errors.length > 0
-        }
-
-        let errors = this.errors.filter(function(error) {
-            return error.name === name.toLowerCase()
-        })
-
-        return errors.length > 0
-    }
-
-    getErrors() {
-        return this.errors
-    }
-
     validate(name, rule) {
         let value = this.getValue(name)
         let method = this['validate' + rule.name]
@@ -293,11 +275,10 @@ export default class Validator {
     addFailure(name, rule) {
         this.addError(name, rule)
 
-        this.failedRules.push({
-            name: name,
-            rule: rule.name,
-            params: rule.params
-        })
+        if (typeof(this.failedRules[name]) === 'undefined') {
+            this.failedRules[name] = {}
+        }
+        this.failedRules[name][rule.name] = rule.params
     }
 
     addError(name, rule) {
@@ -305,11 +286,27 @@ export default class Validator {
 
         msg = this.doReplacements(msg, name, rule)
 
-        this.errors.push({
-            name: name,
-            rule: rule.name,
-            message: msg
-        })
+        if (! this.hasError(name)) {
+            this.errors[name] = []
+        }
+
+        this.errors[name].push(msg)
+    }
+
+    hasError(name = null) {
+        if (name === null) {
+            return ! this.isEmptyObject(this.errors)
+        }
+
+        return this.getError(name) === null ? false : true
+    }
+
+    getError(name) {
+        return typeof(this.errors[name]) === 'undefined' ? null : this.errors[name]
+    }
+
+    getErrors() {
+        return this.errors
     }
 
     /** Validation Rules **/
