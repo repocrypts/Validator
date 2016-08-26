@@ -45,6 +45,8 @@ and reference it in the script tag. Or, you can use NPMCDN to reference it like 
     }
 ```
 
+`getErrors()` will return an object containing error field as a key and array of error messages for that field.
+
 ## Supported Validation Rules
 
 See validation rule usage in [Laravel Documentation](https://laravel.com/docs/5.2/validation#available-validation-rules)
