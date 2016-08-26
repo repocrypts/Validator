@@ -46,6 +46,9 @@ and reference it in the script tag. Or, you can use NPMCDN to reference it like 
 ```
 
 ## Supported Validation Rules
+
+See validation rule usage in [Laravel Documentation](https://laravel.com/docs/5.2/validation#available-validation-rules)
+
 - accepted
 - after (date)
 - alpha
