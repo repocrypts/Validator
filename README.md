@@ -13,7 +13,7 @@ and reference it in the script tag. Or, you can use NPMCDN to reference it like 
     <head>
         <script src="public/js/Validator.js"></script>
         <!-- or using NPMCDN -->
-        <script src="https://npmcdn.com/Validator"></script>
+        <script src="https://unpkg.com/Validator"></script>
     </head>
     ```
 
