@@ -1,6 +1,6 @@
 {
   "name": "Validator",
-  "version": "1.0.2",
+  "version": "1.0.3",
   "description": "Client-side Javascript Validator library. Ports from Laravel 5.2",
   "main": "dist/Validator.js",
   "scripts": {
