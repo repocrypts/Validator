@@ -72,6 +72,10 @@ var _typeof = typeof Symbol === "function" && typeof Symbol.iterator === "symbol
   return obj && typeof Symbol === "function" && obj.constructor === Symbol ? "symbol" : typeof obj;
 };
 
+
+
+
+
 var classCallCheck = function (instance, Constructor) {
   if (!(instance instanceof Constructor)) {
     throw new TypeError("Cannot call a class as a function");
@@ -95,6 +99,52 @@ var createClass = function () {
     return Constructor;
   };
 }();
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+var set = function set(object, property, value, receiver) {
+  var desc = Object.getOwnPropertyDescriptor(object, property);
+
+  if (desc === undefined) {
+    var parent = Object.getPrototypeOf(object);
+
+    if (parent !== null) {
+      set(parent, property, value, receiver);
+    }
+  } else if ("value" in desc && desc.writable) {
+    desc.value = value;
+  } else {
+    var setter = desc.set;
+
+    if (setter !== undefined) {
+      setter.call(receiver, value);
+    }
+  }
+
+  return value;
+};
 
 var Validator = function () {
     function Validator(data, rules) {
@@ -225,7 +275,7 @@ var Validator = function () {
             this.failedRules = {};
 
             this.rules.forEach(function (item) {
-                var name = item.name.toLowerCase();
+                var name = item.name;
                 item.rules.forEach(function (rule) {
                     self.validate(name, rule);
                 });
@@ -330,7 +380,6 @@ var Validator = function () {
         value: function validate(name, rule) {
             var value = this.getValue(name);
             var method = this['validate' + rule.name];
-
             if (typeof method !== 'function') {
                 console.error('"' + rule.name + '" validation rule does not exist!');
             }

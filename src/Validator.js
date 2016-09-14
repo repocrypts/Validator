@@ -143,7 +143,7 @@ export default class Validator {
         this.failedRules = {}
 
         this.rules.forEach(function(item) {
-            let name = item.name.toLowerCase()
+            let name = item.name;
             item.rules.forEach(function(rule) {
                 self.validate(name, rule)
             })
@@ -242,7 +242,6 @@ export default class Validator {
     validate(name, rule) {
         let value = this.getValue(name)
         let method = this['validate' + rule.name]
-
         if (typeof method !== 'function') {
             console.error('"' + rule.name + '" validation rule does not exist!')
         }
