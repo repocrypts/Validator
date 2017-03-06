@@ -4,7 +4,7 @@
 
 > Client-side javascript validator library. Ports from Laravel 5.2
 
-## Instalation
+## Installation
 
 1. Included as global `<script>`, copy the `Validator.js` file inside `dist` directory to your project directory
 and reference it in the script tag. Or, you can use NPMCDN to reference it like so,
