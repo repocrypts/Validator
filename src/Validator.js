@@ -56,21 +56,21 @@ export default class Validator {
         return arr
     }
 
-    parseItemRules(rule) {
+    parseItemRules(itemRules) {
         let self = this
-        let arr = []
+        let rules = []
 
-        rule.split('|').forEach(function(ruleAndArgs) {
+        itemRules.split('|').forEach(function(ruleAndArgs) {
             if (ruleAndArgs.trim()) {
                 let args = ruleAndArgs.split(':')
-                arr.push({
+                rules.push({
                     name: self.titleCase(args[0], '_'),
                     params: args[1] ? args[1].split(',') : []
                 })
             }
         })
 
-        return arr
+        return rules
     }
 
     titleCase(str, delimiter) {
@@ -191,13 +191,14 @@ export default class Validator {
     }
 
     getMessage(name, rule) {
-        let key = this.snakeCase(rule.name)
-        let msg = this.customMessages[name + '.' + key]
-
+        // return custom message if defined
+        let msg = this.getCustomMessage(name, rule)
         if (typeof(msg) !== 'undefined') {
             return msg
         }
 
+        // then, use the default message for that rule
+        let key = this.snakeCase(rule.name)
         msg = Messages[key]
         // message might has sub-rule
         if (typeof(msg) === 'object') {
@@ -206,6 +207,20 @@ export default class Validator {
         }
 
         return typeof(msg) === 'undefined' ? '' : msg
+    }
+
+    /**
+     * return user-defined custom message for a given rule, or undefined
+     */
+    getCustomMessage(name, rule) {
+        let ruleName = this.snakeCase(rule.name)
+        let msg = this.customMessages[name + '.' + ruleName]
+
+        // first, check for custom message for specific attribute rule
+        // then, check for custom message for rule
+        return typeof(msg) === 'undefined'
+            ? this.customMessages[ruleName]
+            : msg
     }
 
     getDataType(name) {

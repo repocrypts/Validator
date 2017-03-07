@@ -1158,23 +1158,44 @@ describe('Validator', function() {
             age: 'required' ,
             email: 'required'
         }
-        let customMessages = {
-            'name.required': ':attr is required.',
-            'age.required': ':Attr field is required.',
-            'email.required': ':ATTR field must not be blank.'
-        }
-        let expectedResult = {
-            'name': [
-                'name is required.'
-            ],
-            'age': [
-                'Age field is required.'
-            ],
-            'email': [
-                'EMAIL field must not be blank.'
-            ]
-        }
-        it('tests custom message for rules being applied correctly', function() {
+
+        it('tests custom message for specific rules being applied correctly', function() {
+            let customMessages = {
+                'required': 'You must provide the :attr.'
+            }
+            let expectedResult = {
+                'name': [
+                    'You must provide the name.'
+                ],
+                'age': [
+                    'You must provide the age.'
+                ],
+                'email': [
+                    'You must provide the email.'
+                ]
+            }
+            let v = Validator.make({name: ''}, rules, customMessages)
+            expect(v.passes()).to.be.false
+            expect(v.getErrors()).to.deep.equal(expectedResult)
+        })
+
+        it('tests custom message for specific rules being applied correctly', function() {
+            let customMessages = {
+                'name.required': ':attr is required.',
+                'age.required': ':Attr field is required.',
+                'email.required': ':ATTR field must not be blank.'
+            }
+            let expectedResult = {
+                'name': [
+                    'name is required.'
+                ],
+                'age': [
+                    'Age field is required.'
+                ],
+                'email': [
+                    'EMAIL field must not be blank.'
+                ]
+            }
             let v = Validator.make({name: ''}, rules, customMessages)
             expect(v.passes()).to.be.false
             expect(v.getErrors()).to.deep.equal(expectedResult)

@@ -69,8 +69,14 @@ var Messages = {
 var _typeof = typeof Symbol === "function" && typeof Symbol.iterator === "symbol" ? function (obj) {
   return typeof obj;
 } : function (obj) {
-  return obj && typeof Symbol === "function" && obj.constructor === Symbol ? "symbol" : typeof obj;
+  return obj && typeof Symbol === "function" && obj.constructor === Symbol && obj !== Symbol.prototype ? "symbol" : typeof obj;
 };
+
+
+
+
+
+
 
 
 
@@ -100,56 +106,10 @@ var createClass = function () {
   };
 }();
 
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-var set = function set(object, property, value, receiver) {
-  var desc = Object.getOwnPropertyDescriptor(object, property);
-
-  if (desc === undefined) {
-    var parent = Object.getPrototypeOf(object);
-
-    if (parent !== null) {
-      set(parent, property, value, receiver);
-    }
-  } else if ("value" in desc && desc.writable) {
-    desc.value = value;
-  } else {
-    var setter = desc.set;
-
-    if (setter !== undefined) {
-      setter.call(receiver, value);
-    }
-  }
-
-  return value;
-};
-
 var Validator = function () {
     function Validator(data, rules) {
-        var customMessages = arguments.length <= 2 || arguments[2] === undefined ? {} : arguments[2];
-        var customNames = arguments.length <= 3 || arguments[3] === undefined ? {} : arguments[3];
+        var customMessages = arguments.length > 2 && arguments[2] !== undefined ? arguments[2] : {};
+        var customNames = arguments.length > 3 && arguments[3] !== undefined ? arguments[3] : {};
         classCallCheck(this, Validator);
 
         this.data = data;
@@ -178,21 +138,21 @@ var Validator = function () {
         }
     }, {
         key: 'parseItemRules',
-        value: function parseItemRules(rule) {
+        value: function parseItemRules(itemRules) {
             var self = this;
-            var arr = [];
+            var rules = [];
 
-            rule.split('|').forEach(function (ruleAndArgs) {
+            itemRules.split('|').forEach(function (ruleAndArgs) {
                 if (ruleAndArgs.trim()) {
                     var args = ruleAndArgs.split(':');
-                    arr.push({
+                    rules.push({
                         name: self.titleCase(args[0], '_'),
                         params: args[1] ? args[1].split(',') : []
                     });
                 }
             });
 
-            return arr;
+            return rules;
         }
     }, {
         key: 'titleCase',
@@ -328,13 +288,14 @@ var Validator = function () {
     }, {
         key: 'getMessage',
         value: function getMessage(name, rule) {
-            var key = this.snakeCase(rule.name);
-            var msg = this.customMessages[name + '.' + key];
-
+            // return custom message if defined
+            var msg = this.getCustomMessage(name, rule);
             if (typeof msg !== 'undefined') {
                 return msg;
             }
 
+            // then, use the default message for that rule
+            var key = this.snakeCase(rule.name);
             msg = Messages[key];
             // message might has sub-rule
             if ((typeof msg === 'undefined' ? 'undefined' : _typeof(msg)) === 'object') {
@@ -343,6 +304,21 @@ var Validator = function () {
             }
 
             return typeof msg === 'undefined' ? '' : msg;
+        }
+
+        /**
+         * return user-defined custom message for a given rule, or undefined
+         */
+
+    }, {
+        key: 'getCustomMessage',
+        value: function getCustomMessage(name, rule) {
+            var ruleName = this.snakeCase(rule.name);
+            var msg = this.customMessages[name + '.' + ruleName];
+
+            // first, check for custom message for specific attribute rule
+            // then, check for custom message for rule
+            return typeof msg === 'undefined' ? this.customMessages[ruleName] : msg;
         }
     }, {
         key: 'getDataType',
@@ -435,7 +411,7 @@ var Validator = function () {
     }, {
         key: 'hasError',
         value: function hasError() {
-            var name = arguments.length <= 0 || arguments[0] === undefined ? null : arguments[0];
+            var name = arguments.length > 0 && arguments[0] !== undefined ? arguments[0] : null;
 
             if (name === null) {
                 return !this.isEmptyObject(this.errors);
@@ -1108,33 +1084,33 @@ var Validator = function () {
         }
     }, {
         key: 'dateRules',
-        get: function get() {
+        get: function get$$1() {
             return ['Before', 'After', 'DateBetween'];
         }
     }, {
         key: 'sizeRules',
-        get: function get() {
+        get: function get$$1() {
             return ['Size', 'Between', 'Min', 'Max'];
         }
     }, {
         key: 'numericRules',
-        get: function get() {
+        get: function get$$1() {
             return ['Numeric', 'Integer'];
         }
     }, {
         key: 'implicitRules',
-        get: function get() {
+        get: function get$$1() {
             return ['Required', 'Filled', 'RequiredWith', 'RequiredWithAll', 'RequiredWithout', 'RequiredWithoutAll', 'RequiredIf', 'RequiredUnless', 'Accepted', 'Present'];
         }
     }, {
         key: 'dependentRules',
-        get: function get() {
+        get: function get$$1() {
             return ['RequiredWith', 'RequiredWithAll', 'RequiredWithout', 'RequiredWithoutAll', 'RequiredIf', 'RequiredUnless', 'Confirmed', 'Same', 'Different', 'Unique', 'Before', 'After'];
         }
     }], [{
         key: 'make',
         value: function make(data, rules) {
-            var customMessages = arguments.length <= 2 || arguments[2] === undefined ? [] : arguments[2];
+            var customMessages = arguments.length > 2 && arguments[2] !== undefined ? arguments[2] : [];
             var customNames = arguments[3];
 
             return new Validator(data, rules, customMessages, customNames);
