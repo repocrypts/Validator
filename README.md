@@ -68,6 +68,12 @@ and reference it in the script tag. Or, you can use NPMCDN to reference it like 
     }
 ```
 
+- Custom Name
+
+```javascript
+    var v = Validator.make(data, rules, messages, { 'email': 'Email Address' })
+```
+
 ## Supported Validation Rules
 
 See validation rule usage in [Laravel Documentation](https://laravel.com/docs/5.2/validation#available-validation-rules)
