@@ -28,6 +28,7 @@ and reference it in the script tag. Or, you can use NPMCDN to reference it like 
     ```
 
 ## Usage
+- Basic usage
 ```javascript
     var data = {
         name: 'John Doe',
@@ -48,6 +49,24 @@ and reference it in the script tag. Or, you can use NPMCDN to reference it like 
 ```
 
 `getErrors()` will return an object containing error field as a key and array of error messages for that field.
+
+- Custom Error Messages
+
+```javascript
+    const messages = {
+        // custom message for based rules
+        'required': 'You forgot the :attr field',
+        'email': ':attr is not valid',
+        // custom message for specific rule of attribute
+        'receiver.email': 'The receiver email address is not valid'
+    }
+    
+    var v = Validator.make(data, rules, messages)
+    
+    if (v.passes()) {
+        //...
+    }
+```
 
 ## Supported Validation Rules
 
