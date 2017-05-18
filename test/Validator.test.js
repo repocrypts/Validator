@@ -95,7 +95,6 @@ describe('Validator', function() {
     })
     describe('#extend()', function() {
         let isMongoId = (name, value, args) => {
-            console.log(args);
             let hexadecimal = /^[0-9A-F]+$/i
             return value && hexadecimal.test(value) && value.length === 24
         }
