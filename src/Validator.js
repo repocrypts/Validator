@@ -6,6 +6,7 @@ export default class Validator {
         this.rules = this.parseRules(rules)
         this.failedRules = []
         this.errors = null
+        this.customRules = {}
         this.customMessages = customMessages
         this.customNames = customNames
         this.customValues = {}
@@ -40,6 +41,13 @@ export default class Validator {
 
     static make(data, rules, customMessages = [], customNames) {
         return new Validator(data, rules, customMessages, customNames)
+    }
+
+    extend(ruleName, callback, customMessage) {
+        this.customRules[this.titleCase(ruleName)] = callback;
+        if (customMessage) {
+            this.customMessages[this.snakeCase(ruleName)] = customMessage;
+        }
     }
 
     parseRules(rules) {
@@ -238,7 +246,7 @@ export default class Validator {
         if (msg.trim() === '') {
             return ''
         }
-
+        
         name = this.getDataName(name)
 
         msg = msg.replace(':ATTR', name.toUpperCase())
@@ -256,16 +264,27 @@ export default class Validator {
 
     validate(name, rule) {
         let value = this.getValue(name)
-        let method = this['validate' + rule.name]
-        if (typeof method !== 'function') {
-            console.error('"' + rule.name + '" validation rule does not exist!')
-        }
+        let method = this.findRuleMethod(rule)
 
         // return method.apply(this, [name, value, rule.params])
         if (! method.apply(this, [name, value, rule.params])) {
             this.addFailure(name, rule)
         }
     }
+
+    findRuleMethod(rule) {
+        let method = this['validate' + rule.name]
+        if (!method) {
+            method = this.customRules[rule.name];
+        }
+
+        if (typeof method !== 'function') {
+            console.error('"' + rule.name + '" validation rule does not exist!')
+        }
+        return method;
+    }
+
+
 /*
     isValidatable(rule, name, value) {
         return this.presentOrRuleIsImplicit(rule, name, value) &&

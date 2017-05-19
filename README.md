@@ -113,3 +113,41 @@ See validation rule usage in [Laravel Documentation](https://laravel.com/docs/5.
 - size
 - string
 - url
+
+## Extending with Custom Validation Rules
+
+The validator can be extended with custom rules
+
+```javascript
+    var rules = {
+        id: 'required|mongoid'
+    }
+
+    function validateMongoId(name, value, params) {
+        let hexadecimal = /^[0-9A-F]+$/i
+        return value && hexadecimal.test(value) && value.length === 24
+    }
+    
+    var v = Validator.make(data, rules)
+    v.extend('mongoid', validateMongoId, ":attr is not a valid mongo id")
+
+    
+    if (v.passes()) {
+        //...
+    }
+```
+
+`validator.extend` takes three _required_ parameters:
+
+* `name`: the name of the custom rule
+* `callback`: called when the rule is checked
+* `validationMessage`: error message text on validation failure
+
+The validation callback receives three parameters:
+
+1. `name`: the field name being validated
+2. `value`: the given value in the data
+3. `params`: Any parameters, passed after the colon in the rule definition.
+ 
+Params defined ike so: `rulename:min=10,max=15` would be passed in as an array: `['min=10', 'max=15']`
+

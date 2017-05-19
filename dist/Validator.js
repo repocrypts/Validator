@@ -116,12 +116,21 @@ var Validator = function () {
         this.rules = this.parseRules(rules);
         this.failedRules = [];
         this.errors = null;
+        this.customRules = {};
         this.customMessages = customMessages;
         this.customNames = customNames;
         this.customValues = {};
     }
 
     createClass(Validator, [{
+        key: 'extend',
+        value: function extend(ruleName, callback, customMessage) {
+            this.customRules[this.titleCase(ruleName)] = callback;
+            if (customMessage) {
+                this.customMessages[this.snakeCase(ruleName)] = customMessage;
+            }
+        }
+    }, {
         key: 'parseRules',
         value: function parseRules(rules) {
             var self = this;
@@ -355,16 +364,27 @@ var Validator = function () {
         key: 'validate',
         value: function validate(name, rule) {
             var value = this.getValue(name);
-            var method = this['validate' + rule.name];
-            if (typeof method !== 'function') {
-                console.error('"' + rule.name + '" validation rule does not exist!');
-            }
+            var method = this.findRuleMethod(rule);
 
             // return method.apply(this, [name, value, rule.params])
             if (!method.apply(this, [name, value, rule.params])) {
                 this.addFailure(name, rule);
             }
         }
+    }, {
+        key: 'findRuleMethod',
+        value: function findRuleMethod(rule) {
+            var method = this['validate' + rule.name];
+            if (!method) {
+                method = this.customRules[rule.name];
+            }
+
+            if (typeof method !== 'function') {
+                console.error('"' + rule.name + '" validation rule does not exist!');
+            }
+            return method;
+        }
+
         /*
             isValidatable(rule, name, value) {
                 return this.presentOrRuleIsImplicit(rule, name, value) &&

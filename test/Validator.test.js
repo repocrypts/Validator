@@ -93,6 +93,37 @@ describe('Validator', function() {
             expect(arr).to.be.null
         })
     })
+    describe('#extend()', function() {
+        let isMongoId = (name, value, args) => {
+            let hexadecimal = /^[0-9A-F]+$/i
+            return value && hexadecimal.test(value) && value.length === 24
+        }
+        let rules = {
+            id: 'mongoid:min=24,max=24',
+        }
+        let v = Validator.make({
+            id: '5915b8434479e9b7e11db37c'
+        }, rules)
+        v.extend('mongoid', isMongoId, ':attr must be a valid mongo id')
+
+        let fail_v = Validator.make({
+            id: 'asdfasfdw'
+        }, rules)
+        fail_v.extend('mongoid', isMongoId, ':attr must be a valid mongo id')
+
+        it('can be extended with a custom rule', function() {            
+            expect(v.findRuleMethod({name: 'Mongoid'})).to.equal(isMongoId)
+        })
+        it('runs custom validation rule', function() {            
+            expect(v.passes(data)).to.be.true
+            expect(fail_v.passes()).to.be.false
+        })
+        it('custom validator fails with custom message', function() {            
+            expect(fail_v.getErrors()).to.deep.equal({
+                id: ['id must be a valid mongo id']
+            })
+        })
+    })
     describe('#hasError()', function() {
         it('returns true if there is any error', function() {
             let v = Validator.make({name: 'Test'}, {
