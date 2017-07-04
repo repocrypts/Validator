@@ -201,17 +201,18 @@ export default class Validator {
     getMessage(name, rule) {
         // return custom message if defined
         let msg = this.getCustomMessage(name, rule)
-        if (typeof(msg) !== 'undefined') {
+        if (typeof(msg) !== 'object' && typeof(msg) !== 'undefined') {
             return msg
         }
 
-        // then, use the default message for that rule
         let key = this.snakeCase(rule.name)
-        msg = Messages[key]
         // message might has sub-rule
         if (typeof(msg) === 'object') {
             let type = this.getDataType(name)
             msg = Messages[key][type]
+        } else {
+            // otherwise, use the default message for that rule
+            msg = Messages[key]
         }
 
         return typeof(msg) === 'undefined' ? '' : msg
@@ -246,7 +247,7 @@ export default class Validator {
         if (msg.trim() === '') {
             return ''
         }
-        
+
         name = this.getDataName(name)
 
         msg = msg.replace(':ATTR', name.toUpperCase())
