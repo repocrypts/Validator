@@ -297,19 +297,21 @@ var Validator = function () {
     }, {
         key: 'getMessage',
         value: function getMessage(name, rule) {
-            // return custom message if defined
+            // 1) return custom message if defined
             var msg = this.getCustomMessage(name, rule);
-            if (typeof msg !== 'undefined') {
+            if ((typeof msg === 'undefined' ? 'undefined' : _typeof(msg)) !== 'object' && typeof msg !== 'undefined') {
                 return msg;
             }
 
-            // then, use the default message for that rule
             var key = this.snakeCase(rule.name);
+
+            // 2) then, use the default message for that rule, and re-test
             msg = Messages[key];
-            // message might has sub-rule
+
+            // 3) check if the message has subtype
             if ((typeof msg === 'undefined' ? 'undefined' : _typeof(msg)) === 'object') {
-                var type = this.getDataType(name);
-                msg = Messages[key][type];
+                var subtype = this.getDataType(name);
+                msg = Messages[key][subtype];
             }
 
             return typeof msg === 'undefined' ? '' : msg;
@@ -419,7 +421,9 @@ var Validator = function () {
         key: 'addError',
         value: function addError(name, rule) {
             var msg = this.getMessage(name, rule);
-
+            if ((typeof msg === 'undefined' ? 'undefined' : _typeof(msg)) === 'object') {
+                console.log('***** ', JSON.stringify(rule), JSON.stringify(msg));
+            }
             msg = this.doReplacements(msg, name, rule);
 
             if (!this.hasError(name)) {

@@ -199,20 +199,21 @@ export default class Validator {
     }
 
     getMessage(name, rule) {
-        // return custom message if defined
+        // 1) return custom message if defined
         let msg = this.getCustomMessage(name, rule)
         if (typeof(msg) !== 'object' && typeof(msg) !== 'undefined') {
             return msg
         }
 
         let key = this.snakeCase(rule.name)
-        // message might has sub-rule
+
+        // 2) then, use the default message for that rule, and re-test
+        msg = Messages[key]
+
+        // 3) check if the message has subtype
         if (typeof(msg) === 'object') {
-            let type = this.getDataType(name)
-            msg = Messages[key][type]
-        } else {
-            // otherwise, use the default message for that rule
-            msg = Messages[key]
+            let subtype = this.getDataType(name)
+            msg = Messages[key][subtype]
         }
 
         return typeof(msg) === 'undefined' ? '' : msg
@@ -317,7 +318,9 @@ export default class Validator {
 
     addError(name, rule) {
         let msg = this.getMessage(name, rule)
-
+        if (typeof(msg) === 'object') {
+            console.log('***** ', JSON.stringify(rule), JSON.stringify(msg))
+        }
         msg = this.doReplacements(msg, name, rule)
 
         if (! this.hasError(name)) {

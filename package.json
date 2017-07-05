@@ -1,10 +1,10 @@
 {
   "name": "Validator",
-  "version": "1.0.4",
+  "version": "1.0.5",
   "description": "Client-side Javascript Validator library. Ports from Laravel 5.2",
   "main": "dist/Validator.js",
   "scripts": {
-    "test": "mocha",
+    "test": "npm run build && mocha",
     "prebuild": "rimraf dist",
     "build": "rollup -c",
     "watch": "rollup -c -w",

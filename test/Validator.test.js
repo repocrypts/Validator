@@ -111,14 +111,14 @@ describe('Validator', function() {
         }, rules)
         fail_v.extend('mongoid', isMongoId, ':attr must be a valid mongo id')
 
-        it('can be extended with a custom rule', function() {            
+        it('can be extended with a custom rule', function() {
             expect(v.findRuleMethod({name: 'Mongoid'})).to.equal(isMongoId)
         })
-        it('runs custom validation rule', function() {            
+        it('runs custom validation rule', function() {
             expect(v.passes(data)).to.be.true
             expect(fail_v.passes()).to.be.false
         })
-        it('custom validator fails with custom message', function() {            
+        it('custom validator fails with custom message', function() {
             expect(fail_v.getErrors()).to.deep.equal({
                 id: ['id must be a valid mongo id']
             })
