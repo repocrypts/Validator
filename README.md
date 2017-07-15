@@ -35,7 +35,9 @@ and reference it in the script tag. Or, you can use NPMCDN to reference it like 
     }
     var rules = {
         name: 'required',
-        birthday: 'required|date'
+        // for multiple rules
+        birthday: 'required|date', // can be a piped string
+        company: ['required', 'string'] // can be an array of strings
     }
     
     var v = Validator.make(data, rules)
