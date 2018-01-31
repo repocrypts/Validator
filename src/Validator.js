@@ -145,6 +145,10 @@ export default class Validator {
         }
     }
 
+    isEmptyValueAndContainsNullableRule(item){
+        return !this.getValue(item.name) && item.rules.filter(rule => rule.name === 'Nullable').length > 0;
+    }
+
     passes() {
         let self = this
         this.errors = {}
@@ -152,7 +156,9 @@ export default class Validator {
 
         this.rules.forEach(function(item) {
             let name = item.name;
-            item.rules.forEach(function(rule) {
+             if(self.isEmptyValueAndContainsNullableRule(item))
+                return false;
+            item.rules.filter(rule => rule.name !== 'Nullable').forEach(function(rule) {
                 self.validate(name, rule)
             })
         })

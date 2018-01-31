@@ -1282,6 +1282,29 @@ describe('Validator', function() {
             })
         })
     })
+
+    describe('# nullable rule tests' , () => {
+        it('should passed a empty date with "nullable" rule' , () => {
+            let v = Validator.make({
+                name: 'adrian'
+            } , {
+                name: 'required|string',
+                lastName: 'nullable|string'
+            });
+            expect(v.passes()).to.be.true;
+        });
+
+        it('should passed a date with "nullable" rule' , () => {
+            let v = Validator.make({
+                name: 'adrian',
+                lastName: 'locurcio'
+            } , {
+                name: 'required|string',
+                lastName: 'nullable|string'
+            });
+            expect(v.passes()).to.be.true;
+        });
+    })
 })
 
 /*

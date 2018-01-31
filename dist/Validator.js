@@ -237,6 +237,13 @@ var Validator = function () {
             }
         }
     }, {
+        key: 'isEmptyValueAndContainsNullableRule',
+        value: function isEmptyValueAndContainsNullableRule(item) {
+            return !this.getValue(item.name) && item.rules.filter(function (rule) {
+                return rule.name === 'Nullable';
+            }).length > 0;
+        }
+    }, {
         key: 'passes',
         value: function passes() {
             var self = this;
@@ -245,7 +252,10 @@ var Validator = function () {
 
             this.rules.forEach(function (item) {
                 var name = item.name;
-                item.rules.forEach(function (rule) {
+                if (self.isEmptyValueAndContainsNullableRule(item)) return false;
+                item.rules.filter(function (rule) {
+                    return rule.name !== 'Nullable';
+                }).forEach(function (rule) {
                     self.validate(name, rule);
                 });
             });
