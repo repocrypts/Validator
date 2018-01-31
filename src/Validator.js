@@ -68,7 +68,15 @@ export default class Validator {
         let self = this
         let rules = []
 
-        itemRules.split('|').forEach(function(ruleAndArgs) {
+        if (typeof itemRules === 'string') {
+            itemRules = itemRules.split('|')
+        }
+
+        if (!Array.isArray(itemRules)) {
+            console.error('Unsupported type for item rule', itemRules)
+        }
+
+        itemRules.forEach(function(ruleAndArgs) {
             if (ruleAndArgs.trim()) {
                 let args = ruleAndArgs.split(':')
                 rules.push({
@@ -701,6 +709,23 @@ export default class Validator {
         return (Date.parse(value) < Date.parse(date))
     }
 
+    validateBeforeOrEqual(name, value, params) {
+        this.requireParameterCount(1, params, 'before_or_equal')
+
+        if (typeof(value) !== 'string' && typeof(value) !== 'number' && !(value instanceof Date)) {
+            return false
+        }
+
+        let date = this.hasData(params[0]) ? this.getValue(params[0]) : params[0]
+
+        if( ! this.validateDate(name, date)) {
+            console.error(params[0] + ' does not appear to be a date.')
+            return false
+        }
+
+        return (Date.parse(value) <= Date.parse(date))
+    }
+
     validateAfter(name, value, params) {
         this.requireParameterCount(1, params, 'after')
 
@@ -716,6 +741,23 @@ export default class Validator {
         }
 
         return (Date.parse(value) > Date.parse(date))
+    }
+
+    validateAfterOrEqual(name, value, params) {
+        this.requireParameterCount(1, params, 'afterOrEqual')
+
+        if (typeof(value) !== 'string' && typeof(value) !== 'number' && !(value instanceof Date)) {
+            return false
+        }
+
+        let date = this.hasData(params[0]) ? this.getValue(params[0]) : params[0]
+
+        if( ! this.validateDate(name, date)) {
+            console.error(params[0] + ' does not appear to be a date.')
+            return false
+        }
+
+        return (Date.parse(value) >= Date.parse(date))
     }
 
     validateDate(name, value) {

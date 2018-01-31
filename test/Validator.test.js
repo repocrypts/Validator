@@ -26,16 +26,26 @@ describe('Validator', function() {
     describe('#parseItemRules()', function() {
         let rules = {
             name: 'required|min:3',
-            group: 'not_in:admin,exec'
+            group: 'not_in:admin,exec',
+            nick: ['required', 'string']
         }
-        let v = Validator.make({name: 'Rati'}, rules)
+        let v = Validator.make({name: 'Rati', nick: 'Rati' }, rules)
 
-        it('parses multiple rules correctly', function() {
+        it('parses multiple piped rules correctly', function() {
             let arr = v.parseItemRules(rules['name'])
             expect(arr).to.be.lengthOf(2)
             expect(arr).to.deep.equal([
                 { name: 'Required', params: [] },
                 { name: 'Min', params: ['3'] }
+            ])
+        })
+        it('parses array of rules correctly', function() {
+            let arr = v.parseItemRules(rules['nick'])
+            console.log(arr);
+            expect(arr).to.be.lengthOf(2)
+            expect(arr).to.be.deep.equal([
+                { name: 'Required', params: [] },
+                { name: 'String', params: [] }
             ])
         })
         it('parses rule with array argument (not_in)', function() {
@@ -841,6 +851,44 @@ describe('Validator', function() {
             expect(v.fails()).to.be.true
         })
     })
+    describe('#validateBeforeOrEqual()', function() {
+        it('returns true when given date is before or equal the specified one', function() {
+            let v = Validator.make({x: '2000-01-01'}, {x: 'before_or_equal:2012-01-01'})
+            expect(v.passes()).to.be.true
+
+            v = Validator.make({x: '2012-01-01'}, {x: 'before_or_equal:2012-01-01'})
+            expect(v.passes()).to.be.true
+
+            v = Validator.make({x: new Date('2000-01-01')}, {x: 'before_or_equal:2012-01-01'})
+            expect(v.passes()).to.be.true
+
+            v = Validator.make({x: new Date('2012-01-01')}, {x: 'before_or_equal:2012-01-01'})
+            expect(v.passes()).to.be.true
+        })
+        it('returns false when given date is not a string or number', function() {
+            let v = Validator.make({x: ['2000-01-01']}, {x: 'before_or_equal:2012-01-01'})
+            expect(v.passes()).to.be.false
+        })
+        it('returns true when given date refer to another existing field', function() {
+            let v = Validator.make({start: '2012-01-01', ends: '2013-01-01'}, {
+                start: 'before_or_equal:ends',
+                ends: 'after:start'
+            })
+            expect(v.passes()).to.be.true
+
+            v = Validator.make({start: '2012-01-01', ends: '2013-01-01'}, {
+                start: 'before_or_equal:ends',
+                ends: 'after_or_equal:start'
+            })
+            expect(v.passes()).to.be.true
+
+            v = Validator.make({start: '2012-01-01', ends: '2000-01-01'}, {
+                start: 'before_or_equal:ends',
+                ends: 'after:start'
+            })
+            expect(v.fails()).to.be.true
+        })
+    })
     describe('#validateAfter()', function() {
         it('returns true when given date is after the specified one', function() {
             let v = Validator.make({x: '2012-01-01'}, {x: 'after:2000-01-01'})
@@ -874,6 +922,50 @@ describe('Validator', function() {
                 ends: 'after:start'
             })
             expect(v.fails()).to.be.true
+        })
+    })
+    describe('#validateAfterOrEqual()', function() {
+        it('returns true when given date is after or equal the specified one', function() {
+            let v = Validator.make({x: '2012-01-01'}, {x: 'after_or_equal:2000-01-01'})
+            expect(v.passes()).to.be.true
+
+            v = Validator.make({x: '2000-01-01'}, {x: 'after_or_equal:2000-01-01'})
+            expect(v.passes()).to.be.true
+        })
+        it('returns false when given date is not a string or number', function() {
+            let v = Validator.make({x: ['2012-01-01']}, {x: 'after_or_equal:2000-01-01'})
+            expect(v.passes()).to.be.false
+        })
+        it('returns true when given date refer to another existing field', function() {
+            let v = Validator.make({start: '2012-01-01', ends: '2013-01-01'}, {
+                start: 'after_or_equal:2000-01-01',
+                ends: 'after_or_equal:start'
+            })
+            expect(v.passes()).to.be.true
+
+            v = Validator.make({start: '2012-01-01', ends: '2000-01-01'}, {
+                start: 'after_or_equal:2000-01-01',
+                ends: 'after_or_equal:start'
+            })
+            expect(v.fails()).to.be.true
+
+            v = Validator.make({start: new Date('2012-01-01'), ends: '2000-01-01'}, {
+                start: 'before:ends',
+                ends: 'after_or_equal:start'
+            })
+            expect(v.fails()).to.be.true
+
+            v = Validator.make({start: '2012-01-01', ends: new Date('2000-01-01')}, {
+                start: 'before:ends',
+                ends: 'after_or_equal:start'
+            })
+            expect(v.fails()).to.be.true
+
+            v = Validator.make({start: '2012-01-01', ends: '2012-01-01'}, {
+                start: 'before_or_equal:ends',
+                ends: 'after_or_equal:start'
+            })
+            expect(v.passes()).to.be.true
         })
     })
     describe('#validateArray()', function() {
