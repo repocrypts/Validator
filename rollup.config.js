@@ -2,14 +2,18 @@ import babel from 'rollup-plugin-babel'
 
 var babelOptions = {
   presets: [
-    ["es2015", {"modules": false}]
+    ["env", {"modules": false}]
   ],
-  exclude: 'node_modules/**'
+  exclude: 'node_modules/**',
+  plugins: ['external-helpers']
 }
 
 export default {
-  entry: 'src/Validator.js',
-  format: 'cjs',
-  dest: 'dist/Validator.js',
+  experimentalCodeSplitting: true,
+  input: ['src/Validator.js', 'src/index.js'],
+  output: {
+    dir: 'dist',
+    format: 'cjs'
+  },
   plugins: [ babel(babelOptions) ]
 }
