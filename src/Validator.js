@@ -2,7 +2,7 @@ import Messages from './Messages'
 
 export default class Validator {
     constructor(data, rules, customMessages = {}, customNames = {}) {
-        this.data = data
+        this.setData(data)
         this.rules = this.parseRules(rules)
         this.failedRules = []
         this.errors = null
@@ -48,6 +48,10 @@ export default class Validator {
         if (customMessage) {
             this.customMessages[this.snakeCase(ruleName)] = customMessage;
         }
+    }
+
+    setData(data) {
+        this.data = data
     }
 
     parseRules(rules) {

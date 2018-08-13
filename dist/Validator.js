@@ -112,7 +112,7 @@ var Validator = function () {
         var customNames = arguments.length > 3 && arguments[3] !== undefined ? arguments[3] : {};
         classCallCheck(this, Validator);
 
-        this.data = data;
+        this.setData(data);
         this.rules = this.parseRules(rules);
         this.failedRules = [];
         this.errors = null;
@@ -129,6 +129,11 @@ var Validator = function () {
             if (customMessage) {
                 this.customMessages[this.snakeCase(ruleName)] = customMessage;
             }
+        }
+    }, {
+        key: 'setData',
+        value: function setData(data) {
+            this.data = data;
         }
     }, {
         key: 'parseRules',

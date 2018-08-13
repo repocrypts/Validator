@@ -1397,6 +1397,23 @@ describe('Validator', function() {
             expect(v.passes()).to.be.true;
         });
     })
+
+    describe('#setData' , () => {
+        it('should passed a lazy set date' , () => {
+            let data = {
+                name: 'adrian',
+                lastName: 'locurcio'
+            };
+
+            let v = Validator.make(null , {
+                name: 'required|string',
+                lastName: 'nullable|string'
+            });
+            v.setData(data);
+
+            expect(v.passes()).to.be.true;
+        });
+    })
 })
 
 /*
