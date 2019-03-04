@@ -41,7 +41,6 @@ describe('Validator', function() {
         })
         it('parses array of rules correctly', function() {
             let arr = v.parseItemRules(rules['nick'])
-            console.log(arr);
             expect(arr).to.be.lengthOf(2)
             expect(arr).to.be.deep.equal([
                 { name: 'Required', params: [] },
@@ -243,7 +242,6 @@ describe('Validator', function() {
             let v = Validator.make({ name: 'Rati', email: 'rati@example.com' }, rules)
 
             v.fails()
-            console.log(v.getErrors())
             expect(v.getErrors()).to.have.any.keys('age')
 
             v = Validator.make({ name: 'Rati' }, rules)
