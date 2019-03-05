@@ -12,7 +12,7 @@
     },
     "repository": {
         "type": "git",
-        "url": "git+https://github.com/ratiw/Validator.git"
+        "url": "git+https://github.com/jfstn/Validator.git"
     },
     "keywords": [
         "javascript",
@@ -21,7 +21,7 @@
     ],
     "author": "Rati Wannapanop <rati.wannapanop@gmail.com>",
     "license": "MIT",
-    "homepage": "https://github.com/ratiw/Validator#readme",
+    "homepage": "https://github.com/jfstn/Validator#readme",
     "devDependencies": {
         "babel-plugin-external-helpers": "^6.22.0",
         "babel-preset-es2015": "^6.22.0",
