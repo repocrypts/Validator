@@ -1,13 +1,13 @@
 language: node_js
 cache:
-  directories:
-    - node_modules
+    directories:
+        - node_modules
 branches:
-  only:
-    - master
+    only:
+        - master
 notifications:
-  email: false
+    email: false
 node_js:
-  - iojs
-  
+    - node
+
 script: npm test
