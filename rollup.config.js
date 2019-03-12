@@ -1,4 +1,5 @@
 import babel from 'rollup-plugin-babel';
+import { uglify } from 'rollup-plugin-uglify';
 
 var babelOptions = {
     presets: [['@babel/env', { modules: false }]],
@@ -11,5 +12,5 @@ export default {
         format: 'cjs',
         file: 'dist/Validator.js'
     },
-    plugins: [babel(babelOptions)]
+    plugins: [babel(babelOptions), uglify()]
 };
