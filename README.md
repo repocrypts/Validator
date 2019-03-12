@@ -1,6 +1,7 @@
 # Javascript Validator library
 [![Travis build](https://img.shields.io/travis/jfstn/Validator.svg)](https://travis-ci.org/jfstn/Validator)
 [![npm](https://img.shields.io/npm/v/Validator.svg)](https://www.npmjs.com/package/Validator)
+[![FOSSA Status](https://app.fossa.io/api/projects/git%2Bgithub.com%2Fjfstn%2FValidator.svg?type=shield)](https://app.fossa.io/projects/git%2Bgithub.com%2Fjfstn%2FValidator?ref=badge_shield)
 
 > Client-side javascript validator library. Ports from Laravel 5.2
 
@@ -153,3 +154,7 @@ The validation callback receives three parameters:
  
 Params defined ike so: `rulename:min=10,max=15` would be passed in as an array: `['min=10', 'max=15']`
 
+
+
+## License
+[![FOSSA Status](https://app.fossa.io/api/projects/git%2Bgithub.com%2Fjfstn%2FValidator.svg?type=large)](https://app.fossa.io/projects/git%2Bgithub.com%2Fjfstn%2FValidator?ref=badge_large)
