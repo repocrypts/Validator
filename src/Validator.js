@@ -1,16 +1,15 @@
-import Messages from './Messages';
+import messages from './messages';
 
 export default class Validator {
     constructor(data, rules, customMessages = {}, customNames = {}) {
-        this.setData(data)
-        this.rules = this.parseRules(rules)
-        this.failedRules = []
-        this.errors = null
-        this.customRules = {}
-        this.customMessages = customMessages
-        this.customNames = customNames
-        this.customValues = {}
-
+        this.setData(data);
+        this.rules = this.parseRules(rules);
+        this.failedRules = [];
+        this.errors = null;
+        this.customRules = {};
+        this.customMessages = customMessages;
+        this.customNames = customNames;
+        this.customValues = {};
     }
 
     get dateRules() {
@@ -69,7 +68,7 @@ export default class Validator {
     }
 
     setData(data) {
-        this.data = data
+        this.data = data;
     }
 
     parseRules(rules) {
@@ -253,12 +252,12 @@ export default class Validator {
         let key = this.snakeCase(rule.name);
 
         // 2) then, use the default message for that rule, and re-test
-        msg = Messages[key];
+        msg = messages[key];
 
         // 3) check if the message has subtype
         if (typeof msg === 'object') {
             let subtype = this.getDataType(name);
-            msg = Messages[key][subtype];
+            msg = messages[key][subtype];
         }
 
         return typeof msg === 'undefined' ? '' : msg;

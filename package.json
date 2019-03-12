@@ -4,11 +4,11 @@
     "description": "Client-side Javascript Validator library. Ports from Laravel 5.2",
     "main": "dist/Validator.js",
     "scripts": {
-        "test": "npm run build && mocha --recursive --require @babel/register",
+        "test": "mocha --recursive --require @babel/register",
         "prebuild": "rimraf dist",
         "build": "rollup -c",
         "watch": "rollup -c -w",
-        "prepublish": "npm test"
+        "prepublish": "npm run build && npm run test"
     },
     "repository": {
         "type": "git",

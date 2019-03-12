@@ -7,7 +7,7 @@ var babelOptions = {
 };
 
 export default {
-    input: 'src/Validator.js',
+    input: 'src/validator.js',
     output: {
         format: 'cjs',
         file: 'dist/Validator.js'
