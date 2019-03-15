@@ -5,9 +5,10 @@ cache:
 branches:
     only:
         - master
+        - develop
 notifications:
     email: false
 node_js:
-    - node
+    - '10'
 
-script: npm test
+script: npm run coverage

@@ -1,6 +1,6 @@
-import messages from './messages';
+import messages from './Messages';
 
-export default class Validator {
+class Validator {
     constructor(data, rules, customMessages = {}, customNames = {}) {
         this.setData(data);
         this.rules = this.parseRules(rules);
@@ -999,3 +999,5 @@ export default class Validator {
         return this.dependentRules.indexOf(rule);
     }
 }
+
+export default Validator;

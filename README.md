@@ -1,10 +1,11 @@
-# Javascript Validator library
+# Validator
 
 [![npm](https://img.shields.io/npm/v/Validator.svg)](https://www.npmjs.com/package/Validator)
 [![Travis build](https://img.shields.io/travis/jfstn/Validator.svg)](https://travis-ci.org/jfstn/Validator)
+[![Coverage Status](https://coveralls.io/repos/github/jfstn/Validator/badge.svg?branch=master)](https://coveralls.io/github/jfstn/Validator?branch=master)
 [![FOSSA Status](https://app.fossa.io/api/projects/git%2Bgithub.com%2Fjfstn%2FValidator.svg?type=shield)](https://app.fossa.io/projects/git%2Bgithub.com%2Fjfstn%2FValidator?ref=badge_shield)
 
-> Client-side javascript validator library. Ports from Laravel 5.2
+A client-side JavaScript validation package, based on Laravel 5.2 validation.
 
 ## Installation
 
@@ -24,37 +25,36 @@
     npm install Validator --save
     ```
     ```javascript
-    var Validator = require('Validator');
+    const Validator = require('Validator');
     ```
 
 ## Usage
 
 -   Basic usage
 
-    ````javascript
-    var data = {
+    ```javascript
+    const data = {
         name: 'John Doe',
         company: 'Example Co.',
         birthday: '1985-04-16'
     };
-    var rules = {
+
+    const rules = {
         name: 'required',
         // for multiple rules
         birthday: 'required|date', // can be a piped string
         company: ['required', 'string'] // can be an array of strings
     };
 
-    var v = Validator.make(data, rules);
+    const v = Validator.make(data, rules);
 
     if (v.fails()) {
-            var errors = v.getErrors();
-            console.log(errors);
-        }
-        ```
+        const errors = v.getErrors();
+        console.log(errors);
+    }
+    ```
 
     `getErrors()` will return an object containing error field as a key and array of error messages for that field.
-
-    ````
 
 -   Custom Error Messages
 
@@ -67,7 +67,7 @@
         'receiver.email': 'The receiver email address is not valid'
     };
 
-    var v = Validator.make(data, rules, messages);
+    const v = Validator.make(data, rules, messages);
 
     if (v.passes()) {
         //...
@@ -77,7 +77,7 @@
 -   Custom Name
 
     ```javascript
-    var v = Validator.make(data, rules, messages, { email: 'Email Address' });
+    const v = Validator.make(data, rules, messages, { email: 'Email Address' });
     ```
 
 ## Supported Validation Rules
@@ -127,7 +127,7 @@ See validation rule usage in [Laravel Documentation](https://laravel.com/docs/5.
 The validator can be extended with custom rules
 
 ```javascript
-var rules = {
+const rules = {
     id: 'required|mongoid'
 };
 
@@ -136,7 +136,7 @@ function validateMongoId(name, value, params) {
     return value && hexadecimal.test(value) && value.length === 24;
 }
 
-var v = Validator.make(data, rules);
+const v = Validator.make(data, rules);
 v.extend('mongoid', validateMongoId, ':attr is not a valid mongo id');
 
 if (v.passes()) {

@@ -1,16 +1,32 @@
 import babel from 'rollup-plugin-babel';
+import resolve from 'rollup-plugin-node-resolve';
+import commonjs from 'rollup-plugin-commonjs';
 import { uglify } from 'rollup-plugin-uglify';
 
-var babelOptions = {
-    presets: [['@babel/env', { modules: false }]],
-    exclude: 'node_modules/**'
-};
-
 export default {
-    input: 'src/validator.js',
+    input: 'src/Validator.js',
     output: {
         format: 'cjs',
         file: 'dist/Validator.js'
     },
-    plugins: [babel(babelOptions), uglify()]
+    plugins: [
+        resolve(),
+        commonjs(),
+        babel({
+            babelrc: false,
+            presets: [
+                [
+                    '@babel/preset-env',
+                    {
+                        modules: false,
+                        targets: {
+                            browsers: ['last 3 versions']
+                        }
+                    }
+                ]
+            ],
+            exclude: ['node_modules/**']
+        }),
+        uglify()
+    ]
 };
