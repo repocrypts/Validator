@@ -4,7 +4,7 @@ import commonjs from 'rollup-plugin-commonjs';
 import { uglify } from 'rollup-plugin-uglify';
 
 export default {
-    input: 'src/Validator.js',
+    input: 'src/validator.js',
     output: {
         format: 'cjs',
         file: 'dist/Validator.js'

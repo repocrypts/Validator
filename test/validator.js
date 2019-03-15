@@ -1,5 +1,5 @@
 import { expect } from 'chai';
-import Validator from '../src/Validator.js';
+import Validator from '../src/validator.js';
 
 const rules = {
     name: 'required|min:3',

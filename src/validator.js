@@ -1,4 +1,4 @@
-import messages from './Messages';
+import messages from './messages';
 
 class Validator {
     constructor(data, rules, customMessages = {}, customNames = {}) {

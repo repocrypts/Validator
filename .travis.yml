@@ -11,4 +11,4 @@ notifications:
 node_js:
     - '10'
 
-script: npm run coverage
+script: npm run build && npm run coverage
