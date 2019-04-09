@@ -62,6 +62,7 @@ class Validator {
 
     extend(ruleName, callback, customMessage) {
         this.customRules[this.titleCase(ruleName)] = callback;
+
         if (customMessage) {
             this.customMessages[this.snakeCase(ruleName)] = customMessage;
         }
@@ -98,6 +99,11 @@ class Validator {
         }
 
         itemRules.forEach(function(ruleAndArgs) {
+            if (typeof ruleAndArgs === 'function') {
+                self.extend('batata', ruleAndArgs, 'will this work?');
+                return;
+            }
+
             if (ruleAndArgs.trim()) {
                 let args = ruleAndArgs.split(':');
                 rules.push({
@@ -684,7 +690,7 @@ class Validator {
     }
 
     validateEmail(name, value) {
-        return this.validateMatch(name, value, /^[A-Z0-9._%+\-]+@[A-Z0-9.\-]+\.[A-Z]{2,4}$/i);
+        return this.validateMatch(name, value, /^[A-Z0-9._%+\-]+@[A-Z0-9.\-]+\.[A-Z]{2,8}$/i);
     }
 
     validateIp(name, value) {
