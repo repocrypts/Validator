@@ -4,12 +4,12 @@ import Validator from '../src/validator.js';
 const rules = {
     name: 'required|min:3',
     email: 'required|email',
-    age: 'integer'
+    age: 'integer',
 };
 
 const data = {
     name: 'Rati',
-    email: 'rati@example.com'
+    email: 'rati@example.com',
 };
 
 const v = new Validator(data, rules);
@@ -29,7 +29,7 @@ describe('Validator', () => {
         const rules = {
             name: 'required|min:3',
             group: 'not_in:admin,exec',
-            nick: ['required', 'string']
+            nick: ['required', 'string'],
         };
 
         const v = Validator.make({ name: 'Rati', nick: 'Rati' }, rules);
@@ -40,7 +40,7 @@ describe('Validator', () => {
             expect(arr).to.be.lengthOf(2);
             expect(arr).to.deep.equal([
                 { name: 'Required', params: [] },
-                { name: 'Min', params: ['3'] }
+                { name: 'Min', params: ['3'] },
             ]);
         });
 
@@ -50,21 +50,23 @@ describe('Validator', () => {
             expect(arr).to.be.lengthOf(2);
             expect(arr).to.be.deep.equal([
                 { name: 'Required', params: [] },
-                { name: 'String', params: [] }
+                { name: 'String', params: [] },
             ]);
         });
 
         it('parses rule with array argument (not_in)', () => {
             const arr = v.parseItemRules(rules['group']);
 
-            expect(arr).to.deep.equal([{ name: 'NotIn', params: ['admin', 'exec'] }]);
+            expect(arr).to.deep.equal([
+                { name: 'NotIn', params: ['admin', 'exec'] },
+            ]);
         });
     });
 
     describe('#parseRules()', () => {
         const rules = {
             name: 'required|min:3',
-            group: 'not_in:admin,exec'
+            group: 'not_in:admin,exec',
         };
 
         const v = Validator.make({ name: 'Rati' }, rules);
@@ -75,24 +77,27 @@ describe('Validator', () => {
             expect(arr).to.deep.equal([
                 {
                     name: 'name',
-                    rules: [{ name: 'Required', params: [] }, { name: 'Min', params: ['3'] }]
+                    rules: [
+                        { name: 'Required', params: [] },
+                        { name: 'Min', params: ['3'] },
+                    ],
                 },
                 {
                     name: 'group',
-                    rules: [{ name: 'NotIn', params: ['admin', 'exec'] }]
-                }
+                    rules: [{ name: 'NotIn', params: ['admin', 'exec'] }],
+                },
             ]);
         });
     });
     describe('#getRule()', () => {
         const rules = {
             name: 'required|min:3',
-            group: 'in:admin,exec'
+            group: 'in:admin,exec',
         };
 
         const data = {
             name: 'Rati',
-            group: 'admin'
+            group: 'admin',
         };
 
         const v = Validator.make(data, rules);
@@ -139,7 +144,7 @@ describe('Validator', () => {
 
         it('custom validator fails with custom message', () => {
             expect(fail_v.getErrors()).to.deep.equal({
-                id: ['id must be a valid mongo id']
+                id: ['id must be a valid mongo id'],
             });
         });
     });
@@ -149,7 +154,7 @@ describe('Validator', () => {
             const v = Validator.make(
                 { name: 'Test' },
                 {
-                    name: 'required|min:6'
+                    name: 'required|min:6',
                 }
             );
 
@@ -161,7 +166,7 @@ describe('Validator', () => {
             const v = Validator.make(
                 { name: 'Testing' },
                 {
-                    name: 'required|min:6'
+                    name: 'required|min:6',
                 }
             );
 
@@ -193,7 +198,7 @@ describe('Validator', () => {
     });
 
     describe('#snakeCase()', () => {
-        it('returns snake case using underscore as default delimitor', () => {
+        it('returns snake case using underscore as default delimiter', () => {
             expect(v.snakeCase('helloWorld')).to.equal('hello_world');
         });
 
@@ -227,14 +232,14 @@ describe('Validator', () => {
     describe('#passes() and valid()', () => {
         const rules = {
             name: 'required',
-            email: 'required|email'
+            email: 'required|email',
         };
 
         it('returns true when all validations are valid', () => {
             const v = Validator.make(
                 {
                     name: 'Rati',
-                    email: 'rati@example.com'
+                    email: 'rati@example.com',
                 },
                 rules
             );
@@ -246,7 +251,7 @@ describe('Validator', () => {
         it('returns false when any validation rule is invalid', () => {
             const v = Validator.make(
                 {
-                    name: 'Rati'
+                    name: 'Rati',
                 },
                 rules
             );
@@ -259,13 +264,13 @@ describe('Validator', () => {
     describe('#fails() and invalid()', () => {
         const rules = {
             name: 'required',
-            email: 'required|email'
+            email: 'required|email',
         };
 
         it('returns true when any validation fails', () => {
             const v = Validator.make(
                 {
-                    name: 'Rati'
+                    name: 'Rati',
                 },
                 rules
             );
@@ -278,7 +283,7 @@ describe('Validator', () => {
             const v = Validator.make(
                 {
                     name: 'Rati',
-                    email: 'rati@example.com'
+                    email: 'rati@example.com',
                 },
                 rules
             );
@@ -290,11 +295,14 @@ describe('Validator', () => {
         const rules = {
             name: 'required',
             email: 'required|email',
-            age: 'required'
+            age: 'required',
         };
 
         it('returns errors when validation fails', () => {
-            const v = Validator.make({ name: 'Rati', email: 'rati@example.com' }, rules);
+            const v = Validator.make(
+                { name: 'Rati', email: 'rati@example.com' },
+                rules
+            );
 
             v.fails();
             expect(v.getErrors()).to.have.any.keys('age');
@@ -312,7 +320,7 @@ describe('Validator', () => {
                 {
                     name: 'Rati',
                     email: 'rati@example.com',
-                    age: '45'
+                    age: '45',
                 },
                 rules
             );
@@ -344,7 +352,7 @@ describe('Validator', () => {
 
     describe('#validateRequiredWith()', () => {
         const rules = {
-            last: 'required_with:first'
+            last: 'required_with:first',
         };
 
         it('returns false when the validated field is not present', () => {
@@ -357,7 +365,7 @@ describe('Validator', () => {
             expect(v.passes()).to.be.false;
         });
 
-        it('returns true when the validated field is not present, butthe required_with field is empty', () => {
+        it('returns true when the validated field is not present, but the required_with field is empty', () => {
             const v = Validator.make({ first: '' }, rules);
             expect(v.passes()).to.be.true;
         });
@@ -368,7 +376,10 @@ describe('Validator', () => {
         });
 
         it('returns true when the validated field is present and the required_with field can be validated', () => {
-            const v = Validator.make({ first: 'Taylor', last: 'Otwell' }, rules);
+            const v = Validator.make(
+                { first: 'Taylor', last: 'Otwell' },
+                rules
+            );
             expect(v.passes()).to.be.true;
         });
         // SKIP File related test
@@ -376,12 +387,18 @@ describe('Validator', () => {
 
     describe('#validateRequiredWithAll()', () => {
         it('returns true when the field under validation must be present only if all of the other specified fields are present', () => {
-            const v = Validator.make({ first: 'foo' }, { last: 'required_with_all:first,foo' });
+            const v = Validator.make(
+                { first: 'foo' },
+                { last: 'required_with_all:first,foo' }
+            );
             expect(v.passes()).to.be.true;
         });
 
         it('returns false when the field under validation is not present', () => {
-            const v = Validator.make({ first: 'foo' }, { last: 'required_with_all:first' });
+            const v = Validator.make(
+                { first: 'foo' },
+                { last: 'required_with_all:first' }
+            );
             expect(v.passes()).to.be.false;
         });
     });
@@ -395,7 +412,7 @@ describe('Validator', () => {
 
     describe('#validateMin()', () => {
         const rules = {
-            name: 'min:3'
+            name: 'min:3',
         };
 
         it('returns true when the length of given string is >= the specified "min"', () => {
@@ -419,7 +436,10 @@ describe('Validator', () => {
         });
 
         it('returns true when size of given array is >= the array min', () => {
-            const v = Validator.make({ foo: [1, 2, 3, 4] }, { foo: 'array|min:3' });
+            const v = Validator.make(
+                { foo: [1, 2, 3, 4] },
+                { foo: 'array|min:3' }
+            );
             expect(v.passes()).to.be.true;
         });
 
@@ -432,7 +452,7 @@ describe('Validator', () => {
 
     describe('#validateMax()', () => {
         const rules = {
-            name: 'max:3'
+            name: 'max:3',
         };
 
         it('returns true when length of the given string is <= the specified max', () => {
@@ -446,7 +466,10 @@ describe('Validator', () => {
         });
 
         it('returns false when the given value is > the specified numeric max', () => {
-            const v = Validator.make({ foo: '211' }, { foo: 'numeric|max:100' });
+            const v = Validator.make(
+                { foo: '211' },
+                { foo: 'numeric|max:100' }
+            );
             expect(v.passes()).to.be.false;
         });
 
@@ -456,12 +479,18 @@ describe('Validator', () => {
         });
 
         it('returns true when size of given array is <= the specified array max size', () => {
-            const v = Validator.make({ foo: [1, 2, 3] }, { foo: 'array|max:4' });
+            const v = Validator.make(
+                { foo: [1, 2, 3] },
+                { foo: 'array|max:4' }
+            );
             expect(v.passes()).to.be.true;
         });
 
         it('returns false when size of given array is > the specified array max size', () => {
-            const v = Validator.make({ foo: [1, 2, 3] }, { foo: 'array|max:2' });
+            const v = Validator.make(
+                { foo: [1, 2, 3] },
+                { foo: 'array|max:2' }
+            );
             expect(v.passes()).to.be.false;
         });
         // SKIP file related tests
@@ -479,36 +508,51 @@ describe('Validator', () => {
         });
 
         it('returns false when any value in the given array is not in the list', () => {
-            const v = Validator.make({ name: ['foo', 'bar'] }, { name: 'array|in:foo,baz' });
+            const v = Validator.make(
+                { name: ['foo', 'bar'] },
+                { name: 'array|in:foo,baz' }
+            );
             expect(v.passes()).to.be.false;
         });
 
         it('returns true when all value in given array are in the list', () => {
-            const v = Validator.make({ name: ['foo', 'qux'] }, { name: 'array|in:foo,baz,qux' });
+            const v = Validator.make(
+                { name: ['foo', 'qux'] },
+                { name: 'array|in:foo,baz,qux' }
+            );
             expect(v.passes()).to.be.true;
         });
 
         it('returns false when the field under validation is not an array', () => {
-            const v = Validator.make({ name: ['foo', 'bar'] }, { name: 'alpha|in:foo,bar' });
+            const v = Validator.make(
+                { name: ['foo', 'bar'] },
+                { name: 'alpha|in:foo,bar' }
+            );
             expect(v.passes()).to.be.false;
         });
     });
 
     describe('#validateNotIn()', () => {
         it('return true when given value is not in the list', () => {
-            const v = Validator.make({ name: 'foo' }, { name: 'not_in:bar,baz' });
+            const v = Validator.make(
+                { name: 'foo' },
+                { name: 'not_in:bar,baz' }
+            );
             expect(v.passes()).to.be.true;
         });
 
         it('returns false when given value is in the list', () => {
-            const v = Validator.make({ name: 'foo' }, { name: 'not_in:foo,baz' });
+            const v = Validator.make(
+                { name: 'foo' },
+                { name: 'not_in:foo,baz' }
+            );
             expect(v.passes()).to.be.false;
         });
     });
 
     describe('#validateNumeric()', () => {
         const rules = {
-            foo: 'numeric'
+            foo: 'numeric',
         };
 
         it('return false when given string is not numeric', () => {
@@ -534,7 +578,7 @@ describe('Validator', () => {
 
     describe('#validateInteger()', () => {
         const rules = {
-            foo: 'integer'
+            foo: 'integer',
         };
 
         it('returns false when given string is text value', () => {
@@ -560,7 +604,7 @@ describe('Validator', () => {
 
     describe('#validateEmail()', () => {
         const rules = {
-            email: 'email'
+            email: 'email',
         };
 
         it('returns true when given value looks like an email address', () => {
@@ -576,7 +620,7 @@ describe('Validator', () => {
 
     describe('#validatePresent()', () => {
         const rules = {
-            name: 'present'
+            name: 'present',
         };
 
         it('returns true when the given data is present', () => {
@@ -592,12 +636,18 @@ describe('Validator', () => {
 
     describe('#validateRegex()', () => {
         it('returns true when the given data passes regex validation', () => {
-            const v = Validator.make({ x: 'asdasdf' }, { x: 'regex:/^([a-z])+$/i' });
+            const v = Validator.make(
+                { x: 'asdasdf' },
+                { x: 'regex:/^([a-z])+$/i' }
+            );
             expect(v.passes()).to.be.true;
         });
 
         it('returns false when the given data fails regex validation', () => {
-            const v = Validator.make({ x: 'aasd234fsd1' }, { x: 'regex:/^([a-z])+$/i' });
+            const v = Validator.make(
+                { x: 'aasd234fsd1' },
+                { x: 'regex:/^([a-z])+$/i' }
+            );
             expect(v.passes()).to.be.false;
         });
 
@@ -622,7 +672,7 @@ describe('Validator', () => {
             const v = Validator.make(
                 {
                     foo: 'bar',
-                    baz: 'boom'
+                    baz: 'boom',
                 },
                 { foo: 'same:baz' }
             );
@@ -632,7 +682,7 @@ describe('Validator', () => {
         it('returns false when the specified field does not present', () => {
             const v = Validator.make(
                 {
-                    foo: 'bar'
+                    foo: 'bar',
                 },
                 { foo: 'same:baz' }
             );
@@ -643,7 +693,7 @@ describe('Validator', () => {
             const v = Validator.make(
                 {
                     foo: 'bar',
-                    baz: 'bar'
+                    baz: 'bar',
                 },
                 { foo: 'same:baz' }
             );
@@ -654,7 +704,7 @@ describe('Validator', () => {
             const v = Validator.make(
                 {
                     foo: '1e2',
-                    baz: '100'
+                    baz: '100',
                 },
                 { foo: 'same:baz' }
             );
@@ -669,7 +719,7 @@ describe('Validator', () => {
             const v = Validator.make(
                 {
                     foo: 'bar',
-                    baz: 'boom'
+                    baz: 'boom',
                 },
                 rules
             );
@@ -679,7 +729,7 @@ describe('Validator', () => {
         it('returns false when the specified field does not present', () => {
             const v = Validator.make(
                 {
-                    foo: 'bar'
+                    foo: 'bar',
                 },
                 rules
             );
@@ -690,7 +740,7 @@ describe('Validator', () => {
             const v = Validator.make(
                 {
                     foo: 'bar',
-                    baz: 'bar'
+                    baz: 'bar',
                 },
                 rules
             );
@@ -701,7 +751,7 @@ describe('Validator', () => {
             const v = Validator.make(
                 {
                     foo: '1e2',
-                    baz: '100'
+                    baz: '100',
                 },
                 rules
             );
@@ -721,7 +771,7 @@ describe('Validator', () => {
             const v = Validator.make(
                 {
                     password: 'foo',
-                    password_confirmation: 'bar'
+                    password_confirmation: 'bar',
                 },
                 rules
             );
@@ -732,7 +782,7 @@ describe('Validator', () => {
             const v = Validator.make(
                 {
                     password: 'foo',
-                    password_confirmation: 'foo'
+                    password_confirmation: 'foo',
                 },
                 rules
             );
@@ -807,15 +857,24 @@ describe('Validator', () => {
     });
     describe('$validateDigitsBetween()', () => {
         it('returns true when the number of digits given is between the range', () => {
-            const v = Validator.make({ foo: '12345' }, { foo: 'digits_between:1,6' });
+            const v = Validator.make(
+                { foo: '12345' },
+                { foo: 'digits_between:1,6' }
+            );
             expect(v.passes()).to.be.true;
         });
         it('returns false when the given value is not numeric', () => {
-            const v = Validator.make({ foo: 'bar' }, { foo: 'digits_between:1,10' });
+            const v = Validator.make(
+                { foo: 'bar' },
+                { foo: 'digits_between:1,10' }
+            );
             expect(v.passes()).to.be.false;
         });
         it('returns false when the number of digits given is not in the range', () => {
-            const v = Validator.make({ foo: '123' }, { foo: 'digits_between:4,5' });
+            const v = Validator.make(
+                { foo: '123' },
+                { foo: 'digits_between:4,5' }
+            );
             expect(v.passes()).to.be.false;
         });
     });
@@ -837,11 +896,17 @@ describe('Validator', () => {
             expect(v.passes()).to.be.true;
         });
         it('returns true when given value is array of the given size', () => {
-            const v = Validator.make({ foo: [1, 2, 3] }, { foo: 'array|size:3' });
+            const v = Validator.make(
+                { foo: [1, 2, 3] },
+                { foo: 'array|size:3' }
+            );
             expect(v.passes()).to.be.true;
         });
         it('returns false when given value is array of different size', () => {
-            const v = Validator.make({ foo: [1, 2, 3] }, { foo: 'array|size:4' });
+            const v = Validator.make(
+                { foo: [1, 2, 3] },
+                { foo: 'array|size:4' }
+            );
             expect(v.passes()).to.be.false;
         });
         // SKIP file related tests
@@ -863,19 +928,31 @@ describe('Validator', () => {
             expect(v.passes()).to.be.true;
         });
         it('returns false when the given numeric value is not in the specified range', () => {
-            const v = Validator.make({ foo: '123' }, { foo: 'numeric|between:50,100' });
+            const v = Validator.make(
+                { foo: '123' },
+                { foo: 'numeric|between:50,100' }
+            );
             expect(v.passes()).to.be.false;
         });
         it('returns true when the given numeric value is in the specified range', () => {
-            const v = Validator.make({ foo: '3' }, { foo: 'numeric|between:1,5' });
+            const v = Validator.make(
+                { foo: '3' },
+                { foo: 'numeric|between:1,5' }
+            );
             expect(v.passes()).to.be.true;
         });
         it('returns true when the given array size is in the specified range', () => {
-            const v = Validator.make({ foo: [1, 2, 3] }, { foo: 'array|between:1,5' });
+            const v = Validator.make(
+                { foo: [1, 2, 3] },
+                { foo: 'array|between:1,5' }
+            );
             expect(v.passes()).to.be.true;
         });
         it('returns false when the given array size is not in the specified range', () => {
-            const v = Validator.make({ foo: [1, 2, 3] }, { foo: 'array|between:1,2' });
+            const v = Validator.make(
+                { foo: [1, 2, 3] },
+                { foo: 'array|between:1,2' }
+            );
             expect(v.passes()).to.be.false;
         });
         // SKIP file related tests
@@ -917,7 +994,7 @@ describe('Validator', () => {
 
     describe('#validateAlpha()', () => {
         const rules = { x: 'alpha' };
-        it('returns false when given string contains linebreak and number character', () => {
+        it('returns false when given string contains line break and number character', () => {
             const v = Validator.make({ x: 'asdfsd2fkl' }, rules);
             expect(v.passes()).to.be.false;
 
@@ -995,15 +1072,24 @@ describe('Validator', () => {
 
     describe('#validateBefore()', () => {
         it('returns true when given date is before the specified one', () => {
-            const v = Validator.make({ x: '2000-01-01' }, { x: 'before:2012-01-01' });
+            const v = Validator.make(
+                { x: '2000-01-01' },
+                { x: 'before:2012-01-01' }
+            );
             expect(v.passes()).to.be.true;
 
-            v.setData({ x: new Date('2000-01-01') }, { x: 'before:2012-01-01' });
+            v.setData(
+                { x: new Date('2000-01-01') },
+                { x: 'before:2012-01-01' }
+            );
             expect(v.passes()).to.be.true;
         });
 
         it('returns false when given date is not a string or number', () => {
-            const v = Validator.make({ x: ['2000-01-01'] }, { x: 'before:2012-01-01' });
+            const v = Validator.make(
+                { x: ['2000-01-01'] },
+                { x: 'before:2012-01-01' }
+            );
             expect(v.passes()).to.be.false;
         });
 
@@ -1012,7 +1098,7 @@ describe('Validator', () => {
                 { start: '2012-01-01', ends: '2013-01-01' },
                 {
                     start: 'before:ends',
-                    ends: 'after:start'
+                    ends: 'after:start',
                 }
             );
             expect(v.passes()).to.be.true;
@@ -1021,7 +1107,7 @@ describe('Validator', () => {
                 { start: '2012-01-01', ends: '2000-01-01' },
                 {
                     start: 'before:ends',
-                    ends: 'after:start'
+                    ends: 'after:start',
                 }
             );
             expect(v.fails()).to.be.true;
@@ -1030,21 +1116,33 @@ describe('Validator', () => {
 
     describe('#validateBeforeOrEqual()', () => {
         it('returns true when given date is before or equal the specified one', () => {
-            const v = Validator.make({ x: '2000-01-01' }, { x: 'before_or_equal:2012-01-01' });
+            const v = Validator.make(
+                { x: '2000-01-01' },
+                { x: 'before_or_equal:2012-01-01' }
+            );
             expect(v.passes()).to.be.true;
 
             v.setData({ x: '2012-01-01' }, { x: 'before_or_equal:2012-01-01' });
             expect(v.passes()).to.be.true;
 
-            v.setData({ x: new Date('2000-01-01') }, { x: 'before_or_equal:2012-01-01' });
+            v.setData(
+                { x: new Date('2000-01-01') },
+                { x: 'before_or_equal:2012-01-01' }
+            );
             expect(v.passes()).to.be.true;
 
-            v.setData({ x: new Date('2012-01-01') }, { x: 'before_or_equal:2012-01-01' });
+            v.setData(
+                { x: new Date('2012-01-01') },
+                { x: 'before_or_equal:2012-01-01' }
+            );
             expect(v.passes()).to.be.true;
         });
 
         it('returns false when given date is not a string or number', () => {
-            const v = Validator.make({ x: ['2000-01-01'] }, { x: 'before_or_equal:2012-01-01' });
+            const v = Validator.make(
+                { x: ['2000-01-01'] },
+                { x: 'before_or_equal:2012-01-01' }
+            );
             expect(v.passes()).to.be.false;
         });
 
@@ -1053,7 +1151,7 @@ describe('Validator', () => {
                 { start: '2012-01-01', ends: '2013-01-01' },
                 {
                     start: 'before_or_equal:ends',
-                    ends: 'after:start'
+                    ends: 'after:start',
                 }
             );
             expect(v.passes()).to.be.true;
@@ -1062,7 +1160,7 @@ describe('Validator', () => {
                 { start: '2012-01-01', ends: '2013-01-01' },
                 {
                     start: 'before_or_equal:ends',
-                    ends: 'after_or_equal:start'
+                    ends: 'after_or_equal:start',
                 }
             );
             expect(v.passes()).to.be.true;
@@ -1071,7 +1169,7 @@ describe('Validator', () => {
                 { start: '2012-01-01', ends: '2000-01-01' },
                 {
                     start: 'before_or_equal:ends',
-                    ends: 'after:start'
+                    ends: 'after:start',
                 }
             );
             expect(v.fails()).to.be.true;
@@ -1080,12 +1178,18 @@ describe('Validator', () => {
 
     describe('#validateAfter()', () => {
         it('returns true when given date is after the specified one', () => {
-            const v = Validator.make({ x: '2012-01-01' }, { x: 'after:2000-01-01' });
+            const v = Validator.make(
+                { x: '2012-01-01' },
+                { x: 'after:2000-01-01' }
+            );
             expect(v.passes()).to.be.true;
         });
 
         it('returns false when given date is not a string or number', () => {
-            const v = Validator.make({ x: ['2012-01-01'] }, { x: 'after:2000-01-01' });
+            const v = Validator.make(
+                { x: ['2012-01-01'] },
+                { x: 'after:2000-01-01' }
+            );
             expect(v.passes()).to.be.false;
         });
 
@@ -1094,7 +1198,7 @@ describe('Validator', () => {
                 { start: '2012-01-01', ends: '2013-01-01' },
                 {
                     start: 'after:2000-01-01',
-                    ends: 'after:start'
+                    ends: 'after:start',
                 }
             );
             expect(v.passes()).to.be.true;
@@ -1103,7 +1207,7 @@ describe('Validator', () => {
                 { start: '2012-01-01', ends: '2000-01-01' },
                 {
                     start: 'after:2000-01-01',
-                    ends: 'after:start'
+                    ends: 'after:start',
                 }
             );
             expect(v.fails()).to.be.true;
@@ -1112,7 +1216,7 @@ describe('Validator', () => {
                 { start: new Date('2012-01-01'), ends: '2000-01-01' },
                 {
                     start: 'before:ends',
-                    ends: 'after:start'
+                    ends: 'after:start',
                 }
             );
             expect(v.fails()).to.be.true;
@@ -1121,7 +1225,7 @@ describe('Validator', () => {
                 { start: '2012-01-01', ends: new Date('2000-01-01') },
                 {
                     start: 'before:ends',
-                    ends: 'after:start'
+                    ends: 'after:start',
                 }
             );
             expect(v.fails()).to.be.true;
@@ -1130,7 +1234,10 @@ describe('Validator', () => {
 
     describe('#validateAfterOrEqual()', () => {
         it('returns true when given date is after or equal the specified one', () => {
-            const v = Validator.make({ x: '2012-01-01' }, { x: 'after_or_equal:2000-01-01' });
+            const v = Validator.make(
+                { x: '2012-01-01' },
+                { x: 'after_or_equal:2000-01-01' }
+            );
             expect(v.passes()).to.be.true;
 
             v.setData({ x: '2000-01-01' }, { x: 'after_or_equal:2000-01-01' });
@@ -1138,7 +1245,10 @@ describe('Validator', () => {
         });
 
         it('returns false when given date is not a string or number', () => {
-            const v = Validator.make({ x: ['2012-01-01'] }, { x: 'after_or_equal:2000-01-01' });
+            const v = Validator.make(
+                { x: ['2012-01-01'] },
+                { x: 'after_or_equal:2000-01-01' }
+            );
             expect(v.passes()).to.be.false;
         });
 
@@ -1147,7 +1257,7 @@ describe('Validator', () => {
                 { start: '2012-01-01', ends: '2013-01-01' },
                 {
                     start: 'after_or_equal:2000-01-01',
-                    ends: 'after_or_equal:start'
+                    ends: 'after_or_equal:start',
                 }
             );
             expect(v.passes()).to.be.true;
@@ -1156,7 +1266,7 @@ describe('Validator', () => {
                 { start: '2012-01-01', ends: '2000-01-01' },
                 {
                     start: 'after_or_equal:2000-01-01',
-                    ends: 'after_or_equal:start'
+                    ends: 'after_or_equal:start',
                 }
             );
             expect(v.fails()).to.be.true;
@@ -1165,7 +1275,7 @@ describe('Validator', () => {
                 { start: new Date('2012-01-01'), ends: '2000-01-01' },
                 {
                     start: 'before:ends',
-                    ends: 'after_or_equal:start'
+                    ends: 'after_or_equal:start',
                 }
             );
             expect(v.fails()).to.be.true;
@@ -1174,7 +1284,7 @@ describe('Validator', () => {
                 { start: '2012-01-01', ends: new Date('2000-01-01') },
                 {
                     start: 'before:ends',
-                    ends: 'after_or_equal:start'
+                    ends: 'after_or_equal:start',
                 }
             );
             expect(v.fails()).to.be.true;
@@ -1183,7 +1293,7 @@ describe('Validator', () => {
                 { start: '2012-01-01', ends: '2012-01-01' },
                 {
                     start: 'before_or_equal:ends',
-                    ends: 'after_or_equal:start'
+                    ends: 'after_or_equal:start',
                 }
             );
             expect(v.passes()).to.be.true;
@@ -1306,7 +1416,10 @@ describe('Validator', () => {
         });
 
         it('returns true when the field under validation is present, but the other specified field is not required', () => {
-            const v = Validator.make({ first: 'Taylor', last: 'Otwell' }, rules);
+            const v = Validator.make(
+                { first: 'Taylor', last: 'Otwell' },
+                rules
+            );
             expect(v.passes()).to.be.true;
         });
         // SKIP File related test
@@ -1314,7 +1427,7 @@ describe('Validator', () => {
             const rules = {
                 f1: 'required_without:f2,f3',
                 f2: 'required_without:f1,f3',
-                f3: 'required_without:f1,f2'
+                f3: 'required_without:f1,f2',
             };
             const v = Validator.make({}, rules);
             expect(v.fails()).to.be.true;
@@ -1346,7 +1459,7 @@ describe('Validator', () => {
         const rules = {
             f1: 'required_without_all:f2,f3',
             f2: 'required_without_all:f1,f3',
-            f3: 'required_without_all:f1,f2'
+            f3: 'required_without_all:f1,f2',
         };
 
         it('returns false when given data is empty', () => {
@@ -1382,7 +1495,10 @@ describe('Validator', () => {
 
     describe('#validateRequiredIf()', () => {
         it('returns false when the field under validation is not present', () => {
-            const v = Validator.make({ first: 'taylor' }, { last: 'required_if:first,taylor' });
+            const v = Validator.make(
+                { first: 'taylor' },
+                { last: 'required_if:first,taylor' }
+            );
             expect(v.fails()).to.be.true;
         });
 
@@ -1399,7 +1515,10 @@ describe('Validator', () => {
             );
             expect(v.passes()).to.be.true;
 
-            v.setData({ first: 'dayle', last: 'rees' }, { last: 'required_if:first,taylor,dayle' });
+            v.setData(
+                { first: 'dayle', last: 'rees' },
+                { last: 'required_if:first,taylor,dayle' }
+            );
             expect(v.passes()).to.be.true;
 
             v.setData({ foo: true }, { bar: 'required_if:foo,false' });
@@ -1412,11 +1531,17 @@ describe('Validator', () => {
     });
 
     describe('#validateRequiredUnless()', () => {
-        it('checks the field under validation must be present unless the anotherfield field is equal to any value', () => {
-            let v = Validator.make({ first: 'sven' }, { last: 'required_unless:first,taylor' });
+        it('checks the field under validation must be present unless the another field field is equal to any value', () => {
+            let v = Validator.make(
+                { first: 'sven' },
+                { last: 'required_unless:first,taylor' }
+            );
             expect(v.fails()).to.be.true;
 
-            v = Validator.make({ first: 'taylor' }, { last: 'required_unless:first,taylor' });
+            v = Validator.make(
+                { first: 'taylor' },
+                { last: 'required_unless:first,taylor' }
+            );
             expect(v.passes()).to.be.true;
 
             v = Validator.make(
@@ -1425,10 +1550,16 @@ describe('Validator', () => {
             );
             expect(v.passes()).to.be.true;
 
-            v = Validator.make({ first: 'taylor' }, { last: 'required_unless:first,taylor,sven' });
+            v = Validator.make(
+                { first: 'taylor' },
+                { last: 'required_unless:first,taylor,sven' }
+            );
             expect(v.passes()).to.be.true;
 
-            v = Validator.make({ first: 'sven' }, { last: 'required_unless:first,taylor,sven' });
+            v = Validator.make(
+                { first: 'sven' },
+                { last: 'required_unless:first,taylor,sven' }
+            );
             expect(v.passes()).to.be.true;
         });
         // SKIP test error message when passed multiple values
@@ -1457,17 +1588,23 @@ describe('Validator', () => {
         const rules = {
             name: 'required|min:3',
             age: 'numeric|min:20',
-            email: 'required|email'
+            email: 'required|email',
         };
 
         it('checks that errors are returned correctly when validation failed', () => {
-            const v = Validator.make({ age: 15, email: 'rati@example.com' }, rules);
+            const v = Validator.make(
+                { age: 15, email: 'rati@example.com' },
+                rules
+            );
             v.passes();
             expect(v.valid()).to.deep.equal(['email']);
             expect(v.invalid()).to.deep.equal(['name', 'age']);
             expect(v.getErrors()).to.deep.equal({
-                name: ['The name field is required.', 'The name must be at least 3 characters.'],
-                age: ['The age must be at least 20.']
+                name: [
+                    'The name field is required.',
+                    'The name must be at least 3 characters.',
+                ],
+                age: ['The age must be at least 20.'],
             });
         });
 
@@ -1476,14 +1613,14 @@ describe('Validator', () => {
 
             expect(v.passes()).to.be.false;
             expect(v.getErrors()).to.deep.equal({
-                name: ['The name must be at least 5.']
+                name: ['The name must be at least 5.'],
             });
 
             v = Validator.make({ name: 'asdfkjlsd' }, { name: 'size:2' });
 
             expect(v.passes()).to.be.false;
             expect(v.getErrors()).to.deep.equal({
-                name: ['The name must be 2 characters.']
+                name: ['The name must be 2 characters.'],
             });
         });
     });
@@ -1498,17 +1635,17 @@ describe('Validator', () => {
     describe('# Custom Names', () => {
         const customNames = {
             name: 'Name',
-            age: 'Age'
+            age: 'Age',
         };
 
         const rules = {
             name: 'required',
-            age: 'required'
+            age: 'required',
         };
 
         const expectedResult = {
             name: ['The Name field is required.'],
-            age: ['The Age field is required.']
+            age: ['The Age field is required.'],
         };
 
         it('tests custom name being applied using constructor', () => {
@@ -1536,18 +1673,18 @@ describe('Validator', () => {
         const rules = {
             name: 'required',
             age: 'required',
-            email: 'required'
+            email: 'required',
         };
 
         it('tests custom message for specific rules being applied correctly', () => {
             const customMessages = {
-                required: 'You must provide the :attr.'
+                required: 'You must provide the :attr.',
             };
 
             const expectedResult = {
                 name: ['You must provide the name.'],
                 age: ['You must provide the age.'],
-                email: ['You must provide the email.']
+                email: ['You must provide the email.'],
             };
 
             const v = Validator.make({ name: '' }, rules, customMessages);
@@ -1560,13 +1697,13 @@ describe('Validator', () => {
             const customMessages = {
                 'name.required': ':attr is required.',
                 'age.required': ':Attr field is required.',
-                'email.required': ':ATTR field must not be blank.'
+                'email.required': ':ATTR field must not be blank.',
             };
 
             const expectedResult = {
                 name: ['name is required.'],
                 age: ['Age field is required.'],
-                email: ['EMAIL field must not be blank.']
+                email: ['EMAIL field must not be blank.'],
             };
 
             const v = Validator.make({ name: '' }, rules, customMessages);
@@ -1578,11 +1715,14 @@ describe('Validator', () => {
 
     describe('# Displayable values are replaced', () => {
         it('tests required_if:foo,bar', () => {
-            const v = Validator.make({ color: '1', bar: '' }, { bar: 'required_if:color,1' });
+            const v = Validator.make(
+                { color: '1', bar: '' },
+                { bar: 'required_if:color,1' }
+            );
             v.addCustomValues({ color: { '1': 'Red' } });
             expect(v.passes()).to.be.false;
             expect(v.getErrors()).to.deep.equal({
-                bar: ['The bar field is required when color is Red.']
+                bar: ['The bar field is required when color is Red.'],
             });
         });
         it('tests in:foo,bar using addCustomValues()', () => {
@@ -1594,12 +1734,12 @@ describe('Validator', () => {
             v.addCustomValues({
                 type: {
                     '5': 'Short',
-                    '300': 'Long'
-                }
+                    '300': 'Long',
+                },
             });
             expect(v.passes()).to.be.false;
             expect(v.getErrors()).to.deep.equal({
-                type: ['type must be included in Short, Long.']
+                type: ['type must be included in Short, Long.'],
             });
         });
         it('tests in:foo,bar using setValueNames()', () => {
@@ -1611,12 +1751,12 @@ describe('Validator', () => {
             v.setValueNames({
                 type: {
                     '5': 'Short',
-                    '300': 'Long'
-                }
+                    '300': 'Long',
+                },
             });
             expect(v.passes()).to.be.false;
             expect(v.getErrors()).to.deep.equal({
-                type: ['type must be included in Short, Long.']
+                type: ['type must be included in Short, Long.'],
             });
         });
     });
@@ -1625,11 +1765,11 @@ describe('Validator', () => {
         it('should passed a empty date with "nullable" rule', () => {
             const v = Validator.make(
                 {
-                    name: 'adrian'
+                    name: 'adrian',
                 },
                 {
                     name: 'required|string',
-                    lastName: 'nullable|string'
+                    lastName: 'nullable|string',
                 }
             );
             expect(v.passes()).to.be.true;
@@ -1639,11 +1779,11 @@ describe('Validator', () => {
             const v = Validator.make(
                 {
                     name: 'adrian',
-                    lastName: 'locurcio'
+                    lastName: 'locurcio',
                 },
                 {
                     name: 'required|string',
-                    lastName: 'nullable|string'
+                    lastName: 'nullable|string',
                 }
             );
             expect(v.passes()).to.be.true;
@@ -1654,16 +1794,31 @@ describe('Validator', () => {
         it('should passed a lazy set date', () => {
             const data = {
                 name: 'adrian',
-                lastName: 'locurcio'
+                lastName: 'locurcio',
             };
 
             const v = Validator.make(null, {
                 name: 'required|string',
-                lastName: 'nullable|string'
+                lastName: 'nullable|string',
             });
             v.setData(data);
 
             expect(v.passes()).to.be.true;
+        });
+    });
+
+    describe('should correctly return a correctly formatted message when a variable name consists of more than two words', () => {
+        const data = { threeWordProperty: '' };
+        const rules = { threeWordProperty: 'required|min:1' };
+
+        const v = Validator.make(data, rules);
+
+        expect(v.fails()).to.be.true;
+        expect(v.getErrors()).to.deep.equal({
+            threeWordProperty: [
+                'The three word property field is required.',
+                'The three word property must be at least 1 characters.',
+            ],
         });
     });
 });

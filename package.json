@@ -1,6 +1,6 @@
 {
     "name": "Validator",
-    "version": "1.0.8",
+    "version": "1.0.9",
     "description": "A client-side JavaScript validation package, based on Laravel 5.2 validation.",
     "main": "dist/Validator.js",
     "scripts": {
@@ -21,6 +21,12 @@
         "laravel"
     ],
     "author": "Rati Wannapanop <rati.wannapanop@gmail.com>",
+    "contributors": [
+        {
+            "name": "João Faustino",
+            "email": "joaofaustino@protonmail.com"
+        }
+    ],
     "license": "MIT",
     "homepage": "https://github.com/jfstn/Validator#readme",
     "devDependencies": {

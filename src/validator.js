@@ -35,7 +35,7 @@ class Validator {
             'RequiredIf',
             'RequiredUnless',
             'Accepted',
-            'Present'
+            'Present',
         ];
     }
 
@@ -52,7 +52,7 @@ class Validator {
             'Different',
             'Unique',
             'Before',
-            'After'
+            'After',
         ];
     }
 
@@ -79,7 +79,7 @@ class Validator {
         for (let key in rules) {
             arr.push({
                 name: key,
-                rules: self.parseItemRules(rules[key])
+                rules: self.parseItemRules(rules[key]),
             });
         }
 
@@ -98,7 +98,7 @@ class Validator {
             console.error('Unsupported type for item rule', itemRules);
         }
 
-        itemRules.forEach(function(ruleAndArgs) {
+        itemRules.forEach(function (ruleAndArgs) {
             if (typeof ruleAndArgs === 'function') {
                 self.extend('batata', ruleAndArgs, 'will this work?');
                 return;
@@ -108,7 +108,7 @@ class Validator {
                 let args = ruleAndArgs.split(':');
                 rules.push({
                     name: self.titleCase(args[0], '_'),
-                    params: args[1] ? args[1].split(',') : []
+                    params: args[1] ? args[1].split(',') : [],
                 });
             }
         });
@@ -120,7 +120,7 @@ class Validator {
         delimiter = delimiter || ' ';
         return str
             .split(delimiter)
-            .map(function(item) {
+            .map(function (item) {
                 return item[0].toUpperCase() + item.slice(1).toLowerCase();
             })
             .join('');
@@ -156,7 +156,7 @@ class Validator {
     }
 
     getRule(name, rulesToCheck) {
-        let a = this.rules.filter(function(item) {
+        let a = this.rules.filter(function (item) {
             return item.name === name;
         });
 
@@ -170,7 +170,7 @@ class Validator {
             rulesToCheck = [rulesToCheck];
         }
 
-        let b = a.rules.filter(function(rule) {
+        let b = a.rules.filter(function (rule) {
             return rulesToCheck.indexOf(rule.name) >= 0;
         });
 
@@ -180,7 +180,11 @@ class Validator {
     requireParameterCount(count, params, rule) {
         if (params.length < count) {
             throw new Error(
-                'Validation rule ' + rule + ' requires at least ' + count + ' parameters'
+                'Validation rule ' +
+                    rule +
+                    ' requires at least ' +
+                    count +
+                    ' parameters'
             );
         }
     }
@@ -188,7 +192,7 @@ class Validator {
     isEmptyValueAndContainsNullableRule(item) {
         return (
             !this.getValue(item.name) &&
-            item.rules.filter(rule => rule.name === 'Nullable').length > 0
+            item.rules.filter((rule) => rule.name === 'Nullable').length > 0
         );
     }
 
@@ -197,12 +201,16 @@ class Validator {
         this.errors = {};
         this.failedRules = {};
 
-        this.rules.forEach(function(item) {
+        this.rules.forEach(function (item) {
             let name = item.name;
-            if (self.isEmptyValueAndContainsNullableRule(item)) return false;
+
+            if (self.isEmptyValueAndContainsNullableRule(item)) {
+                return false;
+            }
+
             item.rules
-                .filter(rule => rule.name !== 'Nullable')
-                .forEach(function(rule) {
+                .filter((rule) => rule.name !== 'Nullable')
+                .forEach(function (rule) {
                     self.validate(name, rule);
                 });
         });
@@ -330,22 +338,24 @@ class Validator {
         }
 
         if (typeof method !== 'function') {
-            console.error('"' + rule.name + '" validation rule does not exist!');
+            console.error(
+                '"' + rule.name + '" validation rule does not exist!'
+            );
         }
         return method;
     }
 
     /*
-    isValidatable(rule, name, value) {
-        return this.presentOrRuleIsImplicit(rule, name, value) &&
-               this.passesOptionalCheck(name) &&
-               this.hasNotFailedPreviousRuleIfPresenceRule(rule, name)
-    }
-
-    presentOrRuleIsImplicit(rule, name, value) {
+        isValidatable(rule, name, value) {
+            return this.presentOrRuleIsImplicit(rule, name, value) &&
+            this.passesOptionalCheck(name) &&
+            this.hasNotFailedPreviousRuleIfPresenceRule(rule, name)
+        }
+        
+        presentOrRuleIsImplicit(rule, name, value) {
         return this.validateRequired(name, value) || this.isImplicit(rule)
     }
-
+    
     passesOptionalCheck(name) {
         return true
     }
@@ -353,7 +363,7 @@ class Validator {
     hasNotFailedPreviousRuleIfPresenceRule(rule, name) {
         return true
     }
-*/
+    */
 
     addFailure(name, rule) {
         this.addError(name, rule);
@@ -365,7 +375,12 @@ class Validator {
     }
 
     addError(name, rule) {
+        // if (!Object.keys(this.data).find((data) => data === name)) {
+        //     return;
+        // }
+
         let msg = this.getMessage(name, rule);
+
         if (typeof msg === 'object') {
             console.log('***** ', JSON.stringify(rule), JSON.stringify(msg));
         }
@@ -387,7 +402,9 @@ class Validator {
     }
 
     getError(name) {
-        return typeof this.errors[name] === 'undefined' ? null : this.errors[name];
+        return typeof this.errors[name] === 'undefined'
+            ? null
+            : this.errors[name];
     }
 
     getErrors() {
@@ -440,7 +457,7 @@ class Validator {
         let self = this;
         let result = false;
 
-        names.forEach(function(name) {
+        names.forEach(function (name) {
             if (!self.validateRequired(name, self.getValue(name))) {
                 result = true;
                 return;
@@ -454,7 +471,7 @@ class Validator {
         let self = this;
         let result = true;
 
-        names.forEach(function(name) {
+        names.forEach(function (name) {
             if (self.validateRequired(name, self.getValue(name))) {
                 result = false;
                 return;
@@ -531,7 +548,7 @@ class Validator {
         let self = this;
         let count = 0;
 
-        names.forEach(function(name) {
+        names.forEach(function (name) {
             if (typeof self.data[name] !== 'undefined') {
                 count++;
             }
@@ -566,7 +583,9 @@ class Validator {
     validateAccepted(name, value) {
         let acceptable = ['yes', 'on', '1', 1, true, 'true'];
 
-        return this.validateRequired(name, value) && acceptable.indexOf(value) >= 0;
+        return (
+            this.validateRequired(name, value) && acceptable.indexOf(value) >= 0
+        );
     }
 
     validateArray(name, value) {
@@ -600,7 +619,10 @@ class Validator {
     validateDigits(name, value, params) {
         this.requireParameterCount(1, params, 'digits');
 
-        return this.validateNumeric(name, value) && value.toString().length == params[0];
+        return (
+            this.validateNumeric(name, value) &&
+            value.toString().length == params[0]
+        );
     }
 
     validateDigitsBetween(name, value, params) {
@@ -608,7 +630,11 @@ class Validator {
 
         let len = value.toString().length;
 
-        return this.validateNumeric(name, value) && len >= params[0] && len <= params[1];
+        return (
+            this.validateNumeric(name, value) &&
+            len >= params[0] &&
+            len <= params[1]
+        );
     }
 
     validateSize(name, value, params) {
@@ -659,7 +685,7 @@ class Validator {
 
     arrayDiff(arr1, arr2) {
         let diff = [];
-        arr1.forEach(function(item) {
+        arr1.forEach(function (item) {
             if (arr2.indexOf(item) < 0) {
                 diff.push(item);
             }
@@ -690,7 +716,11 @@ class Validator {
     }
 
     validateEmail(name, value) {
-        return this.validateMatch(name, value, /^[A-Z0-9._%+\-]+@[A-Z0-9.\-]+\.[A-Z]{2,8}$/i);
+        return this.validateMatch(
+            name,
+            value,
+            /^[A-Z0-9._%+\-]+@[A-Z0-9.\-]+\.[A-Z]{2,8}$/i
+        );
     }
 
     validateIp(name, value) {
@@ -710,7 +740,11 @@ class Validator {
     }
 
     validateUrl(name, value) {
-        return this.validateMatch(name, value, /^(https?|ftp):\/\/[^\s\/$.?#].[^\s]*$/i);
+        return this.validateMatch(
+            name,
+            value,
+            /^(https?|ftp):\/\/[^\s\/$.?#].[^\s]*$/i
+        );
     }
 
     validateAlpha(name, value) {
@@ -728,11 +762,17 @@ class Validator {
     validateBefore(name, value, params) {
         this.requireParameterCount(1, params, 'before');
 
-        if (typeof value !== 'string' && typeof value !== 'number' && !(value instanceof Date)) {
+        if (
+            typeof value !== 'string' &&
+            typeof value !== 'number' &&
+            !(value instanceof Date)
+        ) {
             return false;
         }
 
-        let date = this.hasData(params[0]) ? this.getValue(params[0]) : params[0];
+        let date = this.hasData(params[0])
+            ? this.getValue(params[0])
+            : params[0];
 
         if (!this.validateDate(name, date)) {
             console.error(params[0] + ' does not appear to be a date.');
@@ -745,11 +785,17 @@ class Validator {
     validateBeforeOrEqual(name, value, params) {
         this.requireParameterCount(1, params, 'before_or_equal');
 
-        if (typeof value !== 'string' && typeof value !== 'number' && !(value instanceof Date)) {
+        if (
+            typeof value !== 'string' &&
+            typeof value !== 'number' &&
+            !(value instanceof Date)
+        ) {
             return false;
         }
 
-        let date = this.hasData(params[0]) ? this.getValue(params[0]) : params[0];
+        let date = this.hasData(params[0])
+            ? this.getValue(params[0])
+            : params[0];
 
         if (!this.validateDate(name, date)) {
             console.error(params[0] + ' does not appear to be a date.');
@@ -762,11 +808,17 @@ class Validator {
     validateAfter(name, value, params) {
         this.requireParameterCount(1, params, 'after');
 
-        if (typeof value !== 'string' && typeof value !== 'number' && !(value instanceof Date)) {
+        if (
+            typeof value !== 'string' &&
+            typeof value !== 'number' &&
+            !(value instanceof Date)
+        ) {
             return false;
         }
 
-        let date = this.hasData(params[0]) ? this.getValue(params[0]) : params[0];
+        let date = this.hasData(params[0])
+            ? this.getValue(params[0])
+            : params[0];
 
         if (!this.validateDate(name, date)) {
             console.error(params[0] + ' does not appear to be a date.');
@@ -779,11 +831,17 @@ class Validator {
     validateAfterOrEqual(name, value, params) {
         this.requireParameterCount(1, params, 'afterOrEqual');
 
-        if (typeof value !== 'string' && typeof value !== 'number' && !(value instanceof Date)) {
+        if (
+            typeof value !== 'string' &&
+            typeof value !== 'number' &&
+            !(value instanceof Date)
+        ) {
             return false;
         }
 
-        let date = this.hasData(params[0]) ? this.getValue(params[0]) : params[0];
+        let date = this.hasData(params[0])
+            ? this.getValue(params[0])
+            : params[0];
 
         if (!this.validateDate(name, date)) {
             console.error(params[0] + ' does not appear to be a date.');
@@ -832,6 +890,13 @@ class Validator {
         if (!Array.isArray(replace)) {
             replace = [replace];
         }
+
+        if (!Array.isArray(string)) {
+            for (let i = 0; i < string.length; i++) {
+                string = string.replace(find, replace);
+            }
+        }
+
         for (let i = 0; i < find.length; i++) {
             string = string.replace(find[i], replace[i]);
         }
@@ -856,7 +921,7 @@ class Validator {
 
         for (let key in values) {
             names.push({
-                key: this.getDataName(values[key])
+                key: this.getDataName(values[key]),
             });
         }
 
@@ -935,7 +1000,7 @@ class Validator {
 
     replaceIn(msg, name, rule, params) {
         let self = this;
-        params = params.map(function(value) {
+        params = params.map(function (value) {
             return self.getDisplayableValue(name, value);
         });
 
@@ -978,7 +1043,11 @@ class Validator {
     replaceRequiredUnless(msg, name, rule, params) {
         let other = this.getDataName(params.shift());
 
-        return this.strReplace([':other', ':values'], [other, params.join(', ')], msg);
+        return this.strReplace(
+            [':other', ':values'],
+            [other, params.join(', ')],
+            msg
+        );
     }
 
     replaceSame(msg, name, rule, params) {
