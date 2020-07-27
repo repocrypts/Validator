@@ -408,6 +408,30 @@ describe('Validator', () => {
             const v = Validator.make({ name: 'Rati' }, {});
             expect(v.getSize('name', 'Rati')).to.equal(4);
         });
+
+        it('should correctly validate min rules on null data fields', () => {
+            const data = { test: null };
+            const rules = { test: 'min:1' };
+
+            const v = Validator.make(data, rules);
+
+            expect(v.fails()).to.be.true;
+            expect(v.getErrors()).to.deep.equal({
+                test: ['The test must be at least 1 characters.'],
+            });
+        });
+
+        it('should correctly validate min and max rules on null data fields', () => {
+            const data = { test: null };
+            const rules = { test: 'min:1|max:3' };
+
+            const v = Validator.make(data, rules);
+
+            expect(v.fails()).to.be.true;
+            expect(v.getErrors()).to.deep.equal({
+                test: ['The test must be at least 1 characters.'],
+            });
+        });
     });
 
     describe('#validateMin()', () => {
@@ -1807,18 +1831,20 @@ describe('Validator', () => {
         });
     });
 
-    describe('should correctly return a correctly formatted message when a variable name consists of more than two words', () => {
-        const data = { threeWordProperty: '' };
-        const rules = { threeWordProperty: 'required|min:1' };
+    describe('#message', () => {
+        it('should correctly return a correctly formatted message when a variable name consists of more than two words', () => {
+            const data = { threeWordProperty: '' };
+            const rules = { threeWordProperty: 'required|min:1' };
 
-        const v = Validator.make(data, rules);
+            const v = Validator.make(data, rules);
 
-        expect(v.fails()).to.be.true;
-        expect(v.getErrors()).to.deep.equal({
-            threeWordProperty: [
-                'The three word property field is required.',
-                'The three word property must be at least 1 characters.',
-            ],
+            expect(v.fails()).to.be.true;
+            expect(v.getErrors()).to.deep.equal({
+                threeWordProperty: [
+                    'The three word property field is required.',
+                    'The three word property must be at least 1 characters.',
+                ],
+            });
         });
     });
 });

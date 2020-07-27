@@ -666,6 +666,10 @@ class Validator {
     getSize(name, value) {
         let hasNumeric = this.hasRule(name, this.numericRules);
 
+        if (!value) {
+            return 0;
+        }
+
         if (hasNumeric && !isNaN(parseFloat(value))) {
             return parseFloat(value);
         }
