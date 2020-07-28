@@ -290,6 +290,12 @@ describe('Validator', () => {
             expect(v.fails()).to.be.false;
             expect(v.invalid()).to.be.empty;
         });
+
+        it('should not fail if data is defined as an empty object', () => {
+            let v = Validator.make({}, { date: 'date' });
+
+            expect(v.fails()).to.be.false;
+        });
     });
     describe('#getErrors()', () => {
         const rules = {
@@ -334,7 +340,7 @@ describe('Validator', () => {
 
     describe('#validateRequired()', () => {
         it('return false when the required field is not present', () => {
-            const v = Validator.make({}, { name: 'required' });
+            const v = Validator.make({ field: 'data' }, { name: 'required' });
             expect(v.passes()).to.be.false;
         });
 
@@ -827,7 +833,7 @@ describe('Validator', () => {
         });
 
         it('returns false when the field is not present', () => {
-            const v = Validator.make({}, rules);
+            const v = Validator.make({ field: {} }, rules);
             expect(v.passes()).to.be.false;
         });
 
@@ -1435,7 +1441,7 @@ describe('Validator', () => {
         });
 
         it('returns false when the data is empty (the field under validation is not present)', () => {
-            const v = Validator.make({}, rules);
+            const v = Validator.make({ field: 'data' }, rules);
             expect(v.passes()).to.be.false;
         });
 
@@ -1453,7 +1459,7 @@ describe('Validator', () => {
                 f2: 'required_without:f1,f3',
                 f3: 'required_without:f1,f2',
             };
-            const v = Validator.make({}, rules);
+            const v = Validator.make({ field: 'data' }, rules);
             expect(v.fails()).to.be.true;
 
             v.setData({ f1: 'foo' }, rules);
@@ -1487,7 +1493,7 @@ describe('Validator', () => {
         };
 
         it('returns false when given data is empty', () => {
-            const v = Validator.make({}, rules);
+            const v = Validator.make({ field: 'data' }, rules);
             expect(v.fails()).to.be.true;
         });
 
@@ -1608,7 +1614,7 @@ describe('Validator', () => {
         });
     });
 
-    describe('# Error Messages', () => {
+    describe('#Error Messages', () => {
         const rules = {
             name: 'required|min:3',
             age: 'numeric|min:20',
@@ -1649,14 +1655,14 @@ describe('Validator', () => {
         });
     });
 
-    describe('# Others', () => {
+    describe('#Others', () => {
         it('tests that empty rules are skipped', () => {
             const v = Validator.make({ x: 'asksksks' }, { x: '|||required|' });
             expect(v.passes()).to.be.true;
         });
     });
 
-    describe('# Custom Names', () => {
+    describe('#Custom Names', () => {
         const customNames = {
             name: 'Name',
             age: 'Age',
@@ -1673,7 +1679,7 @@ describe('Validator', () => {
         };
 
         it('tests custom name being applied using constructor', () => {
-            const v = Validator.make({}, rules, {}, customNames);
+            const v = Validator.make({ field: 'name' }, rules, {}, customNames);
             expect(v.passes()).to.be.false;
             expect(v.getErrors()).to.deep.equal(expectedResult);
         });
@@ -1693,7 +1699,7 @@ describe('Validator', () => {
         });
     });
 
-    describe('# Custom Messages', () => {
+    describe('#Custom Messages', () => {
         const rules = {
             name: 'required',
             age: 'required',
@@ -1737,7 +1743,7 @@ describe('Validator', () => {
         });
     });
 
-    describe('# Displayable values are replaced', () => {
+    describe('#Displayable values are replaced', () => {
         it('tests required_if:foo,bar', () => {
             const v = Validator.make(
                 { color: '1', bar: '' },
@@ -1785,7 +1791,7 @@ describe('Validator', () => {
         });
     });
 
-    describe('# nullable rule tests', () => {
+    describe('#validateNullable', () => {
         it('should passed a empty date with "nullable" rule', () => {
             const v = Validator.make(
                 {

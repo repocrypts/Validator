@@ -1,6 +1,6 @@
 {
     "name": "Validator",
-    "version": "1.1.0",
+    "version": "1.1.1",
     "description": "A JavaScript validation package, based on Laravel validation.",
     "main": "dist/Validator.js",
     "scripts": {

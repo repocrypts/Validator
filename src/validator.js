@@ -201,6 +201,10 @@ class Validator {
         this.errors = {};
         this.failedRules = {};
 
+        if (this.isEmptyObject(this.data)) {
+            return true;
+        }
+
         this.rules.forEach(function (item) {
             let name = item.name;
 
