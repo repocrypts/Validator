@@ -82,7 +82,6 @@ class Validator {
                 rules: self.parseItemRules(rules[key]),
             });
         }
-
         return arr;
     }
 
@@ -94,16 +93,7 @@ class Validator {
             itemRules = itemRules.split('|');
         }
 
-        if (!Array.isArray(itemRules)) {
-            console.error('Unsupported type for item rule', itemRules);
-        }
-
         itemRules.forEach(function (ruleAndArgs) {
-            if (typeof ruleAndArgs === 'function') {
-                self.extend('batata', ruleAndArgs, 'will this work?');
-                return;
-            }
-
             if (ruleAndArgs.trim()) {
                 let args = ruleAndArgs.split(':');
                 rules.push({
@@ -783,7 +773,6 @@ class Validator {
             : params[0];
 
         if (!this.validateDate(name, date)) {
-            console.error(params[0] + ' does not appear to be a date.');
             return false;
         }
 
@@ -806,7 +795,6 @@ class Validator {
             : params[0];
 
         if (!this.validateDate(name, date)) {
-            console.error(params[0] + ' does not appear to be a date.');
             return false;
         }
 
@@ -829,7 +817,6 @@ class Validator {
             : params[0];
 
         if (!this.validateDate(name, date)) {
-            console.error(params[0] + ' does not appear to be a date.');
             return false;
         }
 
@@ -852,7 +839,6 @@ class Validator {
             : params[0];
 
         if (!this.validateDate(name, date)) {
-            console.error(params[0] + ' does not appear to be a date.');
             return false;
         }
 

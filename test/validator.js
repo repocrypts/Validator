@@ -61,6 +61,33 @@ describe('Validator', () => {
                 { name: 'NotIn', params: ['admin', 'exec'] },
             ]);
         });
+
+        //it('should not validate deep objects', () => {
+            // const data = {
+            //     name: 'John Doe',
+            //     test: {
+            //         birthday: '20000000000000',
+            //     },
+            //     company: 'Example Co.',
+            // };
+
+            // const rules = {
+            //     name: 'required',
+            //     test: {
+            //         birthday: 'required',
+            //     },
+            //     company: ['required', 'string'],
+            // };
+            
+            // const v = Validator.make(data, rules);
+
+            // if (v.fails()) {
+            //     const errors = v.getErrors();
+            //     console.log(errors);
+            // } else {
+            //     console.log('good!');
+            // }
+        // });
     });
 
     describe('#parseRules()', () => {
@@ -1749,7 +1776,7 @@ describe('Validator', () => {
                 { color: '1', bar: '' },
                 { bar: 'required_if:color,1' }
             );
-            v.addCustomValues({ color: { '1': 'Red' } });
+            v.addCustomValues({ color: { 1: 'Red' } });
             expect(v.passes()).to.be.false;
             expect(v.getErrors()).to.deep.equal({
                 bar: ['The bar field is required when color is Red.'],
@@ -1763,8 +1790,8 @@ describe('Validator', () => {
             );
             v.addCustomValues({
                 type: {
-                    '5': 'Short',
-                    '300': 'Long',
+                    5: 'Short',
+                    300: 'Long',
                 },
             });
             expect(v.passes()).to.be.false;
@@ -1780,8 +1807,8 @@ describe('Validator', () => {
             );
             v.setValueNames({
                 type: {
-                    '5': 'Short',
-                    '300': 'Long',
+                    5: 'Short',
+                    300: 'Long',
                 },
             });
             expect(v.passes()).to.be.false;
