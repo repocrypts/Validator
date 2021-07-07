@@ -174,6 +174,14 @@ describe('Validator', () => {
                 id: ['id must be a valid mongo id'],
             });
         });
+
+        const rules2 = { id: 'mongo_id:min=24,max=24' };
+        const v2 = Validator.make({ id: '5915b8434479e9b7e11db37c' }, rules2);
+        v2.extend('mongo_id', isMongoId, ':attr must be a valid mongo id');
+
+        it('converts snake_case rule names to TitleCase functions', () => {
+            expect(v2.findRuleMethod({ name: 'MongoId' })).to.equal(isMongoId);
+        });
     });
 
     describe('#hasError()', () => {
