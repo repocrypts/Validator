@@ -96,9 +96,10 @@ class Validator {
         itemRules.forEach(function (ruleAndArgs) {
             if (ruleAndArgs.trim()) {
                 let args = ruleAndArgs.split(':');
+
                 rules.push({
                     name: self.titleCase(args[0], '_'),
-                    params: args[1] ? args[1].split(',') : [],
+                    params: args[1] ? args[0] === 'regex' ? args[1] : args[1].split(',') : [],
                 });
             }
         });

@@ -743,6 +743,16 @@ describe('Validator', () => {
             const v = Validator.make({ x: 123 }, { x: 'regex:/^123$/i' });
             expect(v.passes()).to.be.true;
         });
+
+        it('should validate regex expressions with commas', () => {
+            const v = Validator.make({
+                number: '3123'
+            }, {
+                number: [`regex:/[0-9]{1,8}/`],
+            });
+
+            expect(v.passes()).to.be.true;
+        });
     });
 
     describe('#validateSame()', () => {
