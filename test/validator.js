@@ -295,6 +295,18 @@ describe('Validator', () => {
             expect(v.passes()).to.be.false;
             expect(v.valid()).to.deep.equal(['name']);
         });
+
+        it('should not fail if data is defined as an empty object', () => {
+            let v = Validator.make({}, { date: 'date' });
+
+            expect(v.fails()).to.be.false;
+        });
+
+        it('should fail if data is defined as an empty object and the field is required', () => {
+            let v = Validator.make({}, { name: 'required|email', potato: 'max:3' },);
+
+            expect(v.fails()).to.be.true;
+        });
     });
 
     describe('#fails() and invalid()', () => {

@@ -171,10 +171,10 @@ class Validator {
         if (params.length < count) {
             throw new Error(
                 'Validation rule ' +
-                    rule +
-                    ' requires at least ' +
-                    count +
-                    ' parameters'
+                rule +
+                ' requires at least ' +
+                count +
+                ' parameters'
             );
         }
     }
@@ -191,7 +191,13 @@ class Validator {
         this.errors = {};
         this.failedRules = {};
 
-        if (this.isEmptyObject(this.data)) {
+        const hasRequiredFields = this.rules.some(item => (
+            item.rules.some(rule => (
+                rule.name === 'Required'
+            ))
+        ))
+
+        if (this.isEmptyObject(this.data) && !hasRequiredFields) {
             return true;
         }
 
@@ -345,11 +351,11 @@ class Validator {
             this.passesOptionalCheck(name) &&
             this.hasNotFailedPreviousRuleIfPresenceRule(rule, name)
         }
-        
+
         presentOrRuleIsImplicit(rule, name, value) {
         return this.validateRequired(name, value) || this.isImplicit(rule)
     }
-    
+
     passesOptionalCheck(name) {
         return true
     }
