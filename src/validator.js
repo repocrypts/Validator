@@ -61,7 +61,7 @@ class Validator {
     }
 
     extend(ruleName, callback, customMessage) {
-        this.customRules[this.titleCase(ruleName)] = callback;
+        this.customRules[this.titleCase(ruleName, '_')] = callback;
 
         if (customMessage) {
             this.customMessages[this.snakeCase(ruleName)] = customMessage;
