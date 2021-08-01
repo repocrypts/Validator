@@ -63,30 +63,30 @@ describe('Validator', () => {
         });
 
         //it('should not validate deep objects', () => {
-            // const data = {
-            //     name: 'John Doe',
-            //     test: {
-            //         birthday: '20000000000000',
-            //     },
-            //     company: 'Example Co.',
-            // };
+        // const data = {
+        //     name: 'John Doe',
+        //     test: {
+        //         birthday: '20000000000000',
+        //     },
+        //     company: 'Example Co.',
+        // };
 
-            // const rules = {
-            //     name: 'required',
-            //     test: {
-            //         birthday: 'required',
-            //     },
-            //     company: ['required', 'string'],
-            // };
-            
-            // const v = Validator.make(data, rules);
+        // const rules = {
+        //     name: 'required',
+        //     test: {
+        //         birthday: 'required',
+        //     },
+        //     company: ['required', 'string'],
+        // };
 
-            // if (v.fails()) {
-            //     const errors = v.getErrors();
-            //     console.log(errors);
-            // } else {
-            //     console.log('good!');
-            // }
+        // const v = Validator.make(data, rules);
+
+        // if (v.fails()) {
+        //     const errors = v.getErrors();
+        //     console.log(errors);
+        // } else {
+        //     console.log('good!');
+        // }
         // });
     });
 
@@ -175,12 +175,13 @@ describe('Validator', () => {
             });
         });
 
-        const rules2 = { id: 'mongo_id:min=24,max=24' };
-        const v2 = Validator.make({ id: '5915b8434479e9b7e11db37c' }, rules2);
-        v2.extend('mongo_id', isMongoId, ':attr must be a valid mongo id');
-
         it('converts snake_case rule names to TitleCase functions', () => {
-            expect(v2.findRuleMethod({ name: 'MongoId' })).to.equal(isMongoId);
+            const rules = { id: 'mongo_id:min=24,max=24' };
+            const validator = Validator.make({ id: '5915b8434479e9b7e11db37c' }, rules);
+
+            validator.extend('mongo_id', isMongoId, ':attr must be a valid mongo id');
+
+            expect(validator.findRuleMethod({ name: 'MongoId' })).to.equal(isMongoId);
         });
     });
 
